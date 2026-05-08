@@ -24,9 +24,9 @@
   --text:#F0F0F0;--text2:#A0A0A0;--text3:#606060;
   --purple:#7B6FD4;--teal:#2BAA8C;
 }
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
-.app{max-width:500px;margin:0 auto;padding:0 0 90px}
-.header{padding:22px 16px 0;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(201,168,76,0.04) 0%,transparent 100%)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);min-height:100vh;color:var(--text);overflow-x:hidden}
+.app{max-width:500px;margin:0 auto;padding:0 0 90px;overflow-x:hidden}
+.header{padding:env(safe-area-inset-top, 44px) 16px 0;padding-top:calc(env(safe-area-inset-top, 44px) + 12px);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(201,168,76,0.04) 0%,transparent 100%)}
 .header h1{font-size:22px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#fff 0%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .header p{font-size:12px;color:var(--text3);margin-top:3px}
 .nav{display:flex;gap:6px;padding:14px 16px 16px;overflow-x:auto;scrollbar-width:none}
@@ -934,7 +934,11 @@ function renderWorkout(){
 }
 
 /* ── To-do v2 ── */
-const PRIORITY={high:{label:'High',color:'#C0202A',bg:'#FCEBEB',dot:'🔴'},medium:{label:'Med',color:'#BA7517',bg:'#FAEEDA',dot:'🟡'},low:{label:'Low',color:'#3B6D11',bg:'#EAF3DE',dot:'🟢'}};
+const PRIORITY={
+  high:{label:'High',color:'#FF6B6B',bg:'rgba(255,107,107,0.15)',dot:'🔴'},
+  medium:{label:'Med',color:'#C9A84C',bg:'rgba(201,168,76,0.15)',dot:'🟡'},
+  low:{label:'Low',color:'#5DD46C',bg:'rgba(93,212,108,0.15)',dot:'🟢'}
+};
 const BACKLOGS={slp:'Swift Leads Pro',cb:'Capital Bros',h2h:'Houses 2 Homes',personal:'Personal',health:'Health/Fitness'};
 let _activeBacklog='slp';
 
@@ -1005,10 +1009,10 @@ function sortByPriority(arr){const O={high:0,medium:1,low:2};return[...arr].sort
 
 function renderTodoItem(item,list,extra=''){
   let p=PRIORITY[item.priority||'medium'];
-  return `<div class="ti" style="border-left:3px solid ${p.color};padding-left:8px;background:${item.done?'#fafafa':'#fff'};border-radius:0 6px 6px 0;margin-bottom:4px">
+  return `<div style="display:flex;align-items:center;gap:8px;border-left:3px solid ${p.color};padding:8px 8px 8px 10px;background:${item.done?'rgba(255,255,255,0.02)':'var(--bg3)'};border-radius:0 8px 8px 0;margin-bottom:5px">
     <input type="checkbox" ${item.done?'checked':''} onchange="toggleTodo('${list}',${item.id})" style="width:17px;height:17px;cursor:pointer;accent-color:${p.color};flex-shrink:0">
-    <span class="tt ${item.done?'done':''}" style="flex:1;font-size:14px">${item.text}</span>
-    <span style="font-size:10px;padding:2px 6px;border-radius:6px;background:${p.bg};color:${p.color};font-weight:500;margin-right:4px">${p.label}</span>
+    <span class="tt ${item.done?'done':''}" style="flex:1;font-size:13px">${item.text}</span>
+    <span style="font-size:10px;padding:2px 7px;border-radius:6px;background:${p.bg};color:${p.color};font-weight:600;margin-right:4px;white-space:nowrap;flex-shrink:0">${p.label}</span>
     ${extra}
     <button class="td-btn" onclick="deleteTodo('${list}',${item.id})">×</button>
   </div>`;
