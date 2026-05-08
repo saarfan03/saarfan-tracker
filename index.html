@@ -565,19 +565,69 @@ const HKEYS=['gym','pushups','diet'];
 const DAYS_SHORT=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const MEAL_LABELS={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snack:'Snack','pre-workout':'Pre-workout','post-workout':'Post-workout'};
 
-/* ── Storage: tries localStorage, falls back to in-memory + sessionStorage ── */
+/* ── Supabase config ── */
+const SB_URL='https://vkndekaptscaxkbhrsrd.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbmRla2FwdHNjYXhrYmhyc3JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzIxMDUsImV4cCI6MjA5MzgwODEwNX0.Ws-N53pateZqmObxOXl5UpE2RDkzf93th9rGfkBioW4';
+
+async function sb_get(k){
+  try{
+    let r=await fetch(`${SB_URL}/rest/v1/tracker_data?key=eq.${k}&select=value`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    let d=await r.json();
+    if(d&&d.length)return JSON.parse(d[0].value);
+  }catch(e){}
+  return null;
+}
+async function sb_set(k,v){
+  try{
+    await fetch(`${SB_URL}/rest/v1/tracker_data`,{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})
+    });
+  }catch(e){}
+}
+async function sb_clear(k){
+  try{await fetch(`${SB_URL}/rest/v1/tracker_data?key=eq.${k}`,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});}catch(e){}
+}
+
+/* ── Storage: Supabase primary, localStorage fallback ── */
 const _mem={};
 function stor_get(k,def){
   try{let v=localStorage.getItem(k);if(v!==null)return JSON.parse(v);}catch(e){}
-  try{let v=sessionStorage.getItem(k);if(v!==null)return JSON.parse(v);}catch(e){}
   return _mem[k]!==undefined?_mem[k]:def;
 }
 function stor_set(k,v){
   _mem[k]=v;
-  try{localStorage.setItem(k,JSON.stringify(v));return;}catch(e){}
-  try{sessionStorage.setItem(k,JSON.stringify(v));}catch(e){}
+  try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}
+  sb_set(k,v); // async sync to cloud
 }
-function stor_clear(k){delete _mem[k];try{localStorage.removeItem(k);}catch(e){}try{sessionStorage.removeItem(k);}catch(e){}}
+function stor_clear(k){
+  delete _mem[k];
+  try{localStorage.removeItem(k);}catch(e){}
+  sb_clear(k);
+}
+
+/* ── Load from Supabase on startup ── */
+async function loadFromCloud(){
+  try{
+    let r=await fetch(`${SB_URL}/rest/v1/tracker_data?select=key,value`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    let rows=await r.json();
+    if(!rows||!rows.length)return;
+    let updated=false;
+    rows.forEach(row=>{
+      try{
+        let v=JSON.parse(row.value);
+        _mem[row.key]=v;
+        localStorage.setItem(row.key,row.value);
+        // Map back to S
+        const reverseMap={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',td3:'todos',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',reviews3:'reviews',food3:'food',favs3:'favs'};
+        if(reverseMap[row.key])S[reverseMap[row.key]]=v;
+        updated=true;
+      }catch(e){}
+    });
+    if(updated){renderAll();fetchPrayerTimes();loadFromCloud();}
+  }catch(e){console.log('Cloud load failed, using local data');}
+}
 
 /* ── State ── */
 const KEYS=['h3','pr3','bz3','wo3','td3','gl3','rf3','tg3','wk3','logos3','mood3','reviews3','food3','favs3'];
