@@ -335,13 +335,13 @@ input[type=file]{display:none}
       <div style="text-align:right"><div class="big-stat" id="cal-left" style="color:var(--green)">0</div><div class="big-sub">remaining</div></div>
     </div>
     <div class="remaining-bar"><div class="remaining-fill" id="cal-fill" style="width:0%;background:var(--amber)"></div></div>
-    <!-- protein row fixed — no flex stretch -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+    <!-- protein row fixed -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;width:100%">
       <div><div style="font-size:13px;font-weight:500;color:var(--text)" id="prot-eaten-disp">0g</div><div style="font-size:11px;color:var(--text3)">eaten</div></div>
       <div style="text-align:center"><div style="font-size:13px;font-weight:500;color:var(--text)" id="prot-goal-disp2">0g</div><div style="font-size:11px;color:var(--text3)">goal</div></div>
       <div style="text-align:right"><div style="font-size:13px;font-weight:500;color:var(--blue)" id="prot-left-disp">0g</div><div style="font-size:11px;color:var(--text3)">left</div></div>
     </div>
-    <div class="remaining-bar"><div class="remaining-fill" id="prot-fill" style="width:0%;background:var(--blue)"></div></div>
+    <div class="remaining-bar" style="width:100%"><div class="remaining-fill" id="prot-fill" style="width:0%;background:var(--blue)"></div></div>
   </div>
   <div class="card">
     <div class="ct">Weekly budget</div>
@@ -815,9 +815,19 @@ function addTask(col){
 }
 function completeTask(col,id){
   let task=S.todos[col]?.find(t=>t.id===id);if(!task)return;
-  task.done=!task.done;ss('todos');
-  if(task.done)spawnConfetti(false);
-  renderPipeline();renderDashboard();
+  // find the done column for this section
+  let cfg=PIPE_COLS[col];let doneCol=cfg?'done_'+cfg.section:null;
+  if(doneCol&&doneCol!==col){
+    // move to done column
+    S.todos[col]=(S.todos[col]||[]).filter(t=>t.id!==id);
+    task.done=true;task.completedAt=td();
+    if(!S.todos[doneCol])S.todos[doneCol]=[];
+    S.todos[doneCol].unshift(task);
+    spawnConfetti(false);
+  }else{
+    task.done=!task.done;
+  }
+  ss('todos');renderPipeline();renderDashboard();
 }
 function deleteTask(col,id){S.todos[col]=(S.todos[col]||[]).filter(t=>t.id!==id);ss('todos');renderPipeline();renderDashboard();}
 
@@ -838,50 +848,66 @@ function onDrop(e,targetCol){
 }
 
 function renderPipeCol(col){
-  let cfg=PIPE_COLS[col];let tasks=getTasksForCol(col);let pending=tasks.filter(t=>!t.done);let done=tasks.filter(t=>t.done);let today=td();
-  let isOverdue=col==='overdue';
+  let cfg=PIPE_COLS[col];let tasks=getTasksForCol(col);let today=td();
+  let isDoneCol=col.startsWith('done_');
+
+  let taskHtml=tasks.map(task=>{
+    let p=PRIORITY_CONFIG[task.priority||'medium'];let isOverdueTask=task.due&&task.due<today&&!task.done;
+    return `<div class="task-card" draggable="true" ondragstart="onDragStart('${col}',${task.id},this)" ondragend="onDragEnd(this)">
+      <div class="task-card-title${task.done?' done':''}">${task.title}</div>
+      <div class="task-meta">
+        <span class="task-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
+        ${task.due?`<span class="task-due ${isOverdueTask?'overdue-due':''}">${isOverdueTask?'⚠ ':''}${task.due}</span>`:''}
+      </div>
+      ${task.note?`<div class="task-note">${task.note}</div>`:''}
+      <div class="task-actions">
+        ${isDoneCol
+          ?`<button class="tbtn" onclick="restoreTask('${col}',${task.id})" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">↩ Restore</button>`
+          :`<button class="tbtn done-btn" onclick="completeTask('${col}',${task.id})">✓ Done</button>`
+        }
+        <button class="tbtn del-btn" onclick="deleteTask('${col}',${task.id})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  let addFormHtml=isDoneCol?'':`<div class="add-task-form">
+    <button class="add-task-toggle" onclick="toggleAddForm('${col}')">+ Add task</button>
+    <div class="add-form-body" id="add-form-${col}">
+      <input type="text" id="add-name-${col}" placeholder="Task name...">
+      <select id="add-pri-${col}"><option value="high">🔴 High</option><option value="medium" selected>🟡 Medium</option><option value="low">🟢 Low</option></select>
+      <input type="date" id="add-due-${col}" style="font-size:12px;padding:7px 10px">
+      <textarea id="add-note-${col}" placeholder="Notes (optional)..." style="min-height:45px;font-size:12px"></textarea>
+      <button class="add-submit" onclick="addTask('${col}')">Add</button>
+    </div>
+  </div>`;
+
   return `<div class="pipe-col" id="pipe-col-${col}" ondragover="onDragOver(event,'${col}')" ondrop="onDrop(event,'${col}')">
     <div class="pipe-col-head">
       <span class="pipe-col-name" style="color:${cfg.accent}">${cfg.name}</span>
-      <span class="pipe-col-cnt">${pending.length}</span>
+      <span class="pipe-col-cnt">${tasks.length}</span>
     </div>
-    ${pending.map(task=>{
-      let p=PRIORITY_CONFIG[task.priority||'medium'];let isOverdueTask=task.due&&task.due<today&&!task.done;
-      return `<div class="task-card" draggable="true" ondragstart="onDragStart('${col}',${task.id},this)" ondragend="onDragEnd(this)">
-        <div class="task-card-title">${task.title}</div>
-        <div class="task-meta">
-          <span class="task-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-          ${task.due?`<span class="task-due ${isOverdueTask?'overdue-due':''}">${isOverdueTask?'⚠ ':''}${task.due}</span>`:''}
-        </div>
-        ${task.note?`<div class="task-note">${task.note}</div>`:''}
-        <div class="task-actions">
-          <button class="tbtn done-btn" onclick="completeTask('${col}',${task.id})">✓ Done</button>
-          <button class="tbtn del-btn" onclick="deleteTask('${col}',${task.id})">Delete</button>
-        </div>
-      </div>`;
-    }).join('')}
-    ${done.length?`<div style="font-size:10px;color:var(--text3);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px">Done (${done.length})</div>${done.map(task=>`<div class="task-card" style="opacity:0.5"><div class="task-card-title done">${task.title}</div><div class="task-actions"><button class="tbtn del-btn" onclick="deleteTask('${col}',${task.id})">Remove</button></div></div>`).join('')}`:''}
-    <div class="add-task-form">
-      <button class="add-task-toggle" onclick="toggleAddForm('${col}')">+ Add task</button>
-      <div class="add-form-body" id="add-form-${col}">
-        <input type="text" id="add-name-${col}" placeholder="Task name...">
-        <select id="add-pri-${col}"><option value="high">🔴 High</option><option value="medium" selected>🟡 Medium</option><option value="low">🟢 Low</option></select>
-        <input type="date" id="add-due-${col}" style="font-size:12px;padding:7px 10px">
-        <textarea id="add-note-${col}" placeholder="Notes (optional)..." style="min-height:45px;font-size:12px"></textarea>
-        <button class="add-submit" onclick="addTask('${col}')">Add</button>
-      </div>
-    </div>
+    ${taskHtml||`<div style="font-size:12px;color:var(--text3);padding:8px 0;text-align:center">${isDoneCol?'Nothing done yet':'Empty'}</div>`}
+    ${addFormHtml}
   </div>`;
 }
-function toggleAddForm(col){let el=document.getElementById('add-form-'+col);if(el)el.classList.toggle('open');}
+function restoreTask(doneCol,id){
+  let task=S.todos[doneCol]?.find(t=>t.id===id);if(!task)return;
+  S.todos[doneCol]=(S.todos[doneCol]||[]).filter(t=>t.id!==id);
+  task.done=false;delete task.completedAt;
+  // restore to today by default
+  let restoreCol=task.col&&!task.col.startsWith('done_')?task.col:'today';
+  if(!S.todos[restoreCol])S.todos[restoreCol]=[];
+  S.todos[restoreCol].push(task);
+  ss('todos');renderPipeline();renderDashboard();
+}
 function renderPipeline(){
   initTasks();
   const sections={
-    execution:['today','tomorrow','overdue'],
-    action:['quickwins','followups','waitingon'],
-    biz:['slp','cb','h2h'],
-    personal:['personal','health'],
-    brain:['ideas']
+    execution:['today','tomorrow','overdue','done_execution'],
+    action:['quickwins','followups','waitingon','done_action'],
+    biz:['slp','cb','h2h','done_biz'],
+    personal:['personal','health','done_personal'],
+    brain:['ideas','done_brain']
   };
   Object.entries(sections).forEach(([sec,cols])=>{
     let el=document.getElementById(sec+'-cols');if(!el)return;
