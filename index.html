@@ -848,11 +848,15 @@ function onDrop(e,targetCol){
 }
 
 function renderPipeCol(col){
-  let cfg=PIPE_COLS[col];let tasks=getTasksForCol(col);let today=td();
+  let cfg=PIPE_COLS[col];if(!cfg)return'';
+  let tasks=getTasksForCol(col);let today=td();
   let isDoneCol=col.startsWith('done_');
+  const priOrder={high:0,medium:1,low:2};
+  let sorted=[...tasks].sort((a,b)=>(priOrder[a.priority]||1)-(priOrder[b.priority]||1));
 
-  let taskHtml=tasks.map(task=>{
-    let p=PRIORITY_CONFIG[task.priority||'medium'];let isOverdueTask=task.due&&task.due<today&&!task.done;
+  let taskHtml=sorted.map(task=>{
+    let p=PRIORITY_CONFIG[task.priority||'medium'];
+    let isOverdueTask=task.due&&task.due<today&&!task.done;
     return `<div class="task-card" draggable="true" ondragstart="onDragStart('${col}',${task.id},this)" ondragend="onDragEnd(this)">
       <div class="task-card-title${task.done?' done':''}">${task.title}</div>
       <div class="task-meta">
@@ -862,7 +866,7 @@ function renderPipeCol(col){
       ${task.note?`<div class="task-note">${task.note}</div>`:''}
       <div class="task-actions">
         ${isDoneCol
-          ?`<button class="tbtn" onclick="restoreTask('${col}',${task.id})" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">↩ Restore</button>`
+          ?`<button class="tbtn restore-btn" onclick="restoreTask('${col}',${task.id})">↩ Restore</button>`
           :`<button class="tbtn done-btn" onclick="completeTask('${col}',${task.id})">✓ Done</button>`
         }
         <button class="tbtn del-btn" onclick="deleteTask('${col}',${task.id})">Delete</button>
@@ -870,7 +874,7 @@ function renderPipeCol(col){
     </div>`;
   }).join('');
 
-  let addFormHtml=isDoneCol?'':`<div class="add-task-form">
+  let addFormHtml=isDoneCol?'':`
     <button class="add-task-toggle" onclick="toggleAddForm('${col}')">+ Add task</button>
     <div class="add-form-body" id="add-form-${col}">
       <input type="text" id="add-name-${col}" placeholder="Task name...">
@@ -878,15 +882,16 @@ function renderPipeCol(col){
       <input type="date" id="add-due-${col}" style="font-size:12px;padding:7px 10px">
       <textarea id="add-note-${col}" placeholder="Notes (optional)..." style="min-height:45px;font-size:12px"></textarea>
       <button class="add-submit" onclick="addTask('${col}')">Add</button>
-    </div>
-  </div>`;
+    </div>`;
 
-  return `<div class="pipe-col" id="pipe-col-${col}" ondragover="onDragOver(event,'${col}')" ondrop="onDrop(event,'${col}')">
+  return `<div class="pipe-col${isDoneCol?' done-col':''}" id="pipe-col-${col}" ondragover="onDragOver(event,'${col}')" ondrop="onDrop(event,'${col}')">
     <div class="pipe-col-head">
       <span class="pipe-col-name" style="color:${cfg.accent}">${cfg.name}</span>
       <span class="pipe-col-cnt">${tasks.length}</span>
     </div>
-    ${taskHtml||`<div style="font-size:12px;color:var(--text3);padding:8px 0;text-align:center">${isDoneCol?'Nothing done yet':'Empty'}</div>`}
+    <div class="task-cards-scroll">
+      ${taskHtml||`<div style="font-size:12px;color:var(--text3);padding:8px 0;text-align:center;font-style:italic">${isDoneCol?'Nothing completed yet':'Empty'}</div>`}
+    </div>
     ${addFormHtml}
   </div>`;
 }
