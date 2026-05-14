@@ -847,7 +847,31 @@ function renderCalories(){
   let wrE=document.getElementById('wk-remain');if(wrE){wrE.textContent=Math.abs(wkR);wrE.style.color=wkR<0?'var(--red)':'var(--green)';}
   let wfE=document.getElementById('wk-fill');if(wfE)wfE.style.width=wkP+'%';
   let dbEl=document.getElementById('wk-day-bars');let today=td();
-  if(dbEl){dbEl.innerHTML=weekDates.map((dd,i)=>{let t=getDayTotals(dd);let pct=Math.min(100,Math.round((t.cal/(S.targets.cal||1600))*100));let isPast=dd<=today;let isToday=dd===today;return `<div style="display:flex;align-items:center;gap:8px;padding:3px 0;cursor:${isPast?'pointer':'default'}" onclick="${isPast?`openDayModal('${dd}')`:''}">${isToday?`<span style="font-size:11px;color:var(--red);min-width:28px;font-weight:600">${DAYS_SHORT[i]}</span>`:`<span style="font-size:11px;color:var(--text3);min-width:28px">${DAYS_SHORT[i]}</span>`}<div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--red)':pct>=80?'var(--green)':'var(--amber)'};border-radius:3px;transition:width .4s"></div></div><span style="font-size:11px;color:${isPast?'var(--text2)':'var(--text3)'};min-width:52px;text-align:right">${isPast?t.cal+'kcal':''}</span>${isPast&&!isToday?`<span style="font-size:10px;color:var(--text3)">✎</span>`:''}`;}).join('');}
+  if(dbEl){
+    dbEl.innerHTML=`<div style="margin-top:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        ${weekDates.map((dd,i)=>{let isToday=dd===today;return `<div style="flex:1;text-align:center;font-size:10px;font-weight:${isToday?700:500};color:${isToday?'var(--red)':'var(--text3)'}">${DAYS_SHORT[i]}</div>`;}).join('')}
+      </div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:48px;margin-bottom:6px">
+        ${weekDates.map((dd,i)=>{
+          let t=getDayTotals(dd);
+          let pct=S.targets.cal?Math.min(100,Math.round((t.cal/S.targets.cal)*100)):0;
+          let isPast=dd<=today;let isToday=dd===today;
+          let barColor=!isPast?'var(--border)':pct>=100?'var(--red)':pct>=80?'var(--green)':'var(--amber)';
+          let heightPct=isPast&&pct>0?Math.max(8,pct):4;
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:${isPast?'pointer':'default'}" onclick="${isPast?`openDayModal('${dd}')`:''}" title="${isPast?t.cal+'kcal — tap to edit':''}">
+            <div style="width:100%;border-radius:4px 4px 0 0;background:${barColor};height:${heightPct}%;min-height:${isPast?4:2}px;transition:height .3s;${isToday?'box-shadow:0 0 6px rgba(224,40,46,0.4)':''}"></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        ${weekDates.map((dd,i)=>{
+          let t=getDayTotals(dd);let isPast=dd<=today;
+          return `<div style="flex:1;text-align:center;font-size:9px;color:${isPast?'var(--text2)':'var(--text3)'}">${isPast&&t.cal>0?t.cal:'—'}</div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
   renderFoodLog(d,'food-log-today',true);renderFavChips();
 }
 let _modalDay=null;
