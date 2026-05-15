@@ -164,12 +164,12 @@ input[type=file]{display:none}
 .tasks-search-bar input:focus{border-color:var(--gold)}
 .task-section{margin-bottom:22px}
 .task-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
-.task-section-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.task-section-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}.task-section-title.biz{font-size:17px;font-weight:800;letter-spacing:-0.5px}
 .task-section-count{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);font-weight:600}
 .task-section-add{margin-left:auto;background:transparent;border:1.5px solid var(--border2);border-radius:8px;color:var(--text3);font-size:12px;padding:4px 10px;cursor:pointer;font-family:inherit;transition:all .15s}
 .task-section-add:hover{border-color:var(--gold-b);color:var(--gold)}
 /* Horizontal lane for business */
-.biz-lane{margin-bottom:24px}
+.biz-lane{margin-bottom:28px}
 .biz-lane-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:6px 10px;background:var(--bg2);border-radius:10px;border:1.5px solid var(--border)}
 .biz-lane-title{font-size:14px;font-weight:700;color:var(--text);flex:1}
 .biz-lane-logo{width:22px;height:22px;border-radius:4px;object-fit:contain}
@@ -348,7 +348,7 @@ input[type=file]{display:none}
   <div class="card" style="border-color:rgba(43,127,212,0.4)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span class="ct" style="margin:0">Prayer times — Trowbridge</span><span id="prayer-date-label" style="font-size:12px;color:var(--text3)"></span></div>
     <div id="prayer-times-list"><div style="font-size:14px;color:var(--text3)">Loading...</div></div>
-    <div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center">Aladhan API · MWL method</div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center">Aladhan API · Moonsighting Committee (UK)</div>
   </div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span class="ct" style="margin:0">Mark today's prayers</span><span id="prayer-tick-count" class="spl a">0/5</span></div>
@@ -618,34 +618,81 @@ function defaultTaskStore(){
     globalCols:[
       {id:'g_today',name:'Today',accent:'#E0282E',type:'today'},
       {id:'g_tomorrow',name:'Tomorrow',accent:'#C9A84C',type:'tomorrow'},
-      {id:'g_overdue',name:'🚨 Overdue',accent:'#FF4444',type:'overdue'},
-      {id:'g_done',name:'✅ Done',accent:'#3DAA4C',type:'done'},
-      {id:'g_brain',name:'🧠 Brain Dump',accent:'#7B6FD4',type:'brain'}
+      {id:'g_overdue',name:'Overdue',accent:'#FF4444',type:'overdue'},
+      {id:'g_done',name:'Done',accent:'#3DAA4C',type:'done'},
+      {id:'g_brain',name:'Brain Dump',accent:'#7B6FD4',type:'brain'}
     ],
     bizLanes:{
-      slp:{cols:[{id:'slp_high',name:'High Priority',accent:'#E0282E'},{id:'slp_mid',name:'In Progress',accent:'#C9A84C'},{id:'slp_done',name:'✅ Done',accent:'#3DAA4C',isDone:true}]},
-      cb:{cols:[{id:'cb_high',name:'High Priority',accent:'#1A8A3C'},{id:'cb_mid',name:'In Progress',accent:'#C9A84C'},{id:'cb_done',name:'✅ Done',accent:'#3DAA4C',isDone:true}]},
-      h2h:{cols:[{id:'h2h_high',name:'High Priority',accent:'#E05020'},{id:'h2h_mid',name:'In Progress',accent:'#C9A84C'},{id:'h2h_done',name:'✅ Done',accent:'#3DAA4C',isDone:true}]}
+      slp:{cols:[
+        {id:'slp_asap',    name:'ASAP / Critical',       accent:'#FF4444'},
+        {id:'slp_week',    name:'This Week',              accent:'#E0282E'},
+        {id:'slp_content', name:'Content & Branding',    accent:'#C9A84C'},
+        {id:'slp_systems', name:'Systems & Automations', accent:'#2B7FD4'},
+        {id:'slp_growth',  name:'Growth Ideas',          accent:'#7B6FD4'},
+        {id:'slp_prog',    name:'In Progress',           accent:'#D4851A'},
+        {id:'slp_wait',    name:'Waiting On',            accent:'#909090'},
+        {id:'slp_done',    name:'Done',                  accent:'#3DAA4C',isDone:true}
+      ]},
+      cb:{cols:[
+        {id:'cb_pri',      name:'Priority',              accent:'#1A8A3C'},
+        {id:'cb_out',      name:'Outreach',              accent:'#2B7FD4'},
+        {id:'cb_content',  name:'Content',               accent:'#C9A84C'},
+        {id:'cb_future',   name:'Future Expansion',      accent:'#7B6FD4'},
+        {id:'cb_prog',     name:'In Progress',           accent:'#D4851A'},
+        {id:'cb_done',     name:'Done',                  accent:'#3DAA4C',isDone:true}
+      ]},
+      h2h:{cols:[
+        {id:'h2h_pri',     name:'Priority',              accent:'#E05020'},
+        {id:'h2h_content', name:'Content & Branding',   accent:'#C9A84C'},
+        {id:'h2h_plan',    name:'Business Planning',    accent:'#2B7FD4'},
+        {id:'h2h_vision',  name:'Future Vision',        accent:'#7B6FD4'},
+        {id:'h2h_prog',    name:'In Progress',          accent:'#D4851A'},
+        {id:'h2h_done',    name:'Done',                 accent:'#3DAA4C',isDone:true}
+      ]}
     },
     personalCols:[
-      {id:'pers_todo',name:'Personal',accent:'#C9A84C'},
-      {id:'pers_health',name:'Health & Fitness',accent:'#3DAA4C'},
-      {id:'pers_done',name:'✅ Done',accent:'#3DAA4C',isDone:true}
+      {id:'pers_admin',  name:'Life Admin',         accent:'#C9A84C'},
+      {id:'pers_health', name:'Health & Fitness',   accent:'#3DAA4C'},
+      {id:'pers_dev',    name:'Self Development',   accent:'#2B7FD4'},
+      {id:'pers_done',   name:'Done',               accent:'#3DAA4C',isDone:true}
     ],
     tasks:{}
   };
+}
+
+// Migrate: adds missing cols from the new default without wiping existing tasks or custom cols
+function migrateTaskStore(t){
+  let def=defaultTaskStore();
+  if(!t.globalCols||!t.globalCols.length)t.globalCols=def.globalCols;
+  if(!t.tasks)t.tasks={};
+  ['slp','cb','h2h'].forEach(bizId=>{
+    if(!t.bizLanes[bizId])t.bizLanes[bizId]=def.bizLanes[bizId];
+    let existingIds=new Set((t.bizLanes[bizId].cols||[]).map(c=>c.id));
+    let newIds=def.bizLanes[bizId].cols.map(c=>c.id);
+    let hasNewCols=newIds.some(id=>existingIds.has(id));
+    if(!hasNewCols){
+      let firstNewCol=def.bizLanes[bizId].cols[0];
+      Object.values(t.tasks).forEach(task=>{if(task.bizId===bizId)task.colId=firstNewCol.id;});
+      t.bizLanes[bizId].cols=def.bizLanes[bizId].cols;
+    }
+  });
+  let existingPersIds=new Set((t.personalCols||[]).map(c=>c.id));
+  let newPersIds=def.personalCols.map(c=>c.id);
+  if(!newPersIds.some(id=>existingPersIds.has(id))){
+    t.personalCols=def.personalCols;
+  }
+  return t;
 }
 
 function initTaskStore2(t){
   if(!t||typeof t!=='object'||!t.tasks){
     return defaultTaskStore();
   }
-  // Ensure all fields exist
   if(!t.globalCols)t.globalCols=defaultTaskStore().globalCols;
   if(!t.bizLanes)t.bizLanes=defaultTaskStore().bizLanes;
   if(!t.personalCols)t.personalCols=defaultTaskStore().personalCols;
   if(!t.tasks)t.tasks={};
-  return t;
+  return migrateTaskStore(t);
 }
 
 let S={
@@ -753,7 +800,7 @@ let _prayerTimes=null,_prayerDate='';
 async function fetchPrayerTimes(){
   let today=td();if(_prayerTimes&&_prayerDate===today){renderPrayerTimes(_prayerTimes);return;}
   try{
-    let now=new Date();let url=`https://api.aladhan.com/v1/timingsByAddress/${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}?address=Trowbridge,Wiltshire,UK&method=3&school=0`;
+    let now=new Date();let url=`https://api.aladhan.com/v1/timingsByAddress/${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}?address=Trowbridge,Wiltshire,UK&method=15&school=0&latitudeAdjustmentMethod=3`;
     let res=await fetch(url);let json=await res.json();
     if(json.code===200){let t=json.data.timings;_prayerTimes={Fajr:t.Fajr,Dhuhr:t.Dhuhr,Asr:t.Asr,Maghrib:t.Maghrib,Isha:t.Isha};_prayerDate=today;renderPrayerTimes(_prayerTimes);renderDashboardPrayer();}
   }catch(e){}
@@ -1154,7 +1201,10 @@ function buildCol2(colDef,bizId,q){
     ondrop="onCol_Drop(event,'${colDef.id}','${bizId||''}')">
     <div class="tcol-head">
       <div class="tcol-dot" style="background:${colDef.accent}"></div>
-      <span class="tcol-name" id="cnm-${colDef.id}" ondblclick="startRenameCol('${colDef.id}')" title="Double-tap to rename">${colDef.name}</span>
+      <div style="flex:1;min-width:0">
+        <span class="tcol-name" id="cnm-${colDef.id}" ondblclick="startRenameCol('${colDef.id}')" title="${colDef.desc||'Double-tap to rename'}" style="display:block">${colDef.name}</span>
+        ${colDef.desc?`<div style="font-size:9px;color:var(--text3);margin-top:1px;line-height:1.3;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${colDef.desc}</div>`:''}
+      </div>
       <input class="tcol-name-input" id="cni-${colDef.id}" style="display:none" value="${colDef.name}" onblur="finishRenameCol('${colDef.id}','${bizId||''}')" onkeydown="if(event.key==='Enter')finishRenameCol('${colDef.id}','${bizId||''}')">
       <span class="tcol-cnt">${totalVisible}</span>
       ${headButtons}
@@ -1185,7 +1235,7 @@ function renderTasks(){
       let colsHtml=lane.cols.map(c=>buildCol2(c,b.id,q)).join('');
       return `<div class="biz-lane task-section">
         <div class="task-section-header">
-          <span class="task-section-title">${b.id==='slp'?'🔴':b.id==='cb'?'🟢':'🟠'} ${b.name}</span>
+          <span class="task-section-title biz" style="color:${b.color}">${b.id==='slp'?'🔴':b.id==='cb'?'🟢':'🟠'} ${b.name}</span>
           ${logoHtml}
           <button class="biz-lane-add-col" onclick="addBizCol('${b.id}')">+ Add column</button>
         </div>
