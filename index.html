@@ -922,6 +922,9 @@ function softDeleteTask2(taskId){
   delete ts.tasks[taskId];
   saveTS();renderTasks();renderTrash();
 }
+function confirmHardDelete(taskId){
+  if(confirm('Permanently delete this task?'))hardDeleteTask2(taskId);
+}
 function hardDeleteTask2(taskId){
   let ts=getTS();
   delete ts.trash[taskId];
@@ -1041,12 +1044,10 @@ function toggleTrash(){
 function renderTrash(){
   let ts=getTS();
   let trashItems=Object.values(ts.trash||{});
-  // Auto-purge items older than 30 days
   let now=new Date();
   trashItems=trashItems.filter(t=>{
     if(!t.deletedAt)return true;
-    let d=new Date(t.deletedAt);
-    let days=(now-d)/(1000*60*60*24);
+    let days=(now-new Date(t.deletedAt))/(1000*60*60*24);
     if(days>30){delete ts.trash[t.id];return false;}
     return true;
   });
@@ -1055,50 +1056,37 @@ function renderTrash(){
   let wrap=document.getElementById('trash-col-wrap');
   if(!wrap)return;
   if(!_trashOpen){wrap.innerHTML='';return;}
-  if(!trashItems.length){wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:10px 0">Nothing in trash</div>';return;}
-  let html=`<div class="tcol" style="min-width:280px;width:280px;opacity:1">
-    <div class="tcol-head"><div class="tcol-dot" style="background:#444"></div><span class="tcol-name">Deleted items</span><span class="tcol-cnt">${trashItems.length}</span></div>
-    <div class="tcol-cards">
-      ${trashItems.sort((a,b)=>new Date(b.deletedAt)-new Date(a.deletedAt)).map(t=>{
-        let d=t.deletedAt?new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'-';
-        let p=PRI_CFG[t.priority||'medium'];
-        return \`<div class="tc trashed">
-          <div class="tc-title">\${t.title}</div>
-          <div class="tc-meta"><span class="tc-pri" style="background:\${p.bg};color:\${p.color}">\${p.label}</span><span style="font-size:10px;color:#505050;margin-left:4px">deleted \${d}</span></div>
-          \${t.subtasks?.length?\`<div style="font-size:10px;color:#505050;margin-top:3px">\${t.subtasks.length} subtask\${t.subtasks.length!==1?'s':''}</div>\`:''}
-          <div class="tc-actions" style="margin-top:6px">
-            <button class="tbtn" style="color:#3DAA4C;border-color:rgba(61,170,76,0.3)" onclick="event.stopPropagation();restoreFromTrash('\${t.id}')">↩ Restore</button>
-            <button class="tbtn del-btn" onclick="event.stopPropagation();if(confirm('Permanently delete?'))hardDeleteTask2('\${t.id}')">Delete forever</button>
-          </div>
-        </div>\`;
-      }).join('')}
-    </div>
-  </div>`;
-  wrap.innerHTML=html;
-}
+  if(!trashItems.length){
+    wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:10px 0">Nothing in trash</div>';
+    return;
+  }
+  let sorted=trashItems.sort((a,b)=>new Date(b.deletedAt||0)-new Date(a.deletedAt||0));
+  let cards=sorted.map(t=>{
+    let d=t.deletedAt?new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'-';
+    let p=PRI_CFG[t.priority||'medium'];
+    let subLine=t.subtasks&&t.subtasks.length?'<div style="font-size:10px;color:#505050;margin-top:3px">'+t.subtasks.length+' subtask'+(t.subtasks.length!==1?'s':'')+'</div>':'';
+    return '<div class="tc trashed">'
+      +'<div class="tc-title">'+t.title+'</div>'
+      +'<div class="tc-meta">'
+        +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span>'
+        +'<span style="font-size:10px;color:#505050;margin-left:4px">deleted '+d+'</span>'
+      +'</div>'
+      +subLine
+      +'<div class="tc-actions" style="margin-top:6px">'
+        +'<button class="tbtn" style="color:#3DAA4C;border-color:rgba(61,170,76,0.3)" data-tid="'+t.id+'" onclick="event.stopPropagation();restoreFromTrash(this.dataset.tid)">↩ Restore</button>'
+        +'<button class="tbtn del-btn" data-tid="'+t.id+'" onclick="event.stopPropagation();confirmHardDelete(this.dataset.tid)">Delete forever</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
 
-// ─ Move task up/down within column ─
-function moveTaskUp(taskId,colId,bizId){
-  let ts=getTS();
-  let tasks=getTasksInCol(colId,bizId||null);
-  let idx=tasks.findIndex(t=>t.id===taskId);
-  if(idx<=0)return;
-  let order=tasks.map(t=>t.id);
-  let tmp=order[idx-1];order[idx-1]=order[idx];order[idx]=tmp;
-  if(!ts.colOrder)ts.colOrder={};
-  ts.colOrder[colId]=order;
-  saveTS();renderTasks();
-}
-function moveTaskDown(taskId,colId,bizId){
-  let ts=getTS();
-  let tasks=getTasksInCol(colId,bizId||null);
-  let idx=tasks.findIndex(t=>t.id===taskId);
-  if(idx===-1||idx>=tasks.length-1)return;
-  let order=tasks.map(t=>t.id);
-  let tmp=order[idx+1];order[idx+1]=order[idx];order[idx]=tmp;
-  if(!ts.colOrder)ts.colOrder={};
-  ts.colOrder[colId]=order;
-  saveTS();renderTasks();
+  wrap.innerHTML='<div class="tcol" style="min-width:280px;width:280px;opacity:1">'
+    +'<div class="tcol-head">'
+      +'<div class="tcol-dot" style="background:#444"></div>'
+      +'<span class="tcol-name">Deleted items</span>'
+      +'<span class="tcol-cnt">'+sorted.length+'</span>'
+    +'</div>'
+    +'<div class="tcol-cards">'+cards+'</div>'
+  +'</div>';
 }
 
 // ─ Move task to col ─
@@ -1166,66 +1154,16 @@ function addPersonalCol(){
 // ─ Drag & drop ─
 function onTC_DragStart(e,taskId,colId,bizId){
   _drag={taskId,fromColId:colId,fromBizId:bizId||null};
-  e.dataTransfer.effectAllowed='move';
   setTimeout(()=>{let el=document.getElementById('tc-'+taskId);if(el)el.classList.add('dragging');},0);
 }
 function onTC_DragEnd(e,taskId){
   let el=document.getElementById('tc-'+taskId);if(el)el.classList.remove('dragging');
   document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
-  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('drag-target-above','drag-target-below'));
-  _drag={taskId:null,fromColId:null,fromBizId:null};
 }
 function onCol_DragOver(e,colId){
   e.preventDefault();
-  e.dataTransfer.dropEffect='move';
   document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
   document.getElementById('tcol-'+colId)?.classList.add('drag-over');
-}
-// Card-level drag over — for reordering within same column
-function onTC_DragOver(e,taskId){
-  e.preventDefault();
-  e.stopPropagation();
-  if(!_drag.taskId||_drag.taskId===taskId)return;
-  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('drag-target-above'));
-  let el=document.getElementById('tc-'+taskId);
-  if(el)el.classList.add('drag-target-above');
-}
-function onTC_Drop(e,taskId,colId,bizId){
-  e.preventDefault();
-  e.stopPropagation();
-  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('drag-target-above'));
-  document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
-  if(!_drag.taskId||_drag.taskId===taskId)return;
-  let ts=getTS();
-  let fromTasks=getTasksInCol(_drag.fromColId,_drag.fromBizId);
-  let fromIdx=fromTasks.findIndex(t=>t.id===_drag.taskId);
-  if(fromIdx===-1)return;
-  // Same column — reorder
-  if(_drag.fromColId===colId&&_drag.fromBizId===(bizId||null)){
-    let toIdx=fromTasks.findIndex(t=>t.id===taskId);
-    if(toIdx===-1)return;
-    let [moved]=fromTasks.splice(fromIdx,1);
-    fromTasks.splice(toIdx,0,moved);
-    // Write order back — store order as array on the col
-    if(!ts.colOrder)ts.colOrder={};
-    ts.colOrder[colId]=fromTasks.map(t=>t.id);
-  } else {
-    // Cross-column move — insert before target task
-    let task=fromTasks.splice(fromIdx,1)[0];
-    let toTasks=getTasksInCol(colId,bizId||null);
-    let toIdx=toTasks.findIndex(t=>t.id===taskId);
-    task.colId=colId;task.bizId=bizId||null;
-    if(!ts.colOrder)ts.colOrder={};
-    // Insert before target
-    let newOrder=toTasks.map(t=>t.id);
-    newOrder.splice(toIdx<0?newOrder.length:toIdx,0,task.id);
-    ts.colOrder[colId]=newOrder;
-    // Rebuild fromCol order
-    let fromRemaining=getTasksInCol(_drag.fromColId,_drag.fromBizId);
-    ts.colOrder[_drag.fromColId]=fromRemaining.map(t=>t.id);
-  }
-  _drag={taskId:null,fromColId:null,fromBizId:null};
-  saveTS();renderTasks();renderDashboard();
 }
 function onCol_Drop(e,colId,bizId){
   e.preventDefault();
