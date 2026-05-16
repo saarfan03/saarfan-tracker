@@ -1528,6 +1528,2107 @@ function renderAll(){
   renderPrayerPage();renderCalories();
 }
 
+const SEED_TASKS = {
+  "globalCols": [
+    {
+      "id": "g_today",
+      "name": "Today",
+      "accent": "#E0282E",
+      "type": "today"
+    },
+    {
+      "id": "g_tomorrow",
+      "name": "Tomorrow",
+      "accent": "#C9A84C",
+      "type": "tomorrow"
+    },
+    {
+      "id": "g_overdue",
+      "name": "Overdue",
+      "accent": "#FF4444",
+      "type": "overdue"
+    },
+    {
+      "id": "g_done",
+      "name": "Done",
+      "accent": "#3DAA4C",
+      "type": "done"
+    },
+    {
+      "id": "g_brain",
+      "name": "Brain Dump",
+      "accent": "#7B6FD4",
+      "type": "brain"
+    }
+  ],
+  "bizLanes": {
+    "slp": {
+      "cols": [
+        {
+          "id": "slp_asap",
+          "name": "ASAP / Critical",
+          "accent": "#FF4444"
+        },
+        {
+          "id": "slp_week",
+          "name": "This Week",
+          "accent": "#E0282E"
+        },
+        {
+          "id": "slp_content",
+          "name": "Content & Branding",
+          "accent": "#C9A84C"
+        },
+        {
+          "id": "slp_systems",
+          "name": "Systems & Automations",
+          "accent": "#2B7FD4"
+        },
+        {
+          "id": "slp_growth",
+          "name": "Growth Ideas",
+          "accent": "#7B6FD4"
+        },
+        {
+          "id": "slp_prog",
+          "name": "In Progress",
+          "accent": "#D4851A"
+        },
+        {
+          "id": "slp_wait",
+          "name": "Waiting On",
+          "accent": "#909090"
+        },
+        {
+          "id": "slp_done",
+          "name": "Done",
+          "accent": "#3DAA4C",
+          "isDone": true
+        }
+      ]
+    },
+    "cb": {
+      "cols": [
+        {
+          "id": "cb_pri",
+          "name": "Priority",
+          "accent": "#1A8A3C"
+        },
+        {
+          "id": "cb_out",
+          "name": "Outreach",
+          "accent": "#2B7FD4"
+        },
+        {
+          "id": "cb_content",
+          "name": "Content",
+          "accent": "#C9A84C"
+        },
+        {
+          "id": "cb_future",
+          "name": "Future Expansion",
+          "accent": "#7B6FD4"
+        },
+        {
+          "id": "cb_prog",
+          "name": "In Progress",
+          "accent": "#D4851A"
+        },
+        {
+          "id": "cb_done",
+          "name": "Done",
+          "accent": "#3DAA4C",
+          "isDone": true
+        }
+      ]
+    },
+    "h2h": {
+      "cols": [
+        {
+          "id": "h2h_pri",
+          "name": "Priority",
+          "accent": "#E05020"
+        },
+        {
+          "id": "h2h_content",
+          "name": "Content & Branding",
+          "accent": "#C9A84C"
+        },
+        {
+          "id": "h2h_plan",
+          "name": "Business Planning",
+          "accent": "#2B7FD4"
+        },
+        {
+          "id": "h2h_vision",
+          "name": "Future Vision",
+          "accent": "#7B6FD4"
+        },
+        {
+          "id": "h2h_prog",
+          "name": "In Progress",
+          "accent": "#D4851A"
+        },
+        {
+          "id": "h2h_done",
+          "name": "Done",
+          "accent": "#3DAA4C",
+          "isDone": true
+        }
+      ]
+    }
+  },
+  "personalCols": [
+    {
+      "id": "pers_admin",
+      "name": "Life Admin",
+      "accent": "#C9A84C"
+    },
+    {
+      "id": "pers_health",
+      "name": "Health & Fitness",
+      "accent": "#3DAA4C"
+    },
+    {
+      "id": "pers_dev",
+      "name": "Self Development",
+      "accent": "#2B7FD4"
+    },
+    {
+      "id": "pers_done",
+      "name": "Done",
+      "accent": "#3DAA4C",
+      "isDone": true
+    }
+  ],
+  "tasks": {
+    "17789361717998533": {
+      "id": 17789361717998533,
+      "title": "Finish Archie website",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717997947": {
+      "id": 17789361717997947,
+      "title": "Start Archie onboarding",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995224": {
+      "id": 17789361717995224,
+      "title": "Create Archie flyers",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717992091": {
+      "id": 17789361717992091,
+      "title": "Sort Harry ad account access",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717991551": {
+      "id": 17789361717991551,
+      "title": "Send Harvey full requirements list",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717991007": {
+      "id": 17789361717991007,
+      "title": "Prepare for Leon meeting",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996279": {
+      "id": 17789361717996279,
+      "title": "Message Secure Drive prospects",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_today",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995093": {
+      "id": 17789361717995093,
+      "title": "Prepare Archie ads/promo",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993832": {
+      "id": 17789361717993832,
+      "title": "Complete FB ads course",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717991892": {
+      "id": 17789361717991892,
+      "title": "Launch Harry ads",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717997806": {
+      "id": 17789361717997806,
+      "title": "Finish Minerva software setup once reply received",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996739": {
+      "id": 17789361717996739,
+      "title": "Get Leon on software",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717990533": {
+      "id": 17789361717990533,
+      "title": "Invite Leon to Skool",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717998378": {
+      "id": 17789361717998378,
+      "title": "Get Tom Day onto software",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717992059": {
+      "id": 17789361717992059,
+      "title": "Business Card Templates",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717992246": {
+      "id": 17789361717992246,
+      "title": "Send leaflets to Haqani",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717994539": {
+      "id": 17789361717994539,
+      "title": "Send leaflets to Curtis Group",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "g_tomorrow",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717990694": {
+      "id": 17789361717990694,
+      "title": "Archie website",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_asap",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717992949,
+          "title": "Finalise homepage",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994110,
+          "title": "Add chatbot",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717996132,
+          "title": "Add forms",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991934,
+          "title": "Add service sections",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998949,
+          "title": "Add case studies",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998351,
+          "title": "Add gallery/photos",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994087,
+          "title": "Mobile optimisation",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717992198,
+          "title": "Final review",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999451,
+          "title": "Connect domain",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717992821,
+          "title": "Testing",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717995680": {
+      "id": 17789361717995680,
+      "title": "Archie onboarding",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_asap",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717995801,
+          "title": "Import past clients",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994578,
+          "title": "Import reviews",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999490,
+          "title": "Setup CRM",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990251,
+          "title": "Setup pipelines",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717993089,
+          "title": "Setup missed call text back",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717992310,
+          "title": "Setup automations",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717996714,
+          "title": "Setup calendars",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998660,
+          "title": "Setup invoicing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991928,
+          "title": "Setup AI chat",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999487,
+          "title": "Connect socials",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717999332": {
+      "id": 17789361717999332,
+      "title": "Archie socials",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_asap",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717995951,
+          "title": "Optimise Instagram",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990931,
+          "title": "Optimise Facebook",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717995971,
+          "title": "Setup LinkedIn",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991790,
+          "title": "Create highlight covers",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998085,
+          "title": "Create services post",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717997097,
+          "title": "Create review template",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717997847,
+          "title": "Behind the scenes content",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717997166,
+          "title": "Setup GMB posting",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991829,
+          "title": "Connect socials to GHL",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717996961": {
+      "id": 17789361717996961,
+      "title": "Twilio / LC Phone Migration",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717997513,
+          "title": "Fix rejected numbers",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994723,
+          "title": "Rebill setup",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991697,
+          "title": "Check client usage",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994419,
+          "title": "Move numbers to LC",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717993373,
+          "title": "Test workflows",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717993203,
+          "title": "Confirm bundles",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990584,
+          "title": "Check costs",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717998149": {
+      "id": 17789361717998149,
+      "title": "Build Onboarding Automation System",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717994511,
+          "title": "Build master onboarding flow",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990487,
+          "title": "Auto-send contracts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998129,
+          "title": "Auto-create tasks",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999576,
+          "title": "Auto-send welcome emails",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717993915,
+          "title": "Auto-generate onboarding pipeline",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998582,
+          "title": "Auto-assign services",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717996663,
+          "title": "Connect forms to workflows",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717998602": {
+      "id": 17789361717998602,
+      "title": "New Onboarding Form",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717993854,
+          "title": "Dynamic pricing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999681,
+          "title": "Clothing options",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990685,
+          "title": "Videography options",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998870,
+          "title": "Ads options",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998678,
+          "title": "CRM options",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717997186,
+          "title": "Conditional logic",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717995011,
+          "title": "Auto-total pricing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994926,
+          "title": "Auto-email outputs",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717995031": {
+      "id": 17789361717995031,
+      "title": "SLP Pricing Structure",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [
+        {
+          "id": 17789361717996360,
+          "title": "Finalise setup fees",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717999608,
+          "title": "Monthly pricing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717992688,
+          "title": "Ads pricing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717998329,
+          "title": "Commission pricing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717991918,
+          "title": "Upsells",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994965,
+          "title": "Packaging structure",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717990166,
+          "title": "Website pricing",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361717999754": {
+      "id": 17789361717999754,
+      "title": "Finish SLP website improvements",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717990797": {
+      "id": 17789361717990797,
+      "title": "Create launch video structure",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996502": {
+      "id": 17789361717996502,
+      "title": "Write launch video script",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717998564": {
+      "id": 17789361717998564,
+      "title": "Film launch footage",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995030": {
+      "id": 17789361717995030,
+      "title": "Edit launch video",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993647": {
+      "id": 17789361717993647,
+      "title": "Create website launch video template prompt",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993280": {
+      "id": 17789361717993280,
+      "title": "Create AI-generated ad creative workflow",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717994589": {
+      "id": 17789361717994589,
+      "title": "Post 3-5 IG mockups",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717999011": {
+      "id": 17789361717999011,
+      "title": "Build IG highlights",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993768": {
+      "id": 17789361717993768,
+      "title": "Daily story posting habit",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_content",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995328": {
+      "id": 17789361717995328,
+      "title": "Build Claude prompt library",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996527": {
+      "id": 17789361717996527,
+      "title": "Build website copy generation workflow",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995040": {
+      "id": 17789361717995040,
+      "title": "Build ad copy generation workflow",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717992321": {
+      "id": 17789361717992321,
+      "title": "Create reusable snapshots",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717998269": {
+      "id": 17789361717998269,
+      "title": "Create client support bot knowledge base",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717994566": {
+      "id": 17789361717994566,
+      "title": "Google My Business",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993510": {
+      "id": 17789361717993510,
+      "title": "Build Lead Gen PDFs",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717998666": {
+      "id": 17789361717998666,
+      "title": "VA Hiring Plan",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717991568": {
+      "id": 17789361717991568,
+      "title": "AI Caller Research",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717992772": {
+      "id": 17789361717992772,
+      "title": "Signage Supplier Research",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717991557": {
+      "id": 17789361717991557,
+      "title": "Client SOPs",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717997166": {
+      "id": 17789361717997166,
+      "title": "Skool Improvements",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_week",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717994206": {
+      "id": 17789361717994206,
+      "title": "Client Review System",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717990863": {
+      "id": 17789361717990863,
+      "title": "Email Deliverability Fixes",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_systems",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717998325": {
+      "id": 17789361717998325,
+      "title": "AI Website Generation",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717999845": {
+      "id": 17789361717999845,
+      "title": "Automated Client Delivery",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717993108": {
+      "id": 17789361717993108,
+      "title": "SLP Mobile App",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717997558": {
+      "id": 17789361717997558,
+      "title": "Client Portal",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996417": {
+      "id": 17789361717996417,
+      "title": "White Label Expansion",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717996143": {
+      "id": 17789361717996143,
+      "title": "AI Sales Agents",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717995710": {
+      "id": 17789361717995710,
+      "title": "Nationwide Scaling",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717999800": {
+      "id": 17789361717999800,
+      "title": "Full Team Structure",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "slp_growth",
+      "bizId": "slp",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361717999607": {
+      "id": 17789361717999607,
+      "title": "Outreach Automation System",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_out",
+      "bizId": "cb",
+      "subtasks": [
+        {
+          "id": 17789361717993479,
+          "title": "Instagram outreach",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717994493,
+          "title": "LinkedIn outreach",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717996514,
+          "title": "Email outreach",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717995410,
+          "title": "SMS testing",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361717993840,
+          "title": "Follow-up logic",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718002839,
+          "title": "Automation testing",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718000247": {
+      "id": 17789361718000247,
+      "title": "Find More Lenders",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [
+        {
+          "id": 17789361718009663,
+          "title": "Research lenders",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718005151,
+          "title": "Compare offers",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718003686,
+          "title": "Build contacts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718000739,
+          "title": "Create lender database",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718005450,
+          "title": "Relationship building",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718007507": {
+      "id": 17789361718007507,
+      "title": "Capital Bros Socials",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_content",
+      "bizId": "cb",
+      "subtasks": [
+        {
+          "id": 17789361718003229,
+          "title": "Case study posts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718003507,
+          "title": "Educational posts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718002866,
+          "title": "Funding structure content",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008167,
+          "title": "Developer pain points",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718009702,
+          "title": "Reels ideas",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718001579,
+          "title": "LinkedIn posts",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718002371": {
+      "id": 17789361718002371,
+      "title": "Contracts / Legal",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [
+        {
+          "id": 17789361718005855,
+          "title": "Introducer agreement",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718005053,
+          "title": "Referral agreements",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718002989,
+          "title": "Terms wording",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008566,
+          "title": "Compliance research",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718002942": {
+      "id": 17789361718002942,
+      "title": "Build outreach system",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_out",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718009017": {
+      "id": 17789361718009017,
+      "title": "Automate messaging flow",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_out",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718000284": {
+      "id": 17789361718000284,
+      "title": "Update website",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006328": {
+      "id": 17789361718006328,
+      "title": "Update Instagram",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_content",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008817": {
+      "id": 17789361718008817,
+      "title": "Build CRM pipeline",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006660": {
+      "id": 17789361718006660,
+      "title": "Reach out to lenders",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008773": {
+      "id": 17789361718008773,
+      "title": "Build lender contact database",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_pri",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718009728": {
+      "id": 17789361718009728,
+      "title": "Build developer lead sourcing workflow",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_out",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718007377": {
+      "id": 17789361718007377,
+      "title": "Cold calling structure",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_out",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718000700": {
+      "id": 17789361718000700,
+      "title": "LinkedIn automation",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718009787": {
+      "id": 17789361718009787,
+      "title": "Email sequencing",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006649": {
+      "id": 17789361718006649,
+      "title": "Investor newsletter",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718004277": {
+      "id": 17789361718004277,
+      "title": "AI outreach assistant",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718005258": {
+      "id": 17789361718005258,
+      "title": "Team Expansion",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718002507": {
+      "id": 17789361718002507,
+      "title": "Paid Ads",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008829": {
+      "id": 17789361718008829,
+      "title": "Events / Networking",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718009908": {
+      "id": 17789361718009908,
+      "title": "Developer Community",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718003489": {
+      "id": 17789361718003489,
+      "title": "Investor Network",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "cb_future",
+      "bizId": "cb",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718001777": {
+      "id": 17789361718001777,
+      "title": "Finish House Renovation",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_pri",
+      "bizId": "h2h",
+      "subtasks": [
+        {
+          "id": 17789361718006623,
+          "title": "Remaining jobs",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718004366,
+          "title": "Snagging",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718000553,
+          "title": "Final finishes",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718005332,
+          "title": "Cleaning",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008395,
+          "title": "Photos/videos",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718006528": {
+      "id": 17789361718006528,
+      "title": "Houses 2 Homes Socials",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_content",
+      "bizId": "h2h",
+      "subtasks": [
+        {
+          "id": 17789361718003267,
+          "title": "Edit renovation videos",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718006769,
+          "title": "Create reels",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718000351,
+          "title": "Before/after posts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718002739,
+          "title": "Branding",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718004731,
+          "title": "Instagram setup",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718000254": {
+      "id": 17789361718000254,
+      "title": "Houses 2 Homes Website",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_plan",
+      "bizId": "h2h",
+      "subtasks": [
+        {
+          "id": 17789361718009618,
+          "title": "Homepage",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718006888,
+          "title": "Portfolio",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718002038,
+          "title": "Services",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718000809,
+          "title": "Vision section",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008063,
+          "title": "Contact forms",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718006231": {
+      "id": 17789361718006231,
+      "title": "Full Business Plan",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_plan",
+      "bizId": "h2h",
+      "subtasks": [
+        {
+          "id": 17789361718007788,
+          "title": "Vision planning",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718006135,
+          "title": "Service structure",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008178,
+          "title": "Profit structure",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718009412,
+          "title": "Growth strategy",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718007175,
+          "title": "Long-term goals",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718000854": {
+      "id": 17789361718000854,
+      "title": "Define roles with Jack + Archie",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_plan",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718002797": {
+      "id": 17789361718002797,
+      "title": "Sit down strategy meeting",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_plan",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718001848": {
+      "id": 17789361718001848,
+      "title": "Connect CRM",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_plan",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718003705": {
+      "id": 17789361718003705,
+      "title": "Build Instagram properly",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_content",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006005": {
+      "id": 17789361718006005,
+      "title": "Create clothing branding",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_content",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006450": {
+      "id": 17789361718006450,
+      "title": "Full Renovation Team",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718005421": {
+      "id": 17789361718005421,
+      "title": "Property Flips",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006384": {
+      "id": 17789361718006384,
+      "title": "Development Projects",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008770": {
+      "id": 17789361718008770,
+      "title": "Estate Builds",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718006340": {
+      "id": 17789361718006340,
+      "title": "Nationwide Brand",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008211": {
+      "id": 17789361718008211,
+      "title": "Apprentices",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718005783": {
+      "id": 17789361718005783,
+      "title": "Luxury Renovations",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "h2h_vision",
+      "bizId": "h2h",
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718000268": {
+      "id": 17789361718000268,
+      "title": "Submit UNITE claim",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [
+        {
+          "id": 17789361718008782,
+          "title": "Attach evidence/screenshots",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718008031,
+          "title": "Write summary of events",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718000867,
+          "title": "Pay court fee",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718001822": {
+      "id": 17789361718001822,
+      "title": "Chase JACA payment",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718002095": {
+      "id": 17789361718002095,
+      "title": "Organise self assessment",
+      "priority": "high",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [
+        {
+          "id": 17789361718002177,
+          "title": "Organise invoices/receipts",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718007044,
+          "title": "Build subcontractor spreadsheet",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718001160,
+          "title": "Add Charlie payments",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718005842,
+          "title": "Add Abs payments",
+          "done": false,
+          "scheduledTo": null
+        },
+        {
+          "id": 17789361718006578,
+          "title": "Add subcontractor records",
+          "done": false,
+          "scheduledTo": null
+        }
+      ],
+      "added": "2025-05-16"
+    },
+    "17789361718000178": {
+      "id": 17789361718000178,
+      "title": "Update CV",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718008796": {
+      "id": 17789361718008796,
+      "title": "Update portfolio",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718005166": {
+      "id": 17789361718005166,
+      "title": "Apply for remote sales jobs",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718009933": {
+      "id": 17789361718009933,
+      "title": "Create monthly budget sheet",
+      "priority": "medium",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718004287": {
+      "id": 17789361718004287,
+      "title": "Buy lamp",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718003524": {
+      "id": 17789361718003524,
+      "title": "Buy t-shirts",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    },
+    "17789361718007251": {
+      "id": 17789361718007251,
+      "title": "Skincare",
+      "priority": "low",
+      "due": "",
+      "note": "",
+      "pinned": false,
+      "colId": "pers_admin",
+      "bizId": null,
+      "subtasks": [],
+      "added": "2025-05-16"
+    }
+  }
+};
+
+// Seed tasks on first load if task store is empty
+(function seedIfEmpty(){
+  let ts = S.tasks2;
+  let existing = Object.keys(ts.tasks||{}).length;
+  if(existing === 0){
+    // Fresh install — merge seed tasks
+    S.tasks2 = SEED_TASKS;
+    // Convert any Python True/False booleans (already handled in JSON)
+    ss('tasks2');
+    console.log('Seeded', Object.keys(SEED_TASKS.tasks).length, 'tasks');
+  } else {
+    // Already has tasks — just ensure column structure is up to date
+    // but DON'T overwrite existing tasks
+    console.log('Existing tasks found:', existing, '— skipping seed');
+  }
+})();
+
 renderAll();
 fetchPrayerTimes();
 loadFromCloud();
