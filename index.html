@@ -181,7 +181,7 @@ input[type=file]{display:none}
 .biz-lane-cols::-webkit-scrollbar{height:4px}
 .biz-lane-cols::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 /* Task column */
-.tcol{min-width:200px;width:200px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:11px;flex-shrink:0;transition:border-color .2s}
+.tcol{min-width:210px;width:210px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:11px;flex-shrink:0;transition:border-color .2s}
 .tcol.drag-over{border-color:var(--gold);background:rgba(201,168,76,0.04)}
 .tcol-head{display:flex;align-items:center;gap:6px;margin-bottom:9px}
 .tcol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -192,29 +192,29 @@ input[type=file]{display:none}
 .tcol-del:hover{color:var(--red);opacity:1}
 .tcol-cards{min-height:30px}
 /* Task card */
-.tc{background:var(--bg3);border:1.5px solid var(--border2);border-radius:9px;padding:9px;margin-bottom:6px;cursor:grab;transition:all .15s;user-select:none;position:relative}
+.tc{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;margin-bottom:4px;cursor:grab;transition:all .15s;user-select:none;position:relative}
 .tc:active,.tc.dragging{cursor:grabbing;opacity:0.5}
 .tc.drag-target-above{border-top:2px solid var(--gold) !important;margin-top:-1px}
 .tc.pinned{border-color:var(--gold-b) !important;background:rgba(201,168,76,0.06)}
 .tc-pin{position:absolute;top:6px;right:6px;font-size:10px;opacity:0.6}
-.tc-title{font-size:13px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:5px;padding-right:14px}
+.tc-title{font-size:12px;color:var(--text);font-weight:500;line-height:1.3;margin-bottom:3px;padding-right:12px}
 .tc-title.done-title{text-decoration:line-through;color:var(--text3)}
-.tc-meta{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
-.tc-pri{font-size:10px;padding:1px 7px;border-radius:5px;font-weight:700}
-.tc-due{font-size:10px;padding:1px 6px;background:var(--bg4);border-radius:5px;color:var(--text3)}
+.tc-meta{display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
+.tc-pri{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+.tc-due{font-size:9px;padding:1px 5px;background:var(--bg4);border-radius:4px;color:var(--text3)}
 .tc-due.overdue{color:#FF6B6B;background:rgba(255,107,107,0.12)}
-.tc-note{font-size:11px;color:var(--text3);line-height:1.5;font-style:italic;margin-bottom:5px}
+.tc-note{font-size:10px;color:var(--text3);line-height:1.4;font-style:italic;margin-bottom:3px}
 .tc-actions{display:flex;gap:4px;flex-wrap:wrap}
-.tbtn{font-size:10px;padding:2px 8px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.tbtn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
 .tbtn:hover{background:var(--bg4);color:var(--text2)}
 .tbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.3)}
 .tbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
 .tbtn.pin-btn{color:var(--gold);border-color:rgba(201,168,76,0.3)}
 /* Subtasks */
-.tc-subtask-bar{display:flex;align-items:center;gap:6px;margin:5px 0 4px;cursor:pointer}
+.tc-subtask-bar{display:flex;align-items:center;gap:5px;margin:3px 0 2px;cursor:pointer}
 .tc-subtask-progress{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
 .tc-subtask-progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width .3s}
-.tc-subtask-label{font-size:10px;color:var(--text3);white-space:nowrap;font-weight:600}
+.tc-subtask-label{font-size:9px;color:var(--text3);white-space:nowrap;font-weight:600}
 .tc-subtask-toggle{font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
 .tc-subtasks{display:none;border-top:1px solid var(--border);margin-top:7px;padding-top:7px}
 .tc-subtasks.open{display:block}
@@ -1089,6 +1089,30 @@ function renderTrash(){
   +'</div>';
 }
 
+// ─ Move task up/down within column ─
+function moveTaskUp(taskId,colId,bizId){
+  let ts=getTS();
+  let tasks=getTasksInCol(colId,bizId||null);
+  let idx=tasks.findIndex(t=>t.id===taskId);
+  if(idx<=0)return;
+  let order=tasks.map(t=>t.id);
+  let tmp=order[idx-1];order[idx-1]=order[idx];order[idx]=tmp;
+  if(!ts.colOrder)ts.colOrder={};
+  ts.colOrder[colId]=order;
+  saveTS();renderTasks();
+}
+function moveTaskDown(taskId,colId,bizId){
+  let ts=getTS();
+  let tasks=getTasksInCol(colId,bizId||null);
+  let idx=tasks.findIndex(t=>t.id===taskId);
+  if(idx===-1||idx>=tasks.length-1)return;
+  let order=tasks.map(t=>t.id);
+  let tmp=order[idx+1];order[idx+1]=order[idx];order[idx]=tmp;
+  if(!ts.colOrder)ts.colOrder={};
+  ts.colOrder[colId]=order;
+  saveTS();renderTasks();
+}
+
 // ─ Move task to col ─
 function moveTask2(taskId,targetColId,targetBizId){
   let task=getTS().tasks[taskId];if(!task)return;
@@ -1258,7 +1282,7 @@ function buildTaskCard(task,colDef,isDone){
     </div>
     ${task.note?`<div class="tc-note">${task.note}</div>`:''}
     ${subtaskSection}
-    <div class="tc-actions" style="margin-top:5px">
+    <div class="tc-actions" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">
       ${isDone
         ?`<button class="tbtn" onclick="event.stopPropagation();restoreTask2('${task.id}')">↩ Restore</button>`
         :`<button class="tbtn done-btn" onclick="event.stopPropagation();doneTask2('${task.id}')">✓ Done</button>`
@@ -1287,13 +1311,10 @@ function buildScheduledSubCard(task,sub,colDef){
 function buildCol2(colDef,bizId,q){
   let isDone=!!colDef.isDone||(colDef.type==='done');
   let tasks=getTasksInCol(colDef.id,bizId||null).filter(t=>taskMatchesSearch(t,q));
-  // Sort: pinned first, then by priority
-  const po={high:0,medium:1,low:2};
-  tasks.sort((a,b)=>{
-    if(a.pinned&&!b.pinned)return -1;
-    if(!a.pinned&&b.pinned)return 1;
-    return (po[a.priority]||1)-(po[b.priority]||1);
-  });
+  // Pinned float to top but respect manual colOrder otherwise
+  let pinned=tasks.filter(t=>t.pinned);
+  let unpinned=tasks.filter(t=>!t.pinned);
+  tasks=[...pinned,...unpinned];
 
   // Scheduled subtasks for global cols
   let scheduledHtml='';
@@ -1381,7 +1402,15 @@ function renderTasks(){
   let persEl=document.getElementById('personal-cols');
   if(persEl){
     persEl.innerHTML=ts.personalCols.map(c=>buildCol2(c,null,q)).join('');
-    persEl.insertAdjacentHTML('afterend',`<button onclick="addPersonalCol()" style="background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold-b)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">+ Add personal column</button>`);
+  }
+  let addPersBtn=document.getElementById('add-pers-col-btn');
+  if(!addPersBtn){
+    let btn=document.createElement('button');
+    btn.id='add-pers-col-btn';
+    btn.textContent='+ Add personal column';
+    btn.setAttribute('style','background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all .15s');
+    btn.onclick=addPersonalCol;
+    if(persEl&&persEl.parentNode)persEl.parentNode.insertBefore(btn,persEl.nextSibling);
   }
 
   // Brain cols - just the brain dump global col
