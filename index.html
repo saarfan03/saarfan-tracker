@@ -1276,12 +1276,14 @@ function buildTaskCard(task,colDef,isDone){
     draggable="true"
     ondragstart="onTC_DragStart(event,'${task.id}','${colDef.id}','${task.bizId||''}')"
     ondragend="onTC_DragEnd(event,'${task.id}')">
-    ${task.pinned?'<span class="tc-pin">📌</span>':''}
-    <div class="tc-title ${isDone?'done-title':''}">${task.title}</div>
-    <div class="tc-meta">
-      <span class="tc-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-      ${task.due?`<span class="tc-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span>`:''}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:2px">
+      <div class="tc-title ${isDone?'done-title':''}" style="margin-bottom:0;flex:1">${task.title}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+        <span class="tc-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
+        ${task.pinned?'<span style="font-size:9px">📌</span>':''}
+      </div>
     </div>
+    ${task.due?`<div style="margin-bottom:2px"><span class="tc-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
     ${task.note?`<div class="tc-note">${task.note}</div>`:''}
     ${subtaskSection}
     <div class="tc-actions" style="margin-top:3px;display:flex;flex-wrap:wrap;gap:2px">
@@ -1290,8 +1292,8 @@ function buildTaskCard(task,colDef,isDone){
         :`<button class="tbtn done-btn" onclick="event.stopPropagation();doneTask2('${task.id}')">✓ Done</button>`
       }
       <button class="tbtn pin-btn" onclick="event.stopPropagation();pinTask2('${task.id}')">${task.pinned?'Unpin':'📌'}</button>
-      <button class="tbtn" onclick="event.stopPropagation();moveTaskUp('${task.id}','${colDef.id}','${task.bizId||''}')" title="Move up" style="font-size:13px">↑</button>
-      <button class="tbtn" onclick="event.stopPropagation();moveTaskDown('${task.id}','${colDef.id}','${task.bizId||''}')" title="Move down" style="font-size:13px">↓</button>
+      <button class="tbtn" data-tid="${task.id}" data-col="${colDef.id}" data-biz="${task.bizId||''}" onclick="event.stopPropagation();moveTaskUp(this.dataset.tid,this.dataset.col,this.dataset.biz)" title="Move up" style="font-size:12px;padding:1px 5px">↑</button>
+      <button class="tbtn" data-tid="${task.id}" data-col="${colDef.id}" data-biz="${task.bizId||''}" onclick="event.stopPropagation();moveTaskDown(this.dataset.tid,this.dataset.col,this.dataset.biz)" title="Move down" style="font-size:12px;padding:1px 5px">↓</button>
       <button class="tbtn del-btn" onclick="event.stopPropagation();softDeleteTask2('${task.id}')">Delete</button>
     </div>
   </div>`;
