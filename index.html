@@ -616,34 +616,18 @@ const MEAL_LABELS={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snack:'Sn
 const PRI_CFG={high:{label:'High',color:'#FF6B6B',bg:'rgba(255,107,107,0.18)'},medium:{label:'Med',color:'#C9A84C',bg:'rgba(201,168,76,0.18)'},low:{label:'Low',color:'#5DD46C',bg:'rgba(93,212,108,0.18)'}};
 const BIZ_COL_ACCENT={slp:'#E0282E',cb:'#1A8A3C',h2h:'#E05020'};
 
-// ── Task store structure ──
-/*
-S.tasks2 = {
-  globalCols: [{id, name, accent, type}]   // global lanes: today,tomorrow,overdue,done,brain
-  bizLanes: {
-    slp: {cols: [{id, name, accent}]},
-    cb:  {cols: [...]},
-    h2h: {cols: [...]}
-  },
-  personalCols: [{id, name, accent}],
-  tasks: {
-    [taskId]: {
-      id, title, priority, due, note, pinned,
-      colId, bizId (optional),
-      subtasks: [{id, title, done, scheduledTo (colId or null), scheduleLabel}]
-    }
-  }
-}
-*/
-
 // ── Supabase ──
-const SB_URL='https://vkndekaptscaxkbhrsrd.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbmRla2FwdHNjYXhrYmhyc3JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzIxMDUsImV4cCI6MjA5MzgwODEwNX0.Ws-N53pateZqmObxOXl5UpE2RDkzf93th9rGfkBioW4';
-const SB_H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
-async function sbSet(k,v){try{await fetch(`${SB_URL}/rest/v1/tracker_data`,{method:'POST',headers:{...SB_H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})});}catch(e){}}
+const SB_URL=lsGet('_sb_url','');
+const SB_KEY=lsGet('_sb_key','');
+const getSBH=()=>({'apikey':lsGet('_sb_key',''),'Authorization':'Bearer '+lsGet('_sb_key',''),'Content-Type':'application/json'});
+async function sbSet(k,v){
+  var url=lsGet('_sb_url','');var key=lsGet('_sb_key','');if(!url||!key)return;
+  try{await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:{...getSBH(),'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})});}catch(e){}
+}
 async function loadFromCloud(){
+  var _url=lsGet('_sb_url','');var _key=lsGet('_sb_key','');if(!_url||!_key)return;
   try{
-    let r=await fetch(`${SB_URL}/rest/v1/tracker_data?select=key,value`,{headers:SB_H});
+    let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value',{headers:getSBH()});
     let rows=await r.json();if(!rows||!rows.length)return;
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',td4:'tasks2',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
     rows.forEach(row=>{try{let v=JSON.parse(row.value);localStorage.setItem(row.key,row.value);if(rm[row.key])S[rm[row.key]]=v;}catch(e){}});
@@ -656,93 +640,7 @@ function lsGet(k,def){try{let v=localStorage.getItem(k);if(v!==null)return JSON.
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function lsClear(k){try{localStorage.removeItem(k);}catch(e){}}
 
-// Default task store
-function defaultTaskStore(){
-  return {
-    globalCols:[
-      {id:'g_today',name:'Today',accent:'#E0282E',type:'today'},
-      {id:'g_tomorrow',name:'Tomorrow',accent:'#C9A84C',type:'tomorrow'},
-      {id:'g_overdue',name:'Overdue',accent:'#FF4444',type:'overdue'},
-      {id:'g_done',name:'Done',accent:'#3DAA4C',type:'done'},
-      {id:'g_brain',name:'Brain Dump',accent:'#7B6FD4',type:'brain'}
-    ],
-    bizLanes:{
-      slp:{cols:[
-        {id:'slp_asap',    name:'ASAP / Critical',       accent:'#FF4444'},
-        {id:'slp_week',    name:'This Week',              accent:'#E0282E'},
-        {id:'slp_content', name:'Content & Branding',    accent:'#C9A84C'},
-        {id:'slp_systems', name:'Systems & Automations', accent:'#2B7FD4'},
-        {id:'slp_growth',  name:'Growth Ideas',          accent:'#7B6FD4'},
-        {id:'slp_prog',    name:'In Progress',           accent:'#D4851A'},
-        {id:'slp_wait',    name:'Waiting On',            accent:'#909090'},
-        {id:'slp_done',    name:'Done',                  accent:'#3DAA4C',isDone:true}
-      ]},
-      cb:{cols:[
-        {id:'cb_pri',      name:'Priority',              accent:'#1A8A3C'},
-        {id:'cb_out',      name:'Outreach',              accent:'#2B7FD4'},
-        {id:'cb_content',  name:'Content',               accent:'#C9A84C'},
-        {id:'cb_future',   name:'Future Expansion',      accent:'#7B6FD4'},
-        {id:'cb_prog',     name:'In Progress',           accent:'#D4851A'},
-        {id:'cb_done',     name:'Done',                  accent:'#3DAA4C',isDone:true}
-      ]},
-      h2h:{cols:[
-        {id:'h2h_pri',     name:'Priority',              accent:'#E05020'},
-        {id:'h2h_content', name:'Content & Branding',   accent:'#C9A84C'},
-        {id:'h2h_plan',    name:'Business Planning',    accent:'#2B7FD4'},
-        {id:'h2h_vision',  name:'Future Vision',        accent:'#7B6FD4'},
-        {id:'h2h_prog',    name:'In Progress',          accent:'#D4851A'},
-        {id:'h2h_done',    name:'Done',                 accent:'#3DAA4C',isDone:true}
-      ]}
-    },
-    personalCols:[
-      {id:'pers_admin',  name:'Life Admin',         accent:'#C9A84C'},
-      {id:'pers_health', name:'Health & Fitness',   accent:'#3DAA4C'},
-      {id:'pers_dev',    name:'Self Development',   accent:'#2B7FD4'},
-      {id:'pers_done',   name:'Done',               accent:'#3DAA4C',isDone:true}
-    ],
-    tasks:{},
-    trash:{},
-    colOrder:{}
-  };
-}
-
-// Migrate: adds missing cols from the new default without wiping existing tasks or custom cols
-function migrateTaskStore(t){
-  let def=defaultTaskStore();
-  if(!t.globalCols||!t.globalCols.length)t.globalCols=def.globalCols;
-  if(!t.tasks)t.tasks={};
-  ['slp','cb','h2h'].forEach(bizId=>{
-    if(!t.bizLanes[bizId])t.bizLanes[bizId]=def.bizLanes[bizId];
-    let existingIds=new Set((t.bizLanes[bizId].cols||[]).map(c=>c.id));
-    let newIds=def.bizLanes[bizId].cols.map(c=>c.id);
-    let hasNewCols=newIds.some(id=>existingIds.has(id));
-    if(!hasNewCols){
-      let firstNewCol=def.bizLanes[bizId].cols[0];
-      Object.values(t.tasks).forEach(task=>{if(task.bizId===bizId)task.colId=firstNewCol.id;});
-      t.bizLanes[bizId].cols=def.bizLanes[bizId].cols;
-    }
-  });
-  let existingPersIds=new Set((t.personalCols||[]).map(c=>c.id));
-  let newPersIds=def.personalCols.map(c=>c.id);
-  if(!newPersIds.some(id=>existingPersIds.has(id))){
-    t.personalCols=def.personalCols;
-  }
-  return t;
-}
-
-function initTaskStore2(t){
-  if(!t||typeof t!=='object'||!t.tasks){
-    return defaultTaskStore();
-  }
-  if(!t.globalCols)t.globalCols=defaultTaskStore().globalCols;
-  if(!t.bizLanes)t.bizLanes=defaultTaskStore().bizLanes;
-  if(!t.personalCols)t.personalCols=defaultTaskStore().personalCols;
-  if(!t.tasks)t.tasks={};
-  if(!t.trash)t.trash={};
-  if(!t.colOrder)t.colOrder={};
-  return migrateTaskStore(t);
-}
-
+// ── App state ──
 let S={
   habits:lsGet('h3',{}),prayers:lsGet('pr3',{}),biz:lsGet('bz3',{}),
   workouts:lsGet('wo3',{}),
@@ -757,818 +655,643 @@ let _sf;
 function flashSaved(){let el=document.getElementById('save-indicator');if(!el)return;el.classList.add('show');clearTimeout(_sf);_sf=setTimeout(()=>el.classList.remove('show'),1500);}
 
 // ── Date helpers ──
-function localDate(d){d=d||new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function localDate(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 const td=()=>localDate();
 function getMonday(d){d=new Date(d||Date.now());let dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);d.setHours(0,0,0,0);return d;}
 function getWeekDates(anchor){let mon=getMonday(anchor);return Array.from({length:7},(_,i)=>{let d=new Date(mon);d.setDate(d.getDate()+i);return localDate(d);});}
 function getLast14(){let days=[];for(let i=13;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(localDate(d));}return days;}
 
-// ── Nav ──
-function showPage(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');btn.classList.add('active');
-  renderAll();
-  if(id==='prayers')fetchPrayerTimes();
-  if(id==='review')renderWeeklyReview();
-  if(id==='settings')renderSettings();
-}
-function showReflectTab(tab,btn){
-  document.querySelectorAll('.rt-panel').forEach(p=>p.style.display='none');
-  document.querySelectorAll('.tib').forEach(b=>b.classList.remove('active'));
-  document.getElementById('rt-'+tab).style.display='block';btn.classList.add('active');
-  if(tab==='month')renderMonthCharts();else if(tab==='quarter')renderQuarterChart();else if(tab==='stats')renderReflectStats();else renderReflectLog();
+// ══════════════════════════════════════════════
+// TASK SYSTEM — COMPLETE REWRITE
+// ══════════════════════════════════════════════
+
+// ── Default store ──
+function defaultTaskStore(){
+  return {
+    globalCols:[
+      {id:'g_today',   name:'Today',       accent:'#E0282E', type:'today'},
+      {id:'g_tomorrow',name:'Tomorrow',    accent:'#C9A84C', type:'tomorrow'},
+      {id:'g_overdue', name:'Overdue',     accent:'#FF4444', type:'overdue'},
+      {id:'g_done',    name:'Done',        accent:'#3DAA4C', type:'done', isDone:true},
+      {id:'g_brain',   name:'Brain Dump',  accent:'#7B6FD4', type:'brain'}
+    ],
+    bizLanes:{
+      slp:{cols:[
+        {id:'slp_asap',    name:'ASAP / Critical',      accent:'#FF4444'},
+        {id:'slp_week',    name:'This Week',             accent:'#E0282E'},
+        {id:'slp_content', name:'Content & Branding',   accent:'#C9A84C'},
+        {id:'slp_systems', name:'Systems & Automations',accent:'#2B7FD4'},
+        {id:'slp_growth',  name:'Growth Ideas',         accent:'#7B6FD4'},
+        {id:'slp_prog',    name:'In Progress',          accent:'#D4851A'},
+        {id:'slp_wait',    name:'Waiting On',           accent:'#909090'},
+        {id:'slp_done',    name:'Done',                 accent:'#3DAA4C', isDone:true}
+      ]},
+      cb:{cols:[
+        {id:'cb_pri',    name:'Priority',         accent:'#1A8A3C'},
+        {id:'cb_out',    name:'Outreach',         accent:'#2B7FD4'},
+        {id:'cb_content',name:'Content',          accent:'#C9A84C'},
+        {id:'cb_future', name:'Future Expansion', accent:'#7B6FD4'},
+        {id:'cb_prog',   name:'In Progress',      accent:'#D4851A'},
+        {id:'cb_done',   name:'Done',             accent:'#3DAA4C', isDone:true}
+      ]},
+      h2h:{cols:[
+        {id:'h2h_pri',    name:'Priority',          accent:'#E05020'},
+        {id:'h2h_content',name:'Content & Branding',accent:'#C9A84C'},
+        {id:'h2h_plan',   name:'Business Planning', accent:'#2B7FD4'},
+        {id:'h2h_vision', name:'Future Vision',     accent:'#7B6FD4'},
+        {id:'h2h_prog',   name:'In Progress',       accent:'#D4851A'},
+        {id:'h2h_done',   name:'Done',              accent:'#3DAA4C', isDone:true}
+      ]}
+    },
+    personalCols:[
+      {id:'pers_admin', name:'Life Admin',      accent:'#C9A84C'},
+      {id:'pers_health',name:'Health & Fitness',accent:'#3DAA4C'},
+      {id:'pers_dev',   name:'Self Development',accent:'#2B7FD4'},
+      {id:'pers_done',  name:'Done',            accent:'#3DAA4C', isDone:true}
+    ],
+    tasks:{},
+    trash:{},
+    colOrder:{}
+  };
 }
 
-// ── Habit helpers ──
-function getH(d){return S.habits[d]||{};}
-function getP(d){return S.prayers[d]||{};}
-function getBizH(d){d=d||td();return BIZ_CFG.reduce((a,b)=>a+(parseFloat(S.biz[b.id]?.[d]?.hours)||0),0);}
-function habScore(d){
-  let h=getH(d),p=getP(d),s=0;
-  PRAYERS.forEach(k=>{if(p[k])s++;});
-  HKEYS.forEach(k=>{if(h[k])s++;});
-  if(getBizH(d)>=2)s++;
-  return Math.round((s/10)*100);
+function initTaskStore2(raw){
+  if(!raw || typeof raw !== 'object' || !raw.tasks) return defaultTaskStore();
+  var d = defaultTaskStore();
+  if(!raw.globalCols)   raw.globalCols   = d.globalCols;
+  if(!raw.bizLanes)     raw.bizLanes     = d.bizLanes;
+  if(!raw.personalCols) raw.personalCols = d.personalCols;
+  if(!raw.trash)        raw.trash        = {};
+  if(!raw.colOrder)     raw.colOrder     = {};
+  // Migrate old biz lane IDs
+  ['slp','cb','h2h'].forEach(function(bid){
+    if(!raw.bizLanes[bid]) raw.bizLanes[bid] = d.bizLanes[bid];
+    var existingIds = (raw.bizLanes[bid].cols||[]).map(function(c){return c.id;});
+    var newIds = d.bizLanes[bid].cols.map(function(c){return c.id;});
+    var hasNew = newIds.some(function(id){return existingIds.indexOf(id)!==-1;});
+    if(!hasNew){
+      var first = d.bizLanes[bid].cols[0];
+      Object.keys(raw.tasks).forEach(function(tid){
+        var t = raw.tasks[tid];
+        if(t.bizId === bid) t.colId = first.id;
+      });
+      raw.bizLanes[bid].cols = d.bizLanes[bid].cols;
+    }
+  });
+  var existingPers = (raw.personalCols||[]).map(function(c){return c.id;});
+  var newPers = d.personalCols.map(function(c){return c.id;});
+  if(!newPers.some(function(id){return existingPers.indexOf(id)!==-1;})){
+    raw.personalCols = d.personalCols;
+  }
+  return raw;
 }
-function pillCls(v,g,a){return v>=g?'g':v>=a?'a':'r';}
-
-// ── Past day editing ──
-let _editDay=td();
-function renderDayPicker(){
-  let el=document.getElementById('habit-day-picker');if(!el)return;
-  let days=getWeekDates();let today=td();
-  el.innerHTML=days.map((d,i)=>{
-    let lbl=d===today?'Today':DAYS_SHORT[i];
-    return `<button class="dpb ${d===_editDay?'active':''} ${d===today&&d!==_editDay?'istoday':''}" onclick="setEditDay('${d}')">${lbl}</button>`;
-  }).join('');
-  let lbl=document.getElementById('editing-day-label');
-  if(lbl){let dt=new Date(_editDay+'T12:00:00');lbl.textContent=_editDay===today?'Today':dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});}
-}
-function setEditDay(d){_editDay=d;renderDayPicker();renderHabitsForDay();}
-function renderHabitsForDay(){
-  let d=_editDay,h=getH(d),p=getP(d);
-  HKEYS.forEach(k=>{let b=document.getElementById('h-'+k);if(!b)return;let v=!!h[k];b.textContent=v?'✓':'—';b.className='cb'+(v?' on':'');});
-  BONUS.forEach(k=>{let b=document.getElementById('h-'+k);if(!b)return;let v=!!h[k];b.textContent=v?'✓':'—';b.className='cb'+(v?' gold-on':'');});
-  PRAYERS.forEach(k=>{let b=document.getElementById('p-'+k);if(!b)return;b.className='pd'+(!!p[k]?' on':'');});
-  let score=habScore(d);let badge=document.getElementById('habit-score-badge');if(badge){badge.textContent=score+'%';badge.className='spl '+pillCls(score,78,50);}
-  let bizH=getBizH(d);let bb=document.getElementById('h-biz2h');if(bb){bb.textContent=bizH>=2?'✓':'—';bb.className='cb'+(bizH>=2?' on':'');}
-  let bl=document.getElementById('biz-hours-today-label');if(bl)bl.textContent=bizH.toFixed(1)+'h logged today';
-  let ref=document.getElementById('reflection-text');if(ref)ref.value=S.refs[_editDay]||'';
-}
-function toggleHabitForDay(k){let d=_editDay;if(!S.habits[d])S.habits[d]={};S.habits[d][k]=!S.habits[d][k];ss('habits');renderHabitsForDay();if(d===td())renderDashboard();}
-function togglePrayerForDay(k){let d=_editDay;if(!S.prayers[d])S.prayers[d]={};S.prayers[d][k]=!S.prayers[d][k];ss('prayers');renderHabitsForDay();renderPrayerPage();if(d===td())renderDashboard();}
-function toggleBonusHabit(k){let d=_editDay;if(!S.habits[d])S.habits[d]={};S.habits[d][k]=!S.habits[d][k];ss('habits');renderHabitsForDay();}
-function togglePrayer(k){let d=td();if(!S.prayers[d])S.prayers[d]={};S.prayers[d][k]=!S.prayers[d][k];ss('prayers');renderPrayerPage();renderDashboard();}
-function setMood(type,val){let d=td();if(!S.mood[d])S.mood[d]={};S.mood[d][type]=val;ss('mood');renderMoodBtns();renderDashboard();}
-function renderMoodBtns(){let d=td();let m=S.mood[d]||{};['mood','energy'].forEach(type=>{for(let i=1;i<=5;i++){let b=document.getElementById(type+'-'+i);if(b)b.className='mood-btn'+(m[type]===i?' sel':'');}});}
-function renderHabits(){_editDay=td();renderDayPicker();renderHabitsForDay();renderMoodBtns();renderStreaks();}
-function renderStreaks(){
-  let el=document.getElementById('streak-display');if(!el)return;
-  let weekDates=getWeekDates();let today=td();
-  let items=[
-    {label:'All 5 prayers',fn:d=>PRAYERS.filter(p=>getP(d)[p]).length>=5},
-    {label:'Gym',fn:d=>!!getH(d).gym,gymOnly:true},
-    {label:'Push-ups',fn:d=>!!getH(d).pushups},
-    {label:'Diet',fn:d=>!!getH(d).diet},
-    {label:'15min reading',fn:d=>!!getH(d).reading},
-    {label:'2h+ business',fn:d=>getBizH(d)>=2}
-  ];
-  el.innerHTML=items.map(item=>{
-    let streak=0,dc=new Date();for(let i=0;i<90;i++){let ds=localDate(dc);if(item.fn(ds))streak++;else break;dc.setDate(dc.getDate()-1);}
-    let wH=weekDates.filter(d=>d<=today&&item.fn(d)).length;
-    let right=item.gymOnly?`<span class="spl ${pillCls(wH,4,2)}" style="font-size:11px">${wH}/4 this week</span>`:`<span class="streak-num">${streak} day streak</span>`;
-    return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:13px;color:var(--text)">${item.label}</span>${right}</div><div class="wdc">${weekDates.map((ds,i)=>{let hit=item.fn(ds);let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hit?'hit':'miss'}">${hit?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div></div>`;
-  }).join('');
-}
-function saveReflection(){let ref=document.getElementById('reflection-text');if(!ref||!ref.value.trim())return;S.refs[_editDay]=ref.value.trim();ss('refs');ref.style.borderColor='var(--green)';setTimeout(()=>ref.style.borderColor='',1500);}
-
-// ── Prayers ──
-let _prayerTimes=null,_prayerDate='';
-async function fetchPrayerTimes(){
-  let today=td();if(_prayerTimes&&_prayerDate===today){renderPrayerTimes(_prayerTimes);return;}
-  try{
-    let now=new Date();let url=`https://api.aladhan.com/v1/timingsByAddress/${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}?address=Trowbridge,Wiltshire,UK&method=15&school=0&latitudeAdjustmentMethod=3`;
-    let res=await fetch(url);let json=await res.json();
-    if(json.code===200){let t=json.data.timings;_prayerTimes={Fajr:t.Fajr,Dhuhr:t.Dhuhr,Asr:t.Asr,Maghrib:t.Maghrib,Isha:t.Isha};_prayerDate=today;renderPrayerTimes(_prayerTimes);renderDashboardPrayer();}
-  }catch(e){}
-}
-function toAmPm(t){if(!t)return '';let[h,m]=t.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')}${h>=12?'pm':'am'}`;}
-function getNextPrayer(times){let now=new Date();let nowM=now.getHours()*60+now.getMinutes();for(let n of['Fajr','Dhuhr','Asr','Maghrib','Isha']){let[h,m]=times[n].split(':').map(Number);if(h*60+m>nowM)return{name:n,time:times[n]};}return{name:'Fajr (tomorrow)',time:times['Fajr']};}
-function renderPrayerTimes(times){
-  let el=document.getElementById('prayer-times-list');if(!el)return;
-  let lbl=document.getElementById('prayer-date-label');if(lbl)lbl.textContent=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'});
-  let next=getNextPrayer(times);
-  el.innerHTML=['Fajr','Dhuhr','Asr','Maghrib','Isha'].map(n=>{let isNext=next&&next.name===n;return `<div class="prayer-row"><span style="font-size:14px;color:var(--text)">${n}</span><div style="display:flex;align-items:center;gap:8px"><span class="prayer-time">${toAmPm(times[n])}</span>${isNext?`<span class="prayer-next">Next</span>`:''}</div></div>`;}).join('');
-}
-function renderDashboardPrayer(){
-  let d=td(),p=getP(d);let ticked=PRAYERS.filter(k=>p[k]).length;
-  let badge=document.getElementById('d-prayer-ticked');if(badge){badge.textContent=ticked+'/5';badge.className='spl '+pillCls(ticked,5,3);}
-  let nextEl=document.getElementById('d-next-prayer');if(!nextEl)return;
-  if(!_prayerTimes){nextEl.innerHTML='<span style="color:var(--text3)">Loading...</span>';return;}
-  let next=getNextPrayer(_prayerTimes);
-  nextEl.innerHTML=next?`<span style="font-size:15px;font-weight:600;color:var(--blue)">${next.name}</span><span style="font-size:13px;color:var(--text3);margin-left:8px">at ${toAmPm(next.time)}</span>`:'<span style="color:var(--green);font-weight:500">All prayers done — BarakAllahu feek ✓</span>';
-}
-function renderPrayerPage(){
-  let d=td(),p=getP(d);PRAYERS.forEach(k=>{let b=document.getElementById('pp-'+k);if(!b)return;b.className='pd'+(!!p[k]?' on':'');});
-  let ticked=PRAYERS.filter(k=>p[k]).length;let badge=document.getElementById('prayer-tick-count');if(badge){badge.textContent=ticked+'/5';badge.className='spl '+pillCls(ticked,5,3);}
-  let we=document.getElementById('prayer-week-grid');if(!we)return;
-  let weekDates=getWeekDates();let today=td();
-  we.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{let ticks=PRAYERS.filter(k=>getP(ds)[k]).length;let hit=ticks>=5;let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hit?'hit':isPast?'miss':''}">${isPast?(hit?'✓':ticks||'·'):'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;
-}
-
-// ════════════════════════════════════════
-//  TASKS SYSTEM — COMPLETE REBUILD
-// ════════════════════════════════════════
-
-
-// ===== TASK SYSTEM =====
-let _drag = {id:null, colId:null, bizId:null};
-let _expanded = {}; // taskId -> bool
-let _mobCol = null;
-let _mobMoveId = null;
 
 // ── Store helpers ──
-function getTS(){return S.tasks2;}
-function saveTS(){ss('tasks2');}
-function allTasks(){return Object.values(getTS().tasks||{});}
-
-function getCol(colId, ts){
-  ts = ts||getTS();
-  for(let c of ts.globalCols||[]){ if(c.id===colId) return c; }
-  for(let b of BIZ_CFG){ let lane=ts.bizLanes[b.id]; if(lane){ for(let c of lane.cols){ if(c.id===colId) return c; } } }
-  for(let c of ts.personalCols||[]){ if(c.id===colId) return c; }
-  return null;
-}
+function getTS(){ return S.tasks2; }
+function saveTS(){ ss('tasks2'); }
+function newId(){ return 't_' + Math.random().toString(36).slice(2,12); }
+function allTasks(){ return Object.values(getTS().tasks); }
 
 function getTasksInCol(colId, bizId){
-  let ts = getTS();
-  let biz = bizId||null;
-  let items = allTasks().filter(t => t.colId===colId && (t.bizId||null)===biz);
-  let order = ts.colOrder && ts.colOrder[colId];
+  var biz = bizId||null;
+  var items = allTasks().filter(function(t){
+    return t.colId===colId && (t.bizId||null)===biz;
+  });
+  var order = (getTS().colOrder||{})[colId];
   if(order && order.length){
-    let map = {}; order.forEach((id,i) => map[id]=i);
-    items.sort((a,b) => (map[a.id]!==undefined?map[a.id]:9999) - (map[b.id]!==undefined?map[b.id]:9999));
+    var map = {};
+    order.forEach(function(id,i){ map[id]=i; });
+    items.sort(function(a,b){
+      var ai = map[a.id]!==undefined ? map[a.id] : 9999;
+      var bi = map[b.id]!==undefined ? map[b.id] : 9999;
+      return ai-bi;
+    });
   }
   return items;
 }
 
-function ensureColOrder(colId, bizId){
-  let ts = getTS();
-  if(!ts.colOrder) ts.colOrder = {};
-  if(!ts.colOrder[colId]){
-    ts.colOrder[colId] = getTasksInCol(colId, bizId||null).map(t=>t.id);
-  }
-  return ts.colOrder[colId];
-}
-
-function getScheduledSubs(colId){
-  let res = [];
-  allTasks().forEach(t => {
-    (t.subtasks||[]).forEach(s => {
-      if(s.scheduledTo === colId) res.push({task:t, sub:s});
-    });
-  });
-  return res;
-}
-
 function getScheduledSubsInCol(colId){
-  let res=[];
-  Object.values(getTS().tasks).forEach(task=>{
-    (task.subtasks||[]).forEach(sub=>{
-      if(sub.scheduledTo===colId) res.push({task,sub});
+  var res = [];
+  allTasks().forEach(function(task){
+    (task.subtasks||[]).forEach(function(sub){
+      if(sub.scheduledTo===colId) res.push({task:task, sub:sub});
     });
   });
   return res;
 }
 
-function newId(){ return 't_' + Math.random().toString(36).slice(2,12); }
+function findColDef(colId, bizId){
+  var ts = getTS();
+  if(bizId){
+    var lane = ts.bizLanes[bizId];
+    if(lane){ var c = lane.cols.find(function(c){return c.id===colId;}); if(c) return c; }
+  }
+  var gc = ts.globalCols.find(function(c){return c.id===colId;});
+  if(gc) return gc;
+  return ts.personalCols.find(function(c){return c.id===colId;})||null;
+}
 
 function findDoneCol(colId, bizId){
-  let ts = getTS();
-  if(bizId){ let lane=ts.bizLanes[bizId]; if(lane){ let dc=lane.cols.find(c=>c.isDone); return dc?dc.id:null; } }
-  let pc = ts.personalCols.find(c=>c.isDone);
-  if(pc && ts.personalCols.find(c=>c.id===colId)) return pc.id;
-  let gc = ts.globalCols.find(c=>c.type==='done'); return gc?gc.id:null;
+  var ts = getTS();
+  if(bizId){
+    var lane = ts.bizLanes[bizId];
+    if(lane){ var dc = lane.cols.find(function(c){return c.isDone;}); if(dc) return dc.id; }
+  }
+  var pc = ts.personalCols.find(function(c){return c.isDone;});
+  if(pc && ts.personalCols.find(function(c){return c.id===colId;})) return pc.id;
+  var gc = ts.globalCols.find(function(c){return c.isDone||c.type==='done';});
+  return gc ? gc.id : null;
 }
 
-// ── CRUD ──
+// ── Task CRUD ──
 function addTask2(colId, bizId){
-  let ts = getTS();
-  let nameEl = document.getElementById('tn2-'+colId);
-  let name = (nameEl?.value||'').trim(); if(!name) return;
-  let pri = document.getElementById('tp2-'+colId)?.value||'medium';
-  let due = document.getElementById('td2b-'+colId)?.value||'';
-  let note = (document.getElementById('tnote2-'+colId)?.value||'').trim();
-  let task = {id:newId(), title:name, priority:pri, due, note, pinned:false, colId, bizId:bizId||null, subtasks:[], added:td()};
-  ts.tasks[task.id] = task;
-  if(nameEl) nameEl.value = '';
-  let form = document.getElementById('tmf-'+colId); if(form) form.classList.remove('open');
+  var nameEl = document.getElementById('tn-'+colId);
+  var name = (nameEl?nameEl.value:'').trim();
+  if(!name) return;
+  var pri  = (document.getElementById('tp-'+colId)||{}).value||'medium';
+  var due  = (document.getElementById('td-'+colId)||{}).value||'';
+  var note = ((document.getElementById('tnt-'+colId)||{}).value||'').trim();
+  var task = {
+    id:newId(), title:name, priority:pri, due:due, note:note,
+    pinned:false, colId:colId, bizId:bizId||null, subtasks:[], added:td()
+  };
+  getTS().tasks[task.id] = task;
+  if(nameEl) nameEl.value='';
+  var ef = document.getElementById('tef-'+colId);
+  if(ef) ef.style.display='none';
   saveTS(); renderTasks(); renderDashboard();
 }
 
 function doneTask2(taskId){
-  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
-  let dc = findDoneCol(task.colId, task.bizId);
+  var ts = getTS();
+  var task = ts.tasks[taskId]; if(!task) return;
+  var dc = findDoneCol(task.colId, task.bizId);
   if(dc){ task.colId=dc; task.doneAt=td(); }
-  saveTS(); spawnConfetti(false);
-  setTimeout(()=>{ renderTasks(); renderDashboard(); }, 0);
+  saveTS(); spawnConfetti(false); renderTasks(); renderDashboard();
 }
 
 function restoreTask2(taskId){
-  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
+  var ts = getTS();
+  var task = ts.tasks[taskId]; if(!task) return;
   delete task.doneAt;
-  let gc = ts.globalCols.find(c=>c.type==='today'); if(gc) task.colId=gc.id;
-  saveTS(); setTimeout(()=>{ renderTasks(); renderDashboard(); },0);
-}
-
-function pinTask2(taskId){
-  let task = getTS().tasks[taskId]; if(!task) return;
-  task.pinned = !task.pinned; saveTS(); setTimeout(()=>renderTasks(),0);
+  var gc = ts.globalCols.find(function(c){return c.type==='today';});
+  if(gc) task.colId = gc.id;
+  saveTS(); renderTasks(); renderDashboard();
 }
 
 function softDeleteTask2(taskId){
-  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
+  var ts = getTS();
+  var task = ts.tasks[taskId]; if(!task) return;
   task.deletedAt = new Date().toISOString();
   if(!ts.trash) ts.trash={};
   ts.trash[taskId] = task;
   delete ts.tasks[taskId];
-  saveTS();
-  setTimeout(()=>{ renderTasks(); renderTrash(); }, 0);
+  saveTS(); renderTasks(); renderTrash();
 }
 
 function hardDeleteTask2(taskId){
-  let ts = getTS(); delete ts.trash[taskId]; saveTS(); renderTrash();
+  var ts = getTS();
+  delete ts.trash[taskId];
+  saveTS(); renderTrash();
 }
 
-function confirmHardDelete(taskId){ if(confirm('Permanently delete?')) hardDeleteTask2(taskId); }
+function confirmHardDelete(taskId){
+  if(confirm('Permanently delete this task?')) hardDeleteTask2(taskId);
+}
 
 function restoreFromTrash(taskId){
-  let ts = getTS(); let task = ts.trash[taskId]; if(!task) return;
+  var ts = getTS();
+  var task = ts.trash[taskId]; if(!task) return;
   delete task.deletedAt;
-  let colOk = getCol(task.colId, ts);
-  if(!colOk){ let gc=ts.globalCols.find(c=>c.type==='today'); if(gc){task.colId=gc.id; task.bizId=null;} }
-  ts.tasks[taskId] = task; delete ts.trash[taskId];
+  var gc = ts.globalCols.find(function(c){return c.type==='today';});
+  if(gc) task.colId = gc.id; task.bizId = null;
+  ts.tasks[taskId] = task;
+  delete ts.trash[taskId];
   saveTS(); renderTasks(); renderTrash();
+}
+
+function pinTask2(taskId){
+  var task = getTS().tasks[taskId]; if(!task) return;
+  task.pinned = !task.pinned;
+  saveTS(); renderTasks();
+}
+
+function moveTask2(taskId, toColId, toBizId){
+  var ts = getTS();
+  var task = ts.tasks[taskId]; if(!task) return;
+  task.colId = toColId; task.bizId = toBizId||null;
+  saveTS(); renderTasks(); renderDashboard();
 }
 
 // ── Subtasks ──
 function addSubtask(taskId){
-  let inp = document.getElementById('sub-inp-'+taskId); if(!inp) return;
-  let title = inp.value.trim(); if(!title) return;
-  let task = getTS().tasks[taskId]; if(!task) return;
+  var inp = document.getElementById('sub-inp-'+taskId);
+  if(!inp) return;
+  var title = inp.value.trim(); if(!title) return;
+  var task = getTS().tasks[taskId]; if(!task) return;
   if(!task.subtasks) task.subtasks=[];
-  task.subtasks.push({id:newId(), title, done:false, scheduledTo:null});
-  let val = inp.value; inp.value = '';
-  saveTS();
-  setTimeout(()=>{ renderTasks(); }, 0);
+  task.subtasks.push({id:newId(), title:title, done:false, scheduledTo:null});
+  inp.value = '';
+  saveTS(); renderTasks();
 }
 
 function toggleSubtask(taskId, subId){
-  let task = getTS().tasks[taskId]; if(!task) return;
-  let sub = task.subtasks.find(s=>s.id===subId); if(!sub) return;
+  var task = getTS().tasks[taskId]; if(!task) return;
+  var sub = (task.subtasks||[]).find(function(s){return s.id===subId;}); if(!sub) return;
   sub.done = !sub.done;
-  if(task.subtasks.length > 0 && task.subtasks.every(s=>s.done)){ doneTask2(taskId); return; }
-  saveTS(); setTimeout(()=>renderTasks(), 0);
+  if(task.subtasks.every(function(s){return s.done;})){ doneTask2(taskId); return; }
+  saveTS(); renderTasks();
 }
 
 function deleteSubtask(taskId, subId){
-  let task = getTS().tasks[taskId]; if(!task) return;
-  task.subtasks = task.subtasks.filter(s=>s.id!==subId);
+  var task = getTS().tasks[taskId]; if(!task) return;
+  task.subtasks = (task.subtasks||[]).filter(function(s){return s.id!==subId;});
   saveTS(); renderTasks();
 }
 
-function scheduleSubtask(taskId, subId, val){
-  let task = getTS().tasks[taskId]; if(!task) return;
-  let sub = task.subtasks.find(s=>s.id===subId); if(!sub) return;
-  sub.scheduledTo = val||null; saveTS(); renderTasks();
+function scheduleSubtask(taskId, subId, targetColId){
+  var task = getTS().tasks[taskId]; if(!task) return;
+  var sub = (task.subtasks||[]).find(function(s){return s.id===subId;}); if(!sub) return;
+  sub.scheduledTo = targetColId||null;
+  saveTS(); renderTasks();
 }
 
-function toggleExpand(taskId){ _expanded[taskId]=!_expanded[taskId]; renderTasks(); }
-
-// ── Col lookup ──
-function findColDef(colId, bizId, ts){
-  ts = ts || getTS();
-  if(bizId){
-    let lane = ts.bizLanes[bizId];
-    if(lane){ let c = lane.cols.find(c=>c.id===colId); if(c) return c; }
-  }
-  let gc = ts.globalCols.find(c=>c.id===colId);
-  if(gc) return gc;
-  return ts.personalCols.find(c=>c.id===colId) || null;
-}
-function moveTask2(taskId, toColId, toBizId){
-  let ts = getTS();
-  if(!ts.colOrder) ts.colOrder = {};
-  let task = ts.tasks[taskId]; if(!task) return;
-  let fromCol = task.colId, fromBiz = task.bizId;
-  task.colId = toColId; task.bizId = toBizId||null;
-  ts.colOrder[fromCol] = (ts.colOrder[fromCol]||[]).filter(id=>id!==taskId);
-  ts.colOrder[toColId] = [...((ts.colOrder[toColId]||[]).filter(id=>id!==taskId)), taskId];
-  saveTS(); renderTasks(); renderDashboard();
+// ── Expand state ──
+var _expanded = {};
+function toggleExpand(taskId){
+  _expanded[taskId] = !_expanded[taskId];
+  renderTasks();
 }
 
 // ── Ordering ──
-function getColVisualIds(colId, bizId){
-  let tasks = getTasksInCol(colId, bizId||null);
-  let pinned = tasks.filter(t=>t.pinned);
-  let unpinned = tasks.filter(t=>!t.pinned);
-  return [...pinned, ...unpinned].map(t=>t.id);
-}
-function reRenderCol(colId, bizId){
-  let ts = getTS();
-  let colDef = findColDef(colId, bizId||null, ts);
-  if(!colDef) { renderTasks(); return; }
-  let q = (document.getElementById('task-search')?.value||'').trim();
-  let el = document.getElementById('tcol-'+colId);
-  if(!el) { renderTasks(); return; }
-  el.outerHTML = buildCol2(colDef, bizId||null, q);
-}
-function moveTaskUp(taskId, colId, bizId){
-  bizId = bizId||null;
-  let ts = getTS();
-  if(!ts.colOrder) ts.colOrder = {};
-  let ids = getColVisualIds(colId, bizId);
-  let idx = ids.indexOf(taskId);
-  if(idx <= 0) return;
-  [ids[idx-1], ids[idx]] = [ids[idx], ids[idx-1]];
-  ts.colOrder[colId] = ids;
-  saveTS(); reRenderCol(colId, bizId);
-}
-function moveTaskDown(taskId, colId, bizId){
-  bizId = bizId||null;
-  let ts = getTS();
-  if(!ts.colOrder) ts.colOrder = {};
-  let ids = getColVisualIds(colId, bizId);
-  let idx = ids.indexOf(taskId);
-  if(idx === -1 || idx >= ids.length-1) return;
-  [ids[idx+1], ids[idx]] = [ids[idx], ids[idx+1]];
-  ts.colOrder[colId] = ids;
-  saveTS(); reRenderCol(colId, bizId);
+function getVisualOrder(colId, bizId){
+  var tasks = getTasksInCol(colId, bizId||null);
+  var pinned   = tasks.filter(function(t){return  t.pinned;});
+  var unpinned = tasks.filter(function(t){return !t.pinned;});
+  return pinned.concat(unpinned).map(function(t){return t.id;});
 }
 
-// ── Column management ──
-function addBizCol(bizId){
-  let name = prompt('Column name:'); if(!name||!name.trim()) return;
-  let ts = getTS(); let lane = ts.bizLanes[bizId]; if(!lane) return;
-  lane.cols.push({id:bizId+'_'+newId(), name:name.trim(), accent:BIZ_COL_ACCENT[bizId]||'#888'});
+function moveTaskUp(taskId, colId, bizId){
+  bizId = bizId||null;
+  var ts = getTS(); if(!ts.colOrder) ts.colOrder={};
+  var ids = getVisualOrder(colId, bizId);
+  var idx = ids.indexOf(taskId);
+  if(idx <= 0) return;
+  var tmp=ids[idx-1]; ids[idx-1]=ids[idx]; ids[idx]=tmp;
+  ts.colOrder[colId] = ids;
   saveTS(); renderTasks();
 }
 
+function moveTaskDown(taskId, colId, bizId){
+  bizId = bizId||null;
+  var ts = getTS(); if(!ts.colOrder) ts.colOrder={};
+  var ids = getVisualOrder(colId, bizId);
+  var idx = ids.indexOf(taskId);
+  if(idx===-1 || idx>=ids.length-1) return;
+  var tmp=ids[idx+1]; ids[idx+1]=ids[idx]; ids[idx]=tmp;
+  ts.colOrder[colId] = ids;
+  saveTS(); renderTasks();
+}
+
+// ── Column management ──
+function startRenameCol(colId){
+  var nm = document.getElementById('cnm-'+colId);
+  var ni = document.getElementById('cni-'+colId);
+  if(nm) nm.style.display='none';
+  if(ni){ ni.style.display='block'; ni.focus(); ni.select(); }
+}
+function finishRenameCol(colId, bizId){
+  var ni = document.getElementById('cni-'+colId);
+  var nm = document.getElementById('cnm-'+colId);
+  if(ni) ni.style.display='none';
+  if(nm) nm.style.display='';
+  var newName = ni ? ni.value.trim() : '';
+  if(!newName) return;
+  var col = findColDef(colId, bizId||null);
+  if(col) col.name = newName;
+  saveTS(); renderTasks();
+}
+function deleteCol2(colId, bizId){
+  if(!confirm('Delete this column? Tasks will move to the first column.')) return;
+  var ts = getTS();
+  var cols = bizId ? (ts.bizLanes[bizId]||{}).cols : ts.personalCols;
+  if(!cols || cols.length<=1) return;
+  var idx = cols.findIndex(function(c){return c.id===colId;});
+  if(idx===-1) return;
+  var fallback = cols.find(function(c){return c.id!==colId;});
+  cols.splice(idx,1);
+  allTasks().forEach(function(t){if(t.colId===colId){t.colId=fallback.id; t.bizId=bizId||null;}});
+  saveTS(); renderTasks();
+}
+function addBizCol(bizId){
+  var ts = getTS();
+  var lane = ts.bizLanes[bizId]; if(!lane) return;
+  var name = prompt('Column name:'); if(!name||!name.trim()) return;
+  lane.cols.push({id:bizId+'_'+newId(), name:name.trim(), accent:'#C9A84C'});
+  saveTS(); renderTasks();
+}
 function addPersonalCol(){
-  let name = prompt('Column name:'); if(!name||!name.trim()) return;
-  let ts = getTS();
+  var ts = getTS();
+  var name = prompt('Column name:'); if(!name||!name.trim()) return;
   ts.personalCols.push({id:'pers_'+newId(), name:name.trim(), accent:'#C9A84C'});
   saveTS(); renderTasks();
 }
 
-function deleteCol2(colId, bizId){
-  if(!confirm('Delete this column? Tasks will move to first column.')) return;
-  let ts = getTS();
-  let cols = bizId ? ts.bizLanes[bizId]?.cols : ts.personalCols;
-  if(!cols || cols.length <= 1) return;
-  let idx = cols.findIndex(c=>c.id===colId); if(idx===-1) return;
-  let fallback = cols.find(c=>c.id!==colId);
-  cols.splice(idx,1);
-  allTasks().forEach(t=>{ if(t.colId===colId) t.colId=fallback.id; });
-  saveTS(); renderTasks();
-}
+// ── Drag & Drop ──
+var _drag = {id:null, colId:null, bizId:null};
 
-function startRenameCol(colId){
-  let nm=document.getElementById('cnm-'+colId), inp=document.getElementById('cni-'+colId);
-  if(nm) nm.style.display='none'; if(inp){inp.style.display='block';inp.focus();inp.select();}
-}
-
-function finishRenameCol(colId, bizId){
-  let nm=document.getElementById('cnm-'+colId), inp=document.getElementById('cni-'+colId);
-  if(inp) inp.style.display='none'; if(nm) nm.style.display='';
-  let newName = inp?.value.trim(); if(!newName) return;
-  let col = getCol(colId);
-  if(col) col.name = newName;
-  saveTS(); renderTasks();
-}
-
-// ── Drag & Drop (desktop only) ──
 function onTC_DragStart(e, taskId, colId, bizId){
-  _drag = {id:taskId, colId, bizId:bizId||null};
+  _drag = {id:taskId, colId:colId, bizId:bizId||null};
   e.dataTransfer.effectAllowed = 'move';
-  setTimeout(()=>{ let el=document.getElementById('tc-'+taskId); if(el) el.classList.add('dragging'); }, 0);
+  e.dataTransfer.setData('text/plain', taskId);
+  setTimeout(function(){
+    var el = document.getElementById('tc-'+taskId);
+    if(el) el.style.opacity = '0.4';
+  },0);
 }
-
 function onTC_DragEnd(e, taskId){
-  let el = document.getElementById('tc-'+taskId); if(el) el.classList.remove('dragging');
-  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
-  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+  var el = document.getElementById('tc-'+taskId);
+  if(el) el.style.opacity = '';
+  document.querySelectorAll('.tcol').forEach(function(c){c.classList.remove('drag-over');});
 }
-
 function onCol_DragOver(e, colId){
   e.preventDefault();
-  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
-  document.getElementById('tcol-'+colId)?.classList.add('drag-over');
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.tcol').forEach(function(c){c.classList.remove('drag-over');});
+  var el = document.getElementById('tcol-'+colId);
+  if(el) el.classList.add('drag-over');
 }
-
-function onCard_DragOver(e, taskId){
-  // Allow drag - don't stopPropagation so column also gets dragover
-  e.preventDefault();
-  if(!_drag.id || _drag.id===taskId){
-    // Hovering over self - still need to allow drop on column
-    return;
-  }
-  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
-  document.getElementById('tc-'+taskId)?.classList.add('drag-over-top');
-}
-
-function onCard_Drop(e, taskId, colId, bizId){
-  e.preventDefault(); e.stopPropagation();
-  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
-  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
-  if(!_drag.id || _drag.id===taskId) return;
-  let ts = getTS();
-  if(!ts.colOrder) ts.colOrder = {};
-  let task = ts.tasks[_drag.id]; if(!task) return;
-  let fromCol=_drag.colId, fromBiz=_drag.bizId;
-  let toCol=colId, toBiz=bizId||null;
-  task.colId=toCol; task.bizId=toBiz;
-  // Remove from source col order
-  ts.colOrder[fromCol] = getColVisualIds(fromCol, fromBiz).filter(id=>id!==_drag.id);
-  // Insert before target in dest col
-  let toIds = getColVisualIds(toCol, toBiz).filter(id=>id!==_drag.id);
-  let targetIdx = toIds.indexOf(taskId);
-  if(targetIdx === -1) toIds.push(_drag.id); else toIds.splice(targetIdx, 0, _drag.id);
-  ts.colOrder[toCol] = toIds;
-  _drag = {id:null, colId:null, bizId:null};
-  saveTS(); renderTasks(); renderDashboard();
-}
-
 function onCol_Drop(e, colId, bizId){
   e.preventDefault();
-  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.tcol').forEach(function(c){c.classList.remove('drag-over');});
   if(!_drag.id) return;
-  let ts = getTS(); let task = ts.tasks[_drag.id]; if(!task) return;
-  let fromCol=_drag.colId, fromBiz=_drag.bizId;
-  task.colId=colId; task.bizId=bizId||null;
-  // Update colOrder for both cols
-  if(!ts.colOrder) ts.colOrder = {};
-  ts.colOrder[fromCol] = getColVisualIds(fromCol, fromBiz).filter(id=>id!==_drag.id);
-  ts.colOrder[colId] = [...(ts.colOrder[colId]||[]).filter(id=>id!==_drag.id), _drag.id];
+  var ts = getTS();
+  var task = ts.tasks[_drag.id]; if(!task) return;
+  task.colId = colId; task.bizId = bizId||null;
+  if(!ts.colOrder) ts.colOrder={};
+  var existing = (ts.colOrder[colId]||[]).filter(function(id){return id!==_drag.id;});
+  existing.push(_drag.id);
+  ts.colOrder[colId] = existing;
   _drag = {id:null, colId:null, bizId:null};
   saveTS(); renderTasks(); renderDashboard();
 }
 
-// ── Build card HTML ──
-function buildTaskCard(task, colDef, isDone){
-  let p = PRI_CFG[task.priority||'medium'];
-  let isOD = task.due && task.due < td() && !isDone;
-  let subs = task.subtasks||[];
-  let doneSubs = subs.filter(s=>s.done).length;
-  let subPct = subs.length ? Math.round(doneSubs/subs.length*100) : 0;
-  let isExp = !!_expanded[task.id];
-  let biz = task.bizId||'';
-
-  // Subtask section
-  let subHtml = '';
-  if(subs.length > 0){
-    let schedOpts = getTS().globalCols.filter(c=>c.type!=='done')
-      .map(c=>`<option value="${c.id}" ${subs[0]?.scheduledTo===c.id?'selected':''}>${c.name}</option>`).join('') +
-      `<option value="">Backlog</option>`;
-    subHtml = `<div class="tc-sub-bar" onclick="event.stopPropagation();toggleExpand('${task.id}')">
-      <div class="tc-sub-prog"><div class="tc-sub-fill" style="width:${subPct}%"></div></div>
-      <span class="tc-sub-lbl">${doneSubs}/${subs.length}</span>
-      <span style="font-size:9px;color:var(--text3)">${isExp?'▲':'▼'}</span>
-    </div>
-    <div class="tc-subtasks ${isExp?'open':''}">
-      ${subs.map(sub => `<div class="sub-row">
-        <input type="checkbox" class="sub-chk" ${sub.done?'checked':''} onchange="event.stopPropagation();toggleSubtask('${task.id}','${sub.id}')">
-        <span class="sub-title ${sub.done?'done':''}">${sub.title}</span>
-        <select class="sub-sched" onchange="event.stopPropagation();scheduleSubtask('${task.id}','${sub.id}',this.value)">
-          ${getTS().globalCols.filter(c=>c.type!=='done').map(c=>`<option value="${c.id}" ${sub.scheduledTo===c.id?'selected':''}>${c.name}</option>`).join('')}
-          <option value="" ${!sub.scheduledTo?'selected':''}>Backlog</option>
-        </select>
-        <button class="sub-del" onclick="event.stopPropagation();deleteSubtask('${task.id}','${sub.id}')">×</button>
-      </div>`).join('')}
-      <div class="sub-add-row">
-        <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter'){event.stopPropagation();addSubtask('${task.id}')}">
-        <button onclick="event.stopPropagation();addSubtask('${task.id}')">+</button>
-      </div>
-    </div>`;
-  } else {
-    subHtml = `<div class="tc-subtasks ${isExp?'open':''}">
-      <div class="sub-add-row">
-        <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter'){event.stopPropagation();addSubtask('${task.id}')}">
-        <button onclick="event.stopPropagation();addSubtask('${task.id}')">+</button>
-      </div>
-    </div>`;
-  }
-
-  return `<div class="tc ${task.pinned?'pinned':''}" id="tc-${task.id}"
-    draggable="true"
-    ondragstart="onTC_DragStart(event,'${task.id}','${colDef.id}','${biz}')"
-    ondragend="onTC_DragEnd(event,'${task.id}')"
-    ondragover="onCard_DragOver(event,'${task.id}')"
-    ondrop="onCard_Drop(event,'${task.id}','${colDef.id}','${biz}')">
-    <div class="tc-row1">
-      <span class="tc-title ${isDone?'done':''}">${task.title}</span>
-      <span class="tc-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-    </div>
-    ${task.due?`<div><span class="tc-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
-    ${task.note?`<div class="tc-note">${task.note}</div>`:''}
-    ${subHtml}
-    <div class="tc-actions">
-      ${isDone
-        ?`<button class="tbtn" onclick="event.stopPropagation();restoreTask2('${task.id}')">↩</button>`
-        :`<button class="tbtn done-btn" onclick="event.stopPropagation();doneTask2('${task.id}')">✓ Done</button>`
-      }
-      <button class="tbtn arr" data-id="${task.id}" data-col="${colDef.id}" data-biz="${biz}" onclick="event.stopPropagation();moveTaskUp(this.dataset.id,this.dataset.col,this.dataset.biz)">↑</button>
-      <button class="tbtn arr" data-id="${task.id}" data-col="${colDef.id}" data-biz="${biz}" onclick="event.stopPropagation();moveTaskDown(this.dataset.id,this.dataset.col,this.dataset.biz)">↓</button>
-      <button class="tbtn pin-btn" onclick="event.stopPropagation();pinTask2('${task.id}')">${task.pinned?'📌 Unpin':'📌'}</button>
-      <button class="tbtn" onclick="event.stopPropagation();toggleExpand('${task.id}')">${isExp?'▲ Sub':'+ Sub'}</button>
-      <button class="tbtn del-btn" onclick="event.stopPropagation();softDeleteTask2('${task.id}')">Del</button>
-    </div>
-  </div>`;
+// ── Trash ──
+var _trashOpen = false;
+function toggleTrash(){
+  _trashOpen = !_trashOpen;
+  var el = document.getElementById('trash-cols');
+  if(el) el.style.display = _trashOpen ? 'block' : 'none';
+  renderTrash();
+}
+function renderTrash(){
+  var ts = getTS();
+  var items = Object.values(ts.trash||{});
+  var now = new Date();
+  items = items.filter(function(t){
+    if(!t.deletedAt) return true;
+    if((now-new Date(t.deletedAt))/(1000*60*60*24) > 30){ delete ts.trash[t.id]; return false; }
+    return true;
+  });
+  var countEl = document.getElementById('trash-count');
+  if(countEl) countEl.textContent = items.length;
+  var wrap = document.getElementById('trash-col-wrap');
+  if(!wrap||!_trashOpen) return;
+  if(!items.length){ wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:10px 0">Nothing in trash</div>'; return; }
+  items.sort(function(a,b){return new Date(b.deletedAt||0)-new Date(a.deletedAt||0);});
+  var cards = items.map(function(t){
+    var p = PRI_CFG[t.priority||'medium'];
+    var d = t.deletedAt ? new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+    var subLine = t.subtasks&&t.subtasks.length ? '<div style="font-size:10px;color:#505050;margin-top:3px">'+t.subtasks.length+' subtask'+(t.subtasks.length!==1?'s':'')+'</div>' : '';
+    return '<div class="tc" style="opacity:0.7">'
+      +'<div class="tc-row1"><span class="tc-title done" style="text-decoration:line-through">'+t.title+'</span>'
+      +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span></div>'
+      +subLine
+      +'<div style="font-size:10px;color:#505050;margin:3px 0">deleted '+d+'</div>'
+      +'<div class="tc-actions">'
+      +'<button class="tbtn" style="color:#3DAA4C;border-color:rgba(61,170,76,0.3)" data-tid="'+t.id+'" onclick="restoreFromTrash(this.dataset.tid)">↩ Restore</button>'
+      +'<button class="tbtn del-btn" data-tid="'+t.id+'" onclick="confirmHardDelete(this.dataset.tid)">Delete forever</button>'
+      +'</div></div>';
+  }).join('');
+  wrap.innerHTML = '<div class="tcol" style="min-width:280px;width:280px">'
+    +'<div class="tcol-head"><div class="tcol-dot" style="background:#444"></div>'
+    +'<span class="tcol-name">Deleted items</span>'
+    +'<span class="tcol-cnt">'+items.length+'</span></div>'
+    +'<div class="tcol-cards">'+cards+'</div></div>';
 }
 
-function buildSchedSubCard(task, sub){
-  return `<div class="tc is-sub">
-    <div class="tc-sub-parent">↳ ${task.title}</div>
-    <div class="tc-row1"><span class="tc-title ${sub.done?'done':''}">${sub.title}</span></div>
-    <div class="tc-actions">
-      <button class="tbtn done-btn" onclick="event.stopPropagation();toggleSubtask('${task.id}','${sub.id}')">✓ Done</button>
-      <button class="tbtn" onclick="event.stopPropagation();scheduleSubtask('${task.id}','${sub.id}','')">Remove</button>
-    </div>
-  </div>`;
-}
-
-// ── Build column ──
-function buildCol2(colDef, bizId, q){
-  let isDone = !!colDef.isDone || colDef.type==='done';
-  let tasks = getTasksInCol(colDef.id, bizId||null).filter(t=>taskMatchesSearch(t,q));
-  // Pinned float to top
-  let pinned = tasks.filter(t=>t.pinned);
-  let rest = tasks.filter(t=>!t.pinned);
-  tasks = [...pinned, ...rest];
-
-  let schedHtml = '';
-  if(!bizId && (colDef.type==='today'||colDef.type==='tomorrow'||colDef.type==='brain')){
-    schedHtml = getScheduledSubs(colDef.id).filter(({sub})=>!sub.done&&taskMatchesSearch({title:sub.title},q))
-      .map(({task,sub})=>buildSchedSubCard(task,sub)).join('');
-  }
-
-  let cardsHtml = tasks.map(t=>buildTaskCard(t,colDef,isDone)).join('');
-  let total = tasks.length + (schedHtml ? getScheduledSubs(colDef.id).filter(({sub})=>!sub.done).length : 0);
-
-  let addHtml = isDone ? '' : `
-    <div class="tcol-qadd">
-      <input type="text" id="tn2-${colDef.id}" placeholder="+ Quick add..." onkeydown="if(event.key==='Enter')addTask2('${colDef.id}','${bizId||''}')">
-    </div>
-    <button class="tcol-more-btn" onclick="document.getElementById('tmf-${colDef.id}').classList.toggle('open')">⚙ More options</button>
-    <div class="tcol-more-form" id="tmf-${colDef.id}">
-      <select id="tp2-${colDef.id}"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>
-      <input type="date" id="td2b-${colDef.id}">
-      <textarea id="tnote2-${colDef.id}" placeholder="Notes..."></textarea>
-      <button class="tcol-add-submit" onclick="addTask2('${colDef.id}','${bizId||''}')">Add task</button>
-    </div>`;
-
-  let canDel = !isDone && !colDef.type;
-  let delBtn = canDel ? `<button class="tcol-del" onclick="deleteCol2('${colDef.id}','${bizId||''}')">×</button>` : '';
-
-  return `<div class="tcol ${isDone?'done-col':''}" id="tcol-${colDef.id}"
-    ondragover="onCol_DragOver(event,'${colDef.id}')"
-    ondrop="onCol_Drop(event,'${colDef.id}','${bizId||''}')">
-    <div class="tcol-head">
-      <div class="tcol-dot" style="background:${colDef.accent}"></div>
-      <span class="tcol-name" id="cnm-${colDef.id}" ondblclick="startRenameCol('${colDef.id}')" title="Double-tap to rename">${colDef.name}</span>
-      <input class="tcol-name-input" id="cni-${colDef.id}" style="display:none" value="${colDef.name}"
-        onblur="finishRenameCol('${colDef.id}','${bizId||''}')"
-        onkeydown="if(event.key==='Enter')finishRenameCol('${colDef.id}','${bizId||''}')">
-      <span class="tcol-cnt">${total}</span>
-      ${delBtn}
-    </div>
-    <div class="tcol-cards">${schedHtml}${cardsHtml||`<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;font-style:italic">${isDone?'None':'Empty'}</div>`}</div>
-    ${addHtml}
-  </div>`;
-}
-
-// ── Main render ──
+// ── Search ──
 function taskMatchesSearch(task, q){
   if(!q) return true;
   q = q.toLowerCase();
-  return task.title?.toLowerCase().includes(q) || task.note?.toLowerCase().includes(q) ||
-    (task.subtasks||[]).some(s=>s.title.toLowerCase().includes(q));
+  if(task.title.toLowerCase().indexOf(q)!==-1) return true;
+  if(task.note && task.note.toLowerCase().indexOf(q)!==-1) return true;
+  if((task.subtasks||[]).some(function(s){return s.title.toLowerCase().indexOf(q)!==-1;})) return true;
+  return false;
 }
 
-function renderTasks(){
-  let ts = getTS();
-  let q = (document.getElementById('task-search')?.value||'').trim();
+// ── Build card ──
+var PRI_LABELS = {high:'High', medium:'Med', low:'Low'};
+function buildCard(task, colDef, isDone){
+  var biz  = task.bizId||'';
+  var p    = PRI_CFG[task.priority||'medium'];
+  var today2 = td();
+  var isOD = task.due && task.due < today2 && !isDone;
+  var subs = task.subtasks||[];
+  var doneSubs = subs.filter(function(s){return s.done;}).length;
+  var subPct = subs.length ? Math.round((doneSubs/subs.length)*100) : 0;
+  var isExp = !!_expanded[task.id];
 
-  let globalEl = document.getElementById('global-cols');
-  if(globalEl){
-    // Exclude brain from global zone (shown separately)
-    let gcols = ts.globalCols.filter(c=>c.type!=='brain');
-    globalEl.innerHTML = gcols.map(c=>buildCol2(c,null,q)).join('');
+  // Subtask section
+  var subHtml = '';
+  if(subs.length > 0){
+    var subRows = subs.map(function(sub){
+      var locLabel = '';
+      if(sub.scheduledTo){
+        var gc2 = getTS().globalCols.find(function(c){return c.id===sub.scheduledTo;});
+        if(gc2) locLabel = '<span class="subtask-loc">'+gc2.name+'</span>';
+      }
+      var schedOpts = getTS().globalCols
+        .filter(function(c){return c.type!=='done';})
+        .map(function(c){
+          return '<option value="'+c.id+'"'+(sub.scheduledTo===c.id?' selected':'')+'>'+c.name+'</option>';
+        }).join('') + '<option value=""'+(!sub.scheduledTo?' selected':'')+'">📌 Backlog</option>';
+      return '<div class="subtask-row">'
+        +'<input type="checkbox" class="subtask-check"'+(sub.done?' checked':'')
+        +' onchange="toggleSubtask(\''+task.id+'\',\''+sub.id+'\')">'
+        +'<span class="subtask-title'+(sub.done?' done':'')+'">'+sub.title+'</span>'
+        +locLabel
+        +'<select class="subtask-schedule" onchange="scheduleSubtask(\''+task.id+'\',\''+sub.id+'\',this.value)">'+schedOpts+'</select>'
+        +'<button class="subtask-del" onclick="deleteSubtask(\''+task.id+'\',\''+sub.id+'\')">×</button>'
+        +'</div>';
+    }).join('');
+    subHtml = '<div class="tc-subtask-bar" onclick="toggleExpand(\''+task.id+'\')">'
+      +'<div class="tc-subtask-progress"><div class="tc-subtask-progress-fill" style="width:'+subPct+'%"></div></div>'
+      +'<span class="tc-subtask-label">'+doneSubs+'/'+subs.length+'</span>'
+      +'<span style="font-size:10px;color:var(--text3)">'+(isExp?'▲':'▼')+'</span>'
+      +'</div>'
+      +'<div class="tc-subtasks'+(isExp?' open':'')+'">'
+      +subRows
+      +'<div class="subtask-add-row">'
+      +'<input type="text" id="sub-inp-'+task.id+'" placeholder="Add subtask...">'
+      +'<button onclick="addSubtask(\''+task.id+'\')">+ Add</button>'
+      +'</div></div>';
+  } else {
+    subHtml = '<div class="tc-subtasks'+(isExp?' open':'')+'">'
+      +'<div class="subtask-add-row">'
+      +'<input type="text" id="sub-inp-'+task.id+'" placeholder="Add subtask...">'
+      +'<button onclick="addSubtask(\''+task.id+'\')">+ Add</button>'
+      +'</div></div>';
   }
 
-  let bizEl = document.getElementById('biz-task-lanes');
-  if(bizEl){
-    bizEl.innerHTML = BIZ_CFG.map(b=>{
-      let lane = ts.bizLanes[b.id]; if(!lane) return '';
-      let logo = S.logos[b.id];
-      let logoHtml = logo ? `<img style="width:20px;height:20px;object-fit:contain;border-radius:3px" src="${logo}" alt="${b.name}">` : '';
-      return `<div class="biz-lane task-section">
-        <div class="task-section-header">
-          <span class="task-section-title biz" style="color:${b.color}">${b.id==='slp'||b.id==='biz1'?'🔴':b.id==='cb'||b.id==='biz2'?'🟢':'🟠'} ${b.name}</span>
-          ${logoHtml}
-          <button class="tcol-add-col-btn" onclick="addBizCol('${b.id}')">+ Column</button>
-        </div>
-        <div class="biz-lane-cols">${lane.cols.map(c=>buildCol2(c,b.id,q)).join('')}</div>
-      </div>`;
+  var actions = '<div class="tc-actions">'
+    +(isDone
+      ? '<button class="tbtn" onclick="restoreTask2(\''+task.id+'\')">↩ Restore</button>'
+      : '<button class="tbtn done-btn" onclick="doneTask2(\''+task.id+'\')">✓ Done</button>'
+    )
+    +'<button class="tbtn" onclick="toggleExpand(\''+task.id+'\')">'+(isExp?'▲':'+ Sub')+'</button>'
+    +'<button class="tbtn" style="font-size:13px;padding:1px 7px" data-tid="'+task.id+'" data-col="'+colDef.id+'" data-biz="'+biz+'" onclick="moveTaskUp(this.dataset.tid,this.dataset.col,this.dataset.biz)">↑</button>'
+    +'<button class="tbtn" style="font-size:13px;padding:1px 7px" data-tid="'+task.id+'" data-col="'+colDef.id+'" data-biz="'+biz+'" onclick="moveTaskDown(this.dataset.tid,this.dataset.col,this.dataset.biz)">↓</button>'
+    +'<button class="tbtn pin-btn" onclick="pinTask2(\''+task.id+'\')">'+(task.pinned?'📌 Unpin':'📌')+'</button>'
+    +'<button class="tbtn del-btn" onclick="softDeleteTask2(\''+task.id+'\')">Del</button>'
+    +'</div>';
+
+  return '<div class="tc'+(task.pinned?' pinned':'')+'" id="tc-'+task.id+'"'
+    +' draggable="true"'
+    +' ondragstart="onTC_DragStart(event,\''+task.id+'\',\''+colDef.id+'\',\''+biz+'\')"'
+    +' ondragend="onTC_DragEnd(event,\''+task.id+'\')">'
+    +'<div class="tc-row1">'
+    +'<span class="tc-title'+(isDone?' done':'')+'">'+(task.pinned?'📌 ':'')+task.title+'</span>'
+    +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span>'
+    +'</div>'
+    +(task.due?'<div><span class="tc-due'+(isOD?' overdue':'')+'">'+( isOD?'⚠ ':'')+task.due+'</span></div>':'')
+    +(task.note?'<div class="tc-note">'+task.note+'</div>':'')
+    +subHtml
+    +actions
+    +'</div>';
+}
+
+function buildSchedSubCard(task, sub){
+  return '<div class="tc is-sub">'
+    +'<div class="tc-sub-parent">↳ '+task.title+'</div>'
+    +'<div class="tc-row1"><span class="tc-title'+(sub.done?' done':'')+'">'+sub.title+'</span></div>'
+    +'<div class="tc-actions">'
+    +'<button class="tbtn done-btn" onclick="toggleSubtask(\''+task.id+'\',\''+sub.id+'\')">'+(sub.done?'✓ Done':'Mark done')+'</button>'
+    +'<button class="tbtn" onclick="scheduleSubtask(\''+task.id+'\',\''+sub.id+'\',\'\')">Remove</button>'
+    +'</div></div>';
+}
+
+// ── Build column ──
+function buildCol(colDef, bizId, q){
+  var isDone = !!(colDef.isDone || colDef.type==='done');
+  var biz = bizId||'';
+  var tasks = getTasksInCol(colDef.id, bizId||null).filter(function(t){return taskMatchesSearch(t,q);});
+  // Pinned first
+  var pinned   = tasks.filter(function(t){return  t.pinned;});
+  var unpinned = tasks.filter(function(t){return !t.pinned;});
+  tasks = pinned.concat(unpinned);
+
+  // Scheduled subtasks (today/tomorrow/brain)
+  var schedHtml = '';
+  if(!bizId && (colDef.type==='today'||colDef.type==='tomorrow'||colDef.type==='brain')){
+    var subs2 = getScheduledSubsInCol(colDef.id).filter(function(x){
+      return !x.sub.done && taskMatchesSearch(x.task,q);
+    });
+    schedHtml = subs2.map(function(x){return buildSchedSubCard(x.task,x.sub);}).join('');
+  }
+
+  var cardsHtml = tasks.map(function(t){return buildCard(t,colDef,isDone);}).join('');
+  var total = tasks.length + (schedHtml ? getScheduledSubsInCol(colDef.id).filter(function(x){return !x.sub.done;}).length : 0);
+
+  // Add form
+  var addHtml = '';
+  if(!isDone){
+    addHtml = '<div class="tcol-quick-add">'
+      +'<input type="text" id="tn-'+colDef.id+'" placeholder="+ Quick add..." '
+      +'onkeydown="if(event.key===\'Enter\')addTask2(\''+colDef.id+'\',\''+biz+'\')">'
+      +'</div>'
+      +'<button class="tcol-expand-btn" onclick="var ef=document.getElementById(\'tef-'+colDef.id+'\');ef.style.display=ef.style.display===\'block\'?\'none\':\'block\'">⚙ More</button>'
+      +'<div class="tcol-expand-form" id="tef-'+colDef.id+'" style="display:none">'
+      +'<select id="tp-'+colDef.id+'"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>'
+      +'<input type="date" id="td-'+colDef.id+'">'
+      +'<textarea id="tnt-'+colDef.id+'" placeholder="Notes..."></textarea>'
+      +'<button class="tcol-expand-submit" onclick="addTask2(\''+colDef.id+'\',\''+biz+'\')">Add task</button>'
+      +'</div>';
+  }
+
+  var canDel = !isDone && !colDef.type;
+  var delBtn = canDel ? '<button class="tcol-del" onclick="deleteCol2(\''+colDef.id+'\',\''+biz+'\')" title="Delete">×</button>' : '';
+
+  return '<div class="tcol'+(isDone?' done-col':'')+'" id="tcol-'+colDef.id+'"'
+    +' ondragover="onCol_DragOver(event,\''+colDef.id+'\')"'
+    +' ondrop="onCol_Drop(event,\''+colDef.id+'\',\''+biz+'\')">'
+    +'<div class="tcol-head">'
+    +'<div class="tcol-dot" style="background:'+colDef.accent+'"></div>'
+    +'<span class="tcol-name" id="cnm-'+colDef.id+'" ondblclick="startRenameCol(\''+colDef.id+'\')">'+colDef.name+'</span>'
+    +'<input class="tcol-name-input" id="cni-'+colDef.id+'" style="display:none" value="'+colDef.name+'"'
+    +' onblur="finishRenameCol(\''+colDef.id+'\',\''+biz+'\')"'
+    +' onkeydown="if(event.key===\'Enter\')finishRenameCol(\''+colDef.id+'\',\''+biz+'\')">'
+    +'<span class="tcol-cnt">'+total+'</span>'
+    +delBtn
+    +'</div>'
+    +'<div class="tcol-cards">'+(schedHtml+cardsHtml||'<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;font-style:italic">'+(isDone?'None yet':'Empty')+'</div>')+'</div>'
+    +addHtml
+    +'</div>';
+}
+
+// ── Main render ──
+function renderTasks(){
+  var ts = getTS();
+  var q = (document.getElementById('task-search')||{}).value||'';
+  q = q.trim();
+
+  // Global cols
+  var gEl = document.getElementById('global-cols');
+  if(gEl){
+    // Exclude brain - it has its own section
+    var gcols = ts.globalCols.filter(function(c){return c.type!=='brain';});
+    gEl.innerHTML = gcols.map(function(c){return buildCol(c,null,q);}).join('');
+  }
+
+  // Biz lanes
+  var bEl = document.getElementById('biz-task-lanes');
+  if(bEl){
+    bEl.innerHTML = BIZ_CFG.map(function(b){
+      var lane = ts.bizLanes[b.id]; if(!lane) return '';
+      var logo = S.logos[b.id];
+      var logoHtml = logo ? '<img class="biz-lane-logo" src="'+logo+'" alt="'+b.name+'">' : '';
+      var emoji = b.id==='slp'?'🔴':b.id==='cb'?'🟢':'🟠';
+      return '<div class="biz-lane task-section">'
+        +'<div class="task-section-header">'
+        +'<span class="task-section-title biz" style="color:'+b.color+'">'+emoji+' '+b.name+'</span>'
+        +logoHtml
+        +'<button class="biz-lane-add-col" onclick="addBizCol(\''+b.id+'\')">+ Col</button>'
+        +'</div>'
+        +'<div class="biz-lane-cols">'
+        +lane.cols.map(function(c){return buildCol(c,b.id,q);}).join('')
+        +'</div></div>';
     }).join('');
   }
 
-  let persEl = document.getElementById('personal-cols');
-  if(persEl){
-    let ts2 = getTS();
-    persEl.innerHTML = ts2.personalCols.map(c=>buildCol2(c,null,q)).join('');
-    // Remove any previously added button
-    let existing = document.getElementById('pers-add-col-btn');
-    if(existing) existing.remove();
-    let btn = document.createElement('button');
-    btn.id = 'pers-add-col-btn';
-    btn.className = 'tcol-add-col-btn';
-    btn.style.cssText = 'margin-top:6px;width:auto';
-    btn.textContent = '+ Add column';
-    btn.onclick = addPersonalCol;
-    persEl.after(btn);
+  // Personal
+  var pEl = document.getElementById('personal-cols');
+  if(pEl){
+    pEl.innerHTML = ts.personalCols.map(function(c){return buildCol(c,null,q);}).join('');
   }
 
-  let brainEl = document.getElementById('brain-cols');
-  if(brainEl){
-    let bc = getTS().globalCols.find(c=>c.type==='brain');
-    brainEl.innerHTML = bc ? buildCol2(bc,null,q) : '';
+  // Brain dump
+  var brEl = document.getElementById('brain-cols');
+  if(brEl){
+    var brainCol = ts.globalCols.find(function(c){return c.type==='brain';});
+    brEl.innerHTML = brainCol ? buildCol(brainCol,null,q) : '';
   }
 
   renderTrash();
 
-  // Update mobile if visible
-  if(window.innerWidth <= 767) renderMobView();
+  // Mobile view
+  if(window.innerWidth<=767) renderMobView();
 }
 
-// ── Trash ──
-let _trashOpen = false;
-function toggleTrash(){ _trashOpen=!_trashOpen; let el=document.getElementById('trash-cols'); if(el) el.style.display=_trashOpen?'block':'none'; renderTrash(); }
-
-function renderTrash(){
-  let ts = getTS();
-  let items = Object.values(ts.trash||{});
-  let now = new Date();
-  items = items.filter(t=>{
-    if(!t.deletedAt) return true;
-    if((now-new Date(t.deletedAt))/(86400000) > 30){ delete ts.trash[t.id]; return false; }
-    return true;
-  });
-  let cnt = document.getElementById('trash-count'); if(cnt) cnt.textContent = items.length;
-  let wrap = document.getElementById('trash-col-wrap'); if(!wrap||!_trashOpen) return;
-  if(!items.length){ wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:8px">Nothing deleted</div>'; return; }
-  let cards = items.sort((a,b)=>new Date(b.deletedAt||0)-new Date(a.deletedAt||0)).map(t=>{
-    let p = PRI_CFG[t.priority||'medium'];
-    let d = t.deletedAt ? new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
-    return '<div class="tc" style="opacity:0.7">'
-      +'<div class="tc-row1"><span class="tc-title" style="text-decoration:line-through;color:var(--text3)">'+t.title+'</span>'
-      +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span></div>'
-      +'<div style="font-size:9px;color:#505050;margin:2px 0">deleted '+d+(t.subtasks?.length?' · '+t.subtasks.length+' subtasks':'')+'</div>'
-      +'<div class="tc-actions">'
-      +'<button class="tbtn" style="color:var(--green);border-color:rgba(61,170,76,0.3)" data-id="'+t.id+'" onclick="restoreFromTrash(this.dataset.id)">↩ Restore</button>'
-      +'<button class="tbtn del-btn" data-id="'+t.id+'" onclick="confirmHardDelete(this.dataset.id)">Delete forever</button>'
-      +'</div></div>';
-  }).join('');
-  wrap.innerHTML = '<div class="tcol" style="min-width:260px;width:260px"><div class="tcol-head"><div class="tcol-dot" style="background:#444"></div><span class="tcol-name">Deleted</span><span class="tcol-cnt">'+items.length+'</span></div><div class="tcol-cards">'+cards+'</div></div>';
-}
-
-// ── MOBILE VIEW ──
-function getMobColList(){
-  let ts = getTS(); let cols = [];
-  ts.globalCols.forEach(c=>{ if(c.type!=='done') cols.push({...c,bizId:null,bizColor:null}); });
-  BIZ_CFG.forEach(b=>{ let lane=ts.bizLanes[b.id]; if(lane) lane.cols.forEach(c=>{ if(!c.isDone) cols.push({...c,bizId:b.id,bizColor:b.color}); }); });
-  ts.personalCols.forEach(c=>{ if(!c.isDone) cols.push({...c,bizId:null,bizColor:null}); });
-  return cols;
-}
-
-function renderMobView(){
-  let cols = getMobColList();
-  if(!_mobCol || !cols.find(c=>c.id===_mobCol)) _mobCol = cols[0]?.id;
-  // Tabs
-  let tabsEl = document.getElementById('mob-tabs'); if(!tabsEl) return;
-  tabsEl.innerHTML = cols.map(c=>{
-    let cnt = getTasksInCol(c.id,c.bizId||null).length;
-    let subs = (c.type==='today'||c.type==='tomorrow') ? getScheduledSubs(c.id).filter(({sub})=>!sub.done).length : 0;
-    let total = cnt + subs;
-    let dot = c.bizColor ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${c.bizColor};margin-right:4px;vertical-align:middle"></span>` : '';
-    return `<button class="mob-tab ${_mobCol===c.id?'active':''}" onclick="setMobCol('${c.id}')">${dot}${c.name}${total>0?`<span class="mob-tab-cnt">${total}</span>`:''}</button>`;
-  }).join('');
-  // List
-  let col = cols.find(c=>c.id===_mobCol); if(!col) return;
-  let isDone = !!col.isDone || col.type==='done';
-  let tasks = getTasksInCol(col.id, col.bizId||null);
-  let pinned = tasks.filter(t=>t.pinned); let rest = tasks.filter(t=>!t.pinned);
-  tasks = [...pinned,...rest];
-  let listEl = document.getElementById('mob-list'); if(!listEl) return;
-  let html = '';
-  // Scheduled subs
-  if(col.type==='today'||col.type==='tomorrow'){
-    getScheduledSubs(col.id).filter(({sub})=>!sub.done).forEach(({task,sub})=>{
-      html += `<div class="mob-card" style="border-left:3px solid var(--blue)">
-        <div style="font-size:10px;color:var(--blue);margin-bottom:4px">↳ ${task.title}</div>
-        <div class="mob-card-top"><div class="mob-chk" onclick="toggleSubtask('${task.id}','${sub.id}')"></div><div class="mob-card-title">${sub.title}</div></div>
-        <div class="mob-actions"><button class="mbtn done-btn" onclick="toggleSubtask('${task.id}','${sub.id}')">✓ Done</button><button class="mbtn" onclick="scheduleSubtask('${task.id}','${sub.id}','')">Remove</button></div>
-      </div>`;
-    });
-  }
-  tasks.forEach(task=>{
-    let p = PRI_CFG[task.priority||'medium'];
-    let isOD = task.due && task.due < td() && !isDone;
-    let subs = task.subtasks||[];
-    let doneSubs = subs.filter(s=>s.done).length;
-    let subPct = subs.length ? Math.round(doneSubs/subs.length*100) : 0;
-    let isExp = !!_expanded[task.id];
-    let subSection = '';
-    if(subs.length>0){
-      subSection = `<div class="mob-sub-bar" onclick="toggleExpand('${task.id}')">
-        <div class="mob-sub-prog"><div class="mob-sub-fill" style="width:${subPct}%"></div></div>
-        <span class="mob-sub-lbl">${doneSubs}/${subs.length}</span>
-        <span style="font-size:10px;color:var(--text3)">${isExp?'▲':'▼'}</span>
-      </div>
-      <div class="mob-subs ${isExp?'open':''}">
-        ${subs.map(s=>`<div class="mob-sub-row"><input type="checkbox" class="mob-sub-chk" ${s.done?'checked':''} onchange="toggleSubtask('${task.id}','${s.id}')"><span class="mob-sub-txt ${s.done?'done':''}">${s.title}</span></div>`).join('')}
-        <div class="mob-sub-add"><input type="text" id="mob-sub-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button onclick="addSubtask('${task.id}')">+</button></div>
-      </div>`;
-    } else {
-      subSection = `<div class="mob-subs ${isExp?'open':''}"><div class="mob-sub-add"><input type="text" id="mob-sub-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button onclick="addSubtask('${task.id}')">+</button></div></div>`;
-    }
-    html += `<div class="mob-card ${task.pinned?'pinned':''}">
-      <div class="mob-card-top">
-        <div class="mob-chk ${isDone?'done':''}" onclick="${isDone?`restoreTask2('${task.id}')`:`doneTask2('${task.id}')`}">${isDone?'✓':''}</div>
-        <div class="mob-card-title ${isDone?'done':''}">${task.title}</div>
-        <span class="mob-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-      </div>
-      ${task.due?`<div class="mob-card-meta"><span class="mob-due ${isOD?'od':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
-      ${task.note?`<div class="mob-note">${task.note}</div>`:''}
-      ${subSection}
-      <div class="mob-actions">
-        ${isDone
-          ?`<button class="mbtn done-btn" onclick="restoreTask2('${task.id}')">↩ Restore</button>`
-          :`<button class="mbtn done-btn" onclick="doneTask2('${task.id}')">✓ Done</button>`
-        }
-        <button class="mbtn" onclick="openMobMove('${task.id}')">Move →</button>
-        <button class="mbtn arr-btn" data-id="${task.id}" data-col="${col.id}" data-biz="${col.bizId||''}" onclick="moveTaskUp(this.dataset.id,this.dataset.col,this.dataset.biz)">↑</button>
-        <button class="mbtn arr-btn" data-id="${task.id}" data-col="${col.id}" data-biz="${col.bizId||''}" onclick="moveTaskDown(this.dataset.id,this.dataset.col,this.dataset.biz)">↓</button>
-        <button class="mbtn" onclick="toggleExpand('${task.id}')">${isExp?'▲':'+ Sub'}</button>
-        <button class="mbtn del-btn" onclick="softDeleteTask2('${task.id}')">Del</button>
-      </div>
-    </div>`;
-  });
-  if(!html) html = `<div style="font-size:14px;color:var(--text3);text-align:center;padding:24px 0">${isDone?'Nothing done yet':'Empty — add a task above'}</div>`;
-  listEl.innerHTML = html;
-}
-
-function setMobCol(colId){ _mobCol=colId; renderMobView(); }
-
-function mobAdd(){
-  let inp=document.getElementById('mob-inp'), pri=document.getElementById('mob-pri');
-  let name=(inp?.value||'').trim(); if(!name) return;
-  let cols=getMobColList(); let col=cols.find(c=>c.id===_mobCol); if(!col) return;
-  let ts=getTS();
-  let task={id:newId(),title:name,priority:pri?.value||'medium',due:'',note:'',pinned:false,colId:col.id,bizId:col.bizId||null,subtasks:[],added:td()};
-  ts.tasks[task.id]=task; inp.value='';
-  saveTS(); renderTasks(); renderDashboard();
-}
-
-function openMobMove(taskId){
-  _mobMoveId=taskId;
-  let ts=getTS(); let task=ts.tasks[taskId];
-  let cols=getMobColList();
-  let el=document.getElementById('mob-move-opts'); if(!el) return;
-  let lastBiz='';
-  el.innerHTML=cols.filter(c=>c.id!==task?.colId).map(c=>{
-    let grp=''; let curBiz=c.bizId||'global';
-    if(curBiz!==lastBiz){lastBiz=curBiz;let gname=c.bizId?(BIZ_CFG.find(b=>b.id===c.bizId)?.name||'Business'):c.group==='personal'?'Personal':'Execution';grp=`<div class="mob-section-lbl">${gname}</div>`;}
-    let dot=c.bizColor?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.bizColor};margin-right:8px"></span>`:'';
-    return grp+`<button class="mob-move-opt" data-col="${c.id}" data-biz="${c.bizId||''}" onclick="mobMoveTask(this.dataset.col,this.dataset.biz)">${dot}${c.name}</button>`;
-  }).join('');
-  document.getElementById('mob-move-sheet').classList.add('open');
-}
-
-function mobMoveTask(colId,bizId){
-  if(!_mobMoveId) return;
-  let ts=getTS(); let task=ts.tasks[_mobMoveId]; if(!task) return;
-  let fromCol=task.colId; let fromBiz=task.bizId;
-  task.colId=colId; task.bizId=bizId||null;
-  let fromIds=ensureColOrder(fromCol,fromBiz).filter(id=>id!==_mobMoveId);
-  ts.colOrder[fromCol]=fromIds;
-  let toIds=ensureColOrder(colId,bizId||null).filter(id=>id!==_mobMoveId);
-  toIds.push(_mobMoveId); ts.colOrder[colId]=toIds;
-  _mobMoveId=null; closeMobMove(); saveTS(); renderTasks(); renderDashboard();
-}
-
-function closeMobMove(){ document.getElementById('mob-move-sheet').classList.remove('open'); _mobMoveId=null; }
 
 // ── Confetti ──
 // ── Confetti ──
@@ -1826,6 +1549,212 @@ function exportData(){
 function importData(input){let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{try{let data=JSON.parse(e.target.result);Object.keys(data).forEach(k=>{if(k!=='logos')S[k]=data[k];});if(S.tasks2)S.tasks2=initTaskStore2(S.tasks2);Object.keys(KEY_MAP).forEach(k=>{if(k!=='logos')lsSet(KEY_MAP[k],S[k]);});let st=document.getElementById('import-status');if(st){st.style.display='block';setTimeout(()=>st.style.display='none',3000);}renderAll();}catch(err){alert('Invalid backup file.');}};r.readAsText(file);}
 function clearAllData(){if(!confirm('Clear ALL data? Export first!'))return;Object.values(KEY_MAP).forEach(k=>lsClear(k));location.reload();}
 
+
+
+
+// ── Mobile Task View ──
+var _mobCol = null;
+var _mobMoveId = null;
+
+function getMobCols(){
+  var ts=getTS(), cols=[];
+  ts.globalCols.filter(function(c){return c.type!=='brain'&&c.type!=='done';}).forEach(function(c){cols.push({col:c,bizId:null});});
+  BIZ_CFG.forEach(function(b){var lane=ts.bizLanes[b.id];if(!lane)return;lane.cols.filter(function(c){return !c.isDone;}).forEach(function(c){cols.push({col:c,bizId:b.id,bizColor:b.color,bizName:b.name});});});
+  ts.personalCols.filter(function(c){return !c.isDone;}).forEach(function(c){cols.push({col:c,bizId:null});});
+  ts.globalCols.filter(function(c){return c.type==='brain'||c.isDone||c.type==='done';}).forEach(function(c){cols.push({col:c,bizId:null});});
+  return cols;
+}
+
+function setMobCol(colId){ _mobCol=colId; renderMobView(); }
+
+function mobAdd(){
+  var inp=document.getElementById('mob-inp');
+  var pri=(document.getElementById('mob-pri')||{}).value||'medium';
+  var name=(inp?inp.value:'').trim(); if(!name)return;
+  var cols=getMobCols();
+  var entry=cols.find(function(e){return e.col.id===_mobCol;})||cols[0];
+  if(!entry)return;
+  var task={id:newId(),title:name,priority:pri,due:'',note:'',pinned:false,
+    colId:entry.col.id,bizId:entry.bizId||null,subtasks:[],added:td()};
+  getTS().tasks[task.id]=task;
+  if(inp)inp.value='';
+  saveTS(); renderMobView(); renderDashboard();
+}
+
+function openMobMove(taskId){
+  _mobMoveId=taskId;
+  var task=getTS().tasks[taskId]; if(!task)return;
+  var cols=getMobCols();
+  var el=document.getElementById('mob-move-opts'); if(!el)return;
+  el.innerHTML='';
+  cols.forEach(function(e){
+    if(e.col.id===task.colId)return;
+    var btn=document.createElement('button');
+    btn.style.cssText='display:block;width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:6px;text-align:left;touch-action:manipulation';
+    btn.textContent=e.col.name;
+    btn.addEventListener('click',function(){moveTask2(task.id,e.col.id,e.bizId||null);_mobMoveId=null;closeMobMove();renderMobView();});
+    el.appendChild(btn);
+  });
+  document.getElementById('mob-move-sheet').classList.add('open');
+}
+function closeMobMove(){document.getElementById('mob-move-sheet').classList.remove('open');_mobMoveId=null;}
+
+function renderMobView(){
+  if(!_mobCol){var ts=getTS();var gc=ts.globalCols.find(function(c){return c.type==='today';});_mobCol=gc?gc.id:null;}
+  var cols=getMobCols();
+  var entry=cols.find(function(e){return e.col.id===_mobCol;})||cols[0];
+  if(!entry)return;
+  _mobCol=entry.col.id;
+
+  // Tabs
+  var tabsEl=document.getElementById('mob-tabs');
+  if(tabsEl){
+    tabsEl.innerHTML='';
+    cols.forEach(function(e){
+      var cnt=getTasksInCol(e.col.id,e.bizId||null).length;
+      if(e.col.type==='today'||e.col.type==='tomorrow')cnt+=getScheduledSubsInCol(e.col.id).filter(function(x){return !x.sub.done;}).length;
+      var btn=document.createElement('button');
+      btn.className='mob-tab'+(e.col.id===_mobCol?' active':'');
+      btn.textContent=e.col.name+(cnt>0?' ('+cnt+')':'');
+      btn.addEventListener('click',function(){setMobCol(e.col.id);});
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  // List
+  var listEl=document.getElementById('mob-list');
+  if(!listEl)return;
+  listEl.innerHTML='';
+  var col=entry.col, bizId=entry.bizId||null;
+  var isDone=!!(col.isDone||col.type==='done');
+  var tasks=getTasksInCol(col.id,bizId);
+  var pinned=tasks.filter(function(t){return t.pinned;});
+  var unpinned=tasks.filter(function(t){return !t.pinned;});
+  tasks=pinned.concat(unpinned);
+
+  // Scheduled subs
+  if(col.type==='today'||col.type==='tomorrow'){
+    getScheduledSubsInCol(col.id).filter(function(x){return !x.sub.done;}).forEach(function(x){
+      var div=document.createElement('div');
+      div.className='mob-task';
+      div.style.borderLeft='3px solid var(--blue)';
+      div.innerHTML='<div style="font-size:10px;color:var(--blue);margin-bottom:4px">↳ '+x.task.title+'</div>'
+        +'<div class="mob-task-row"><span class="mob-title">'+x.sub.title+'</span></div>';
+      var acts=document.createElement('div'); acts.className='mob-actions';
+      var db=document.createElement('button'); db.className='mob-btn mob-done'; db.textContent='✓ Done';
+      db.addEventListener('click',function(){toggleSubtask(x.task.id,x.sub.id);});
+      var rb=document.createElement('button'); rb.className='mob-btn'; rb.textContent='Remove';
+      rb.addEventListener('click',function(){scheduleSubtask(x.task.id,x.sub.id,'');});
+      acts.appendChild(db); acts.appendChild(rb);
+      div.appendChild(acts);
+      listEl.appendChild(div);
+    });
+  }
+
+  if(!tasks.length&&!listEl.children.length){
+    var empty=document.createElement('div');
+    empty.style.cssText='font-size:14px;color:var(--text3);text-align:center;padding:24px 0';
+    empty.textContent=isDone?'Nothing done yet':'Empty — add a task above';
+    listEl.appendChild(empty);
+    return;
+  }
+
+  tasks.forEach(function(task){
+    var p=PRI_CFG[task.priority||'medium'];
+    var isOD=task.due&&task.due<td()&&!isDone;
+    var subs=task.subtasks||[];
+    var doneSubs=subs.filter(function(s){return s.done;}).length;
+    var isExp=!!_expanded[task.id];
+
+    var card=document.createElement('div');
+    card.className='mob-task'+(task.pinned?' pinned':'');
+
+    // Title row
+    var row=document.createElement('div'); row.className='mob-task-row';
+    var chk=document.createElement('div'); chk.className='mob-check'+(isDone?' checked':'');
+    chk.innerHTML=isDone?'✓':'';
+    chk.addEventListener('click',function(){isDone?restoreTask2(task.id):doneTask2(task.id);});
+    var ttl=document.createElement('span'); ttl.className='mob-title'+(isDone?' done':'');
+    ttl.textContent=(task.pinned?'📌 ':'')+task.title;
+    var pri=document.createElement('span'); pri.className='mob-pri';
+    pri.style.cssText='background:'+p.bg+';color:'+p.color;
+    pri.textContent=p.label;
+    row.appendChild(chk); row.appendChild(ttl); row.appendChild(pri);
+    card.appendChild(row);
+
+    if(task.due){var dd=document.createElement('div');dd.innerHTML='<span class="tc-due'+(isOD?' overdue':'')+'">'+( isOD?'⚠ ':'')+task.due+'</span>';card.appendChild(dd);}
+    if(task.note){var nn=document.createElement('div');nn.style.cssText='font-size:11px;color:var(--text3);font-style:italic;margin-bottom:5px';nn.textContent=task.note;card.appendChild(nn);}
+
+    // Subtask progress
+    if(subs.length>0){
+      var subPct=Math.round((doneSubs/subs.length)*100);
+      var sbar=document.createElement('div'); sbar.className='mob-sub-bar';
+      sbar.addEventListener('click',function(){toggleExpand(task.id);});
+      sbar.innerHTML='<div class="mob-sub-prog"><div style="height:100%;width:'+subPct+'%;background:var(--green);border-radius:2px"></div></div>'
+        +'<span style="font-size:10px;color:var(--text3);font-weight:600">'+doneSubs+'/'+subs.length+'</span>'
+        +'<span style="font-size:10px;color:var(--text3)">'+(isExp?'▲':'▼')+'</span>';
+      card.appendChild(sbar);
+
+      var slist=document.createElement('div'); slist.className='mob-subs'+(isExp?' open':'');
+      subs.forEach(function(sub){
+        var sr=document.createElement('div'); sr.className='mob-sub-row';
+        var sc=document.createElement('input'); sc.type='checkbox'; sc.checked=sub.done;
+        sc.style.cssText='width:16px;height:16px;cursor:pointer;accent-color:var(--green);flex-shrink:0';
+        sc.addEventListener('change',function(){toggleSubtask(task.id,sub.id);});
+        var st=document.createElement('span');
+        st.style.cssText='font-size:13px;color:var(--text2);flex:1;'+(sub.done?'text-decoration:line-through;color:var(--text3)':'');
+        st.textContent=sub.title;
+        sr.appendChild(sc); sr.appendChild(st);
+        slist.appendChild(sr);
+      });
+      // Sub add row
+      var sadd=document.createElement('div'); sadd.className='mob-sub-add';
+      var sinp=document.createElement('input'); sinp.type='text'; sinp.id='mob-sub-inp-'+task.id;
+      sinp.placeholder='Add subtask...'; sinp.style.cssText='flex:1;font-size:12px;padding:6px 10px;border-radius:8px';
+      sinp.addEventListener('keydown',function(ev){if(ev.key==='Enter')addSubtask(task.id);});
+      var sabtn=document.createElement('button');
+      sabtn.style.cssText='padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit';
+      sabtn.textContent='+ Add';
+      sabtn.addEventListener('click',function(){addSubtask(task.id);});
+      sadd.appendChild(sinp); sadd.appendChild(sabtn);
+      slist.appendChild(sadd);
+      card.appendChild(slist);
+    } else {
+      // Show add subtask when expanded
+      var slist2=document.createElement('div'); slist2.className='mob-subs'+(isExp?' open':'');
+      var sadd2=document.createElement('div'); sadd2.className='mob-sub-add';
+      var sinp2=document.createElement('input'); sinp2.type='text'; sinp2.id='mob-sub-inp-'+task.id;
+      sinp2.placeholder='Add subtask...'; sinp2.style.cssText='flex:1;font-size:12px;padding:6px 10px;border-radius:8px';
+      sinp2.addEventListener('keydown',function(ev){if(ev.key==='Enter')addSubtask(task.id);});
+      var sabtn2=document.createElement('button');
+      sabtn2.style.cssText='padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit';
+      sabtn2.textContent='+ Add';
+      sabtn2.addEventListener('click',function(){addSubtask(task.id);});
+      sadd2.appendChild(sinp2); sadd2.appendChild(sabtn2);
+      slist2.appendChild(sadd2);
+      card.appendChild(slist2);
+    }
+
+    // Actions
+    var acts=document.createElement('div'); acts.className='mob-actions';
+    function mkBtn(cls,txt,fn){var b=document.createElement('button');b.className='mob-btn'+(cls?' '+cls:'');b.textContent=txt;b.addEventListener('click',fn);return b;}
+    if(isDone){
+      acts.appendChild(mkBtn('','↩ Restore',function(){restoreTask2(task.id);}));
+    } else {
+      acts.appendChild(mkBtn('mob-done','✓ Done',function(){doneTask2(task.id);}));
+    }
+    acts.appendChild(mkBtn('','Move →',function(){openMobMove(task.id);}));
+    acts.appendChild(mkBtn('',isExp?'▲':'+ Sub',function(){toggleExpand(task.id);}));
+    var upBtn=mkBtn('','↑',function(){moveTaskUp(task.id,col.id,bizId);});
+    upBtn.style.cssText='font-size:14px;padding:4px 10px';
+    var dnBtn=mkBtn('','↓',function(){moveTaskDown(task.id,col.id,bizId);});
+    dnBtn.style.cssText='font-size:14px;padding:4px 10px';
+    acts.appendChild(upBtn); acts.appendChild(dnBtn);
+    acts.appendChild(mkBtn('mob-del','Del',function(){softDeleteTask2(task.id);}));
+    card.appendChild(acts);
+    listEl.appendChild(card);
+  });
+}
 
 
 // ── Init ──
