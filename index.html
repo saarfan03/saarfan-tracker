@@ -156,8 +156,84 @@ input[type=file]{display:none}
 .dpb.active{background:var(--red-l);border-color:var(--red-b);color:#FF6B6B}
 .dpb.istoday{border-color:var(--gold-b);color:var(--gold)}
 
-/* ===== TASKS / PIPELINE - UPGRADED ===== */
+
+/* ===== TASK SYSTEM ===== */
 #todo{padding:0 12px}
+.task-section{margin-bottom:20px}
+.task-section-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.task-section-title.biz{font-size:17px;font-weight:800;letter-spacing:-0.5px}
+.task-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
+.biz-lane{margin-bottom:28px}
+.biz-lane-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.biz-lane-cols::-webkit-scrollbar{height:4px}
+.biz-lane-cols::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.global-cols-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.global-cols-wrap::-webkit-scrollbar{height:4px}
+.global-cols-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.tcol{min-width:215px;width:215px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:9px;flex-shrink:0;transition:border-color .2s}
+.tcol.drag-over{border-color:var(--gold)!important;background:rgba(201,168,76,0.04)}
+.tcol.done-col{opacity:0.8}
+.tcol-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.tcol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tcol-name{font-size:12px;font-weight:700;color:var(--text2);flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tcol-name-input{font-size:12px;font-weight:700;color:var(--text);background:transparent;border:none;border-bottom:1px solid var(--gold);outline:none;width:100%;padding:0;font-family:inherit}
+.tcol-cnt{font-size:10px;padding:1px 6px;border-radius:5px;background:var(--bg4);color:var(--text3);font-weight:600;flex-shrink:0}
+.tcol-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 2px;opacity:0.5;font-family:inherit;flex-shrink:0}
+.tcol-del:hover{color:var(--red);opacity:1}
+.tcol-cards{min-height:10px}
+.tc{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;margin-bottom:3px;cursor:grab;user-select:none;position:relative;transition:border-color .15s,opacity .15s}
+.tc:hover{border-color:var(--border2)}
+.tc.pinned{border-color:var(--gold-b)!important}
+.tc.dragging{opacity:0.4;cursor:grabbing}
+.tc.drag-over-top{border-top:2px solid var(--gold)}
+.tc.is-sub{border-left:3px solid var(--blue)}
+.tc-sub-parent{font-size:9px;color:var(--blue);margin-bottom:3px;font-weight:500}
+.tc-row1{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:2px}
+.tc-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;flex:1}
+.tc-title.done{text-decoration:line-through;color:var(--text3)}
+.tc-pri{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;flex-shrink:0;margin-top:1px}
+.tc-due{font-size:9px;padding:1px 5px;background:var(--bg4);border-radius:4px;color:var(--text3);margin-bottom:2px;display:inline-block}
+.tc-due.overdue{color:#FF6B6B;background:rgba(255,107,107,0.12)}
+.tc-note{font-size:10px;color:var(--text3);font-style:italic;margin-bottom:3px;line-height:1.4}
+.tc-sub-bar{display:flex;align-items:center;gap:4px;margin:3px 0 2px;cursor:pointer}
+.tc-sub-prog{flex:1;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.tc-sub-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+.tc-sub-lbl{font-size:9px;color:var(--text3);font-weight:600;white-space:nowrap}
+.tc-subtasks{display:none;border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.tc-subtasks.open{display:block}
+.sub-row{display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--border)}
+.sub-row:last-of-type{border-bottom:none}
+.sub-chk{width:13px;height:13px;flex-shrink:0;cursor:pointer;accent-color:var(--green)}
+.sub-title{font-size:11px;color:var(--text2);flex:1;line-height:1.3}
+.sub-title.done{text-decoration:line-through;color:var(--text3)}
+.sub-sched{font-size:9px;border:1px solid var(--border2);background:transparent;border-radius:4px;color:var(--text3);padding:1px 4px;cursor:pointer;font-family:inherit;flex-shrink:0;max-width:70px}
+.sub-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0;font-family:inherit;flex-shrink:0;line-height:1}
+.sub-del:hover{color:var(--red)}
+.sub-add-row{display:flex;gap:5px;margin-top:6px}
+.sub-add-row input{flex:1;font-size:11px;padding:5px 8px;border-radius:6px}
+.sub-add-row button{padding:5px 9px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.tc-actions{display:flex;gap:2px;flex-wrap:wrap;margin-top:4px}
+.tbtn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tbtn:hover{background:var(--bg3)}
+.tbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.3)}
+.tbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
+.tbtn.pin-btn{color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.tbtn.arr{font-size:11px;padding:1px 6px}
+.tcol-qadd{margin-top:5px}
+.tcol-qadd input{font-size:12px;padding:6px 8px;border-radius:7px;background:var(--bg4);border:1px dashed var(--border2);width:100%}
+.tcol-qadd input:focus{border-color:var(--gold);background:var(--bg3)}
+.tcol-more-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--text3);font-size:11px;padding:5px;cursor:pointer;font-family:inherit;text-align:left;margin-top:4px;transition:all .15s}
+.tcol-more-btn:hover{border-color:var(--gold-b);color:var(--gold)}
+.tcol-more-form{display:none;margin-top:5px}
+.tcol-more-form.open{display:block}
+.tcol-more-form select,.tcol-more-form input[type=date],.tcol-more-form textarea{margin-bottom:5px;font-size:12px;padding:6px 8px}
+.tcol-more-form textarea{min-height:45px}
+.tcol-add-submit{width:100%;padding:7px;background:linear-gradient(135deg,var(--red),#A01A1E);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.tcol-add-col-btn{background:transparent;border:1px dashed var(--border2);border-radius:7px;color:var(--text3);font-size:11px;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s}
+.tcol-add-col-btn:hover{border-color:var(--gold-b);color:var(--gold)}
+.trash-section{margin-top:16px;opacity:0.7}
+.trash-section:hover{opacity:1}
+.trash-toggle{background:transparent;border:1px dashed var(--border);border-radius:9px;color:var(--text3);font-size:12px;padding:8px 14px;cursor:pointer;font-family:inherit;width:100%;text-align:left;transition:all .2s;margin-bottom:6px}
 .tasks-focus-banner{background:linear-gradient(135deg,rgba(224,40,46,0.07),rgba(201,168,76,0.06));border:1px solid var(--border2);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
 .tasks-focus-banner-icon{font-size:18px;flex-shrink:0;margin-top:1px}
 .tasks-focus-banner-text{font-size:12px;color:var(--text3);line-height:1.6}
@@ -165,162 +241,57 @@ input[type=file]{display:none}
 .tasks-search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
 .tasks-search-bar input{flex:1;font-size:13px;padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text)}
 .tasks-search-bar input:focus{border-color:var(--gold)}
-.task-section{margin-bottom:22px}
-.task-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
-.task-section-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}.task-section-title.biz{font-size:17px;font-weight:800;letter-spacing:-0.5px}
-.task-section-count{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);font-weight:600}
-.task-section-add{margin-left:auto;background:transparent;border:1.5px solid var(--border2);border-radius:8px;color:var(--text3);font-size:12px;padding:4px 10px;cursor:pointer;font-family:inherit;transition:all .15s}
-.task-section-add:hover{border-color:var(--gold-b);color:var(--gold)}
-/* Horizontal lane for business */
-.biz-lane{margin-bottom:28px}
-.biz-lane-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:6px 10px;background:var(--bg2);border-radius:10px;border:1.5px solid var(--border)}
-.biz-lane-title{font-size:14px;font-weight:700;color:var(--text);flex:1}
-.biz-lane-logo{width:22px;height:22px;border-radius:4px;object-fit:contain}
-.biz-lane-add-col{font-size:11px;color:var(--text3);background:transparent;border:1px dashed var(--border2);border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit;transition:all .15s}
-.biz-lane-add-col:hover{border-color:var(--gold-b);color:var(--gold)}
-.biz-lane-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.biz-lane-cols::-webkit-scrollbar{height:4px}
-.biz-lane-cols::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-/* Task column */
-.tcol{min-width:215px;width:215px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:9px;flex-shrink:0;transition:border-color .2s}
-.tcol.drag-over{border-color:var(--gold);background:rgba(201,168,76,0.04)}
-.tcol-head{display:flex;align-items:center;gap:6px;margin-bottom:9px;position:relative;z-index:1}
-.tcol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.tcol-name{font-size:12px;font-weight:700;color:var(--text2);flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tcol-name-input{font-size:12px;font-weight:700;color:var(--text);background:transparent;border:none;border-bottom:1px solid var(--gold);outline:none;width:100%;padding:0;font-family:inherit}
-.tcol-cnt{font-size:10px;padding:1px 6px;border-radius:5px;background:var(--bg4);color:var(--text3);font-weight:600}
-.tcol-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 2px;opacity:0.5;font-family:inherit}
-.tcol-del:hover{color:var(--red);opacity:1}
-.tcol-cards{min-height:30px}
-/* Task card */
-.tc{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;margin-bottom:3px;cursor:grab;transition:all .15s;user-select:none;position:relative;z-index:2}
-.tc:active,.tc.dragging{cursor:grabbing;opacity:0.5}
-.tc.drag-target-above{border-top:2px solid var(--gold) !important;margin-top:-1px}
-.tc.pinned{border-color:var(--gold-b) !important;background:rgba(201,168,76,0.06)}
-.tc-pin{position:absolute;top:6px;right:6px;font-size:10px;opacity:0.6}
-.tc-title{font-size:12px;color:var(--text);font-weight:500;line-height:1.25;margin-bottom:2px;padding-right:10px}
-.tc-title.done-title{text-decoration:line-through;color:var(--text3)}
-.tc-meta{display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-bottom:2px}
-.tc-pri{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
-.tc-due{font-size:9px;padding:1px 5px;background:var(--bg4);border-radius:4px;color:var(--text3)}
-.tc-due.overdue{color:#FF6B6B;background:rgba(255,107,107,0.12)}
-.tc-note{font-size:10px;color:var(--text3);line-height:1.4;font-style:italic;margin-bottom:3px}
-.tc-actions{display:flex;gap:4px;flex-wrap:wrap}
-.tbtn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
-.tbtn:hover{background:var(--bg4);color:var(--text2)}
-.tbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.3)}
-.tbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
-.tbtn.pin-btn{color:var(--gold);border-color:rgba(201,168,76,0.3)}
-/* Subtasks */
-.tc-subtask-bar{display:flex;align-items:center;gap:4px;margin:2px 0 1px;cursor:pointer}
-.tc-subtask-progress{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
-.tc-subtask-progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width .3s}
-.tc-subtask-label{font-size:9px;color:var(--text3);white-space:nowrap;font-weight:600}
-.tc-subtask-toggle{font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
-.tc-subtasks{display:none;border-top:1px solid var(--border);margin-top:7px;padding-top:7px}
-.tc-subtasks.open{display:block}
-.subtask-row{display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)}
-.subtask-row:last-of-type{border-bottom:none}
-.subtask-check{width:14px;height:14px;flex-shrink:0;cursor:pointer;accent-color:var(--green);margin-top:2px}
-.subtask-title{font-size:12px;color:var(--text2);flex:1;line-height:1.4}
-.subtask-title.done{text-decoration:line-through;color:var(--text3)}
-.subtask-loc{font-size:10px;color:var(--blue);background:var(--blue-l);padding:1px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0}
-.subtask-schedule{font-size:10px;border:1px solid var(--border2);background:transparent;border-radius:4px;color:var(--text3);padding:1px 5px;cursor:pointer;font-family:inherit;flex-shrink:0}
-.subtask-schedule:hover{border-color:var(--gold-b);color:var(--gold)}
-.subtask-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0;font-family:inherit;flex-shrink:0;opacity:0.5;line-height:1}
-.subtask-del:hover{color:var(--red);opacity:1}
-.subtask-add-row{display:flex;gap:6px;margin-top:7px}
-.subtask-add-row input{flex:1;font-size:12px;padding:6px 10px;border-radius:7px}
-.subtask-add-row button{padding:6px 10px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
-/* Scheduled subtask card */
-.tc.is-subtask{border-left:3px solid var(--blue);padding-left:9px}
-.tc-subtask-parent{font-size:10px;color:var(--blue);margin-bottom:4px;font-weight:500}
-/* Quick add */
-.tcol-quick-add{margin-top:6px}
-.tcol-quick-add input{font-size:12px;padding:7px 9px;border-radius:7px;background:var(--bg4);border:1px dashed var(--border2)}
-.tcol-quick-add input:focus{border-color:var(--gold);background:var(--bg3)}
-.tcol-expand-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:7px;color:var(--text3);font-size:11px;padding:6px;cursor:pointer;font-family:inherit;text-align:left;margin-top:5px;transition:all .15s}
-.tcol-expand-btn:hover{border-color:var(--gold-b);color:var(--gold)}
-.tcol-expand-form{display:none;margin-top:6px}
-.tcol-expand-form.open{display:block}
-.tcol-expand-form select,.tcol-expand-form input[type=date],.tcol-expand-form textarea{margin-bottom:5px;font-size:12px;padding:6px 9px}
-.tcol-expand-form textarea{min-height:45px}
-.tcol-expand-submit{width:100%;padding:8px;background:linear-gradient(135deg,var(--red),#A01A1E);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-/* Global columns (Today/Tomorrow/Overdue/Brain/Done) */
-.global-cols-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.global-cols-wrap::-webkit-scrollbar{height:4px}
-.global-cols-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.gcol{min-width:210px;width:210px}
-/* Done archive toggle */
-.done-archive-toggle{font-size:11px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit;padding:3px 0;text-align:left;display:block;margin-top:6px}
-.done-archive-toggle:hover{color:var(--text2)}
-
-/* ===== TRASH ===== */
-.trash-section{margin-bottom:22px;opacity:0.7;transition:opacity .2s}
-.trash-section:hover{opacity:1}
-.trash-toggle{background:transparent;border:1px dashed #3A3A3A;border-radius:9px;color:#606060;font-size:12px;padding:8px 14px;cursor:pointer;font-family:inherit;width:100%;text-align:left;transition:all .2s;margin-bottom:8px}
-.trash-toggle:hover{border-color:#484848;color:#909090}
-.trash-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.tc.trashed{border-color:#2A2A2A;opacity:0.7}
-.tc.trashed .tc-title{color:var(--text3);text-decoration:line-through}
-
-
-/* ===== MOBILE TASK VIEW ===== */
-.mobile-task-view{display:none;pointer-events:none}
-.desktop-task-view{display:block}
-@media(max-width:767px){
-  .mobile-task-view{display:block}
-  .desktop-task-view{display:none}
-}
-.mob-col-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none;margin-bottom:2px}
-.mob-col-tabs::-webkit-scrollbar{display:none}
-.mob-tab{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.mob-view{display:none}
+.desk-view{display:block}
+@media(max-width:767px){.mob-view{display:block}.desk-view{display:none}#todo{padding:0 10px}}
+.mob-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.mob-tabs::-webkit-scrollbar{display:none}
+.mob-tab{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;touch-action:manipulation}
 .mob-tab.active{background:var(--red);border-color:var(--red);color:#fff}
 .mob-tab-cnt{display:inline-block;background:rgba(255,255,255,0.2);border-radius:8px;padding:0 5px;font-size:10px;margin-left:3px}
-.mob-task-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
-.mob-task{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;position:relative;touch-action:manipulation}
-.mob-task.pinned{border-color:var(--gold-b);background:rgba(201,168,76,0.05)}
-.mob-task.done-task{opacity:0.6}
-.mob-task-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
-.mob-task-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;margin-top:1px}
-.mob-task-check.checked{background:var(--green);border-color:var(--green);color:#fff;font-size:12px}
-.mob-task-title{flex:1;font-size:14px;font-weight:500;color:var(--text);line-height:1.35}
-.mob-task-title.done{text-decoration:line-through;color:var(--text3)}
-.mob-task-pri{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;flex-shrink:0;margin-top:2px}
-.mob-task-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-.mob-task-due{font-size:10px;color:var(--text3);background:var(--bg4);padding:2px 7px;border-radius:5px}
-.mob-task-due.overdue{color:#FF6B6B;background:rgba(255,107,107,0.12)}
-.mob-task-note{font-size:11px;color:var(--text3);font-style:italic;margin-bottom:6px;line-height:1.4}
-.mob-task-sub-bar{display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer}
-.mob-task-sub-prog{flex:1;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
-.mob-task-sub-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
-.mob-task-sub-label{font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap}
-.mob-subtasks{display:none;background:var(--bg3);border-radius:8px;padding:8px;margin-bottom:6px}
-.mob-subtasks.open{display:block}
+.mob-qadd{background:var(--bg2);border:1.5px solid var(--border2);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.mob-qadd input{background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;width:100%}
+.mob-qadd-btns{display:flex;gap:8px;margin-top:8px}
+.mob-qadd-btns select{flex:1;font-size:12px;padding:6px 8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit}
+.mob-qadd-btns button{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:none;background:var(--red);color:#fff;touch-action:manipulation}
+.mob-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:6px}
+.mob-card.pinned{border-color:var(--gold-b)}
+.mob-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.mob-chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:13px;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mob-chk.done{background:var(--green);border-color:var(--green);color:#fff}
+.mob-card-title{flex:1;font-size:14px;font-weight:500;color:var(--text);line-height:1.4}
+.mob-card-title.done{text-decoration:line-through;color:var(--text3)}
+.mob-pri{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:700;flex-shrink:0;margin-top:2px}
+.mob-card-meta{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.mob-due{font-size:11px;color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:5px}
+.mob-due.od{color:#FF6B6B;background:rgba(255,107,107,0.12)}
+.mob-note{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:6px;line-height:1.4}
+.mob-sub-bar{display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;touch-action:manipulation}
+.mob-sub-prog{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.mob-sub-fill{height:100%;background:var(--green);border-radius:2px}
+.mob-sub-lbl{font-size:10px;color:var(--text3);font-weight:600}
+.mob-subs{display:none;background:var(--bg3);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.mob-subs.open{display:block}
 .mob-sub-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
 .mob-sub-row:last-of-type{border-bottom:none}
-.mob-sub-check{width:18px;height:18px;flex-shrink:0;cursor:pointer;accent-color:var(--green)}
-.mob-sub-title{flex:1;font-size:12px;color:var(--text2);line-height:1.3}
-.mob-sub-title.done{text-decoration:line-through;color:var(--text3)}
+.mob-sub-chk{width:18px;height:18px;flex-shrink:0;cursor:pointer;accent-color:var(--green);touch-action:manipulation}
+.mob-sub-txt{flex:1;font-size:13px;color:var(--text2);line-height:1.3}
+.mob-sub-txt.done{text-decoration:line-through;color:var(--text3)}
 .mob-sub-add{display:flex;gap:6px;margin-top:7px}
-.mob-sub-add input{flex:1;font-size:12px;padding:6px 10px;border-radius:8px}
-.mob-sub-add button{padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.mob-task-actions{display:flex;gap:6px;flex-wrap:wrap}
-.mob-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:32px;display:flex;align-items:center}
-.mob-btn:active{background:var(--bg3)}
-.mob-btn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.35)}
-.mob-btn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
-.mob-btn.move-btn{color:var(--text3);font-size:13px;padding:4px 10px}
-.mob-quick-add{background:var(--bg2);border:1.5px solid var(--border2);border-radius:12px;padding:10px 12px;margin-bottom:8px}
-.mob-quick-add input{background:transparent;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;width:100%}
-.mob-quick-add-row{display:flex;gap:8px;margin-top:8px}
-.mob-quick-add-row button{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;touch-action:manipulation}
-.mob-section-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;padding-left:2px}
-.mob-move-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:5000;align-items:flex-end;justify-content:center;pointer-events:none}
+.mob-sub-add input{flex:1;font-size:13px;padding:7px 10px;border-radius:8px}
+.mob-sub-add button{padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.mob-actions{display:flex;gap:6px;flex-wrap:wrap}
+.mbtn{min-height:34px;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
+.mbtn:active{background:var(--bg3)}
+.mbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.35)}
+.mbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
+.mbtn.arr-btn{font-size:16px;padding:4px 10px;min-width:36px}
+.mob-move-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;align-items:flex-end;justify-content:center;pointer-events:none}
 .mob-move-sheet.open{display:flex;pointer-events:all}
-.mob-move-sheet-inner{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom,16px)+16px);width:100%;max-width:500px;max-height:70vh;overflow-y:auto}
-.mob-move-opt{display:block;width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:6px;text-align:left;touch-action:manipulation}
+.mob-move-inner{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom,16px)+16px);width:100%;max-width:500px;max-height:75vh;overflow-y:auto}
+.mob-move-opt{display:block;width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:6px;text-align:left;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .mob-move-opt:active{background:var(--bg4)}
+.mob-section-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:10px 0 5px;padding-left:2px}
 
 </style>
 </head>
@@ -515,87 +486,48 @@ input[type=file]{display:none}
   <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none"></canvas>
 
   <!-- MOBILE VIEW -->
-  <div class="mobile-task-view" id="mob-task-view">
-    <!-- Tab bar rendered by JS -->
-    <div id="mob-col-tabs" class="mob-col-tabs"></div>
-    <!-- Quick add -->
-    <div class="mob-quick-add">
-      <input type="text" id="mob-quick-input" placeholder="+ Add task to this column..." onkeydown="if(event.key==='Enter')mobQuickAdd()">
-      <div class="mob-quick-add-row">
-        <select id="mob-quick-pri" style="flex:1;font-size:12px;padding:6px 8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit">
-          <option value="high">🔴 High</option>
-          <option value="medium" selected>🟡 Medium</option>
-          <option value="low">🟢 Low</option>
-        </select>
-        <button onclick="mobQuickAdd()" style="background:var(--red);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:7px 16px">Add</button>
+  <div class="mob-view">
+    <div id="mob-tabs" class="mob-tabs"></div>
+    <div class="mob-qadd">
+      <input type="text" id="mob-inp" placeholder="+ Add task..." onkeydown="if(event.key==='Enter')mobAdd()">
+      <div class="mob-qadd-btns">
+        <select id="mob-pri"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>
+        <button onclick="mobAdd()">Add</button>
       </div>
     </div>
-    <!-- Task list rendered by JS -->
-    <div id="mob-task-list" class="mob-task-list"></div>
+    <div id="mob-list"></div>
   </div>
 
-  <!-- Move to column sheet -->
+  <!-- MOVE SHEET -->
   <div class="mob-move-sheet" id="mob-move-sheet" onclick="if(event.target===this)closeMobMove()">
-    <div class="mob-move-sheet-inner">
-      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px">Move to...</div>
+    <div class="mob-move-inner">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Move to...</div>
       <div id="mob-move-opts"></div>
-      <button onclick="closeMobMove()" style="width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px">Cancel</button>
+      <button onclick="closeMobMove()" style="width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;touch-action:manipulation">Cancel</button>
     </div>
   </div>
 
   <!-- DESKTOP VIEW -->
-  <div class="desktop-task-view">
-  <!-- Focus banner -->
-  <div class="tasks-focus-banner">
-    <span class="tasks-focus-banner-icon">🎯</span>
-    <div class="tasks-focus-banner-text">
-      <strong>Execution dashboard — not a CRM</strong>
-      Your personal execution dashboard. Manage tasks, track progress and get things done.
+  <div class="desk-view">
+    <div class="tasks-focus-banner">
+      <span class="tasks-focus-banner-icon">🎯</span>
+      <div class="tasks-focus-banner-text"><strong>Execution dashboard</strong>Your personal execution system. Get things done.</div>
+    </div>
+    <div class="tasks-search-bar">
+      <input type="text" id="task-search" placeholder="🔍 Search..." oninput="renderTasks()">
+      <button onclick="document.getElementById('task-search').value='';renderTasks()" style="background:var(--bg3);border:1.5px solid var(--border2);border-radius:8px;color:var(--text3);font-size:12px;padding:7px 10px;cursor:pointer;font-family:inherit;white-space:nowrap">Clear</button>
+    </div>
+    <div class="task-section"><div class="task-section-header"><span class="task-section-title">🚨 Execution Zone</span></div><div class="global-cols-wrap" id="global-cols"></div></div>
+    <div id="biz-task-lanes"></div>
+    <div class="task-section"><div class="task-section-header"><span class="task-section-title">👤 Personal</span></div><div class="global-cols-wrap" id="personal-cols"></div></div>
+    <div class="task-section"><div class="task-section-header"><span class="task-section-title">🧠 Brain Dump</span></div><div class="global-cols-wrap" id="brain-cols"></div></div>
+    <div class="trash-section" id="trash-section" style="margin-top:8px">
+      <button class="trash-toggle" onclick="toggleTrash()">🗑 Deleted (<span id="trash-count">0</span>) — tap to view</button>
+      <div id="trash-cols" style="display:none"><div class="global-cols-wrap" id="trash-col-wrap"></div><div style="font-size:11px;color:#505050;text-align:center;margin-top:4px">Auto-purged after 30 days</div></div>
     </div>
   </div>
-  <!-- Search -->
-  <div class="tasks-search-bar">
-    <input type="text" id="task-search" placeholder="🔍 Search tasks..." oninput="renderTasks()">
-    <button onclick="document.getElementById('task-search').value='';renderTasks()" style="background:var(--bg3);border:1.5px solid var(--border2);border-radius:8px;color:var(--text3);font-size:12px;padding:7px 10px;cursor:pointer;font-family:inherit;white-space:nowrap">Clear</button>
-  </div>
-
-  <!-- Global lanes -->
-  <div class="task-section">
-    <div class="task-section-header">
-      <span class="task-section-title">🚨 Execution Zone</span>
-    </div>
-    <div class="global-cols-wrap" id="global-cols"></div>
-  </div>
-
-  <!-- Business lanes -->
-  <div id="biz-task-lanes"></div>
-
-  <!-- Personal lane -->
-  <div class="task-section">
-    <div class="task-section-header">
-      <span class="task-section-title">👤 Personal</span>
-    </div>
-    <div class="global-cols-wrap" id="personal-cols"></div>
-  </div>
-
-  <!-- Brain dump -->
-  <div class="task-section">
-    <div class="task-section-header">
-      <span class="task-section-title">🧠 Brain Dump</span>
-    </div>
-    <div class="global-cols-wrap" id="brain-cols"></div>
-  </div>
-
-  <!-- Trash -->
-  <div class="trash-section" id="trash-section" style="margin-top:8px">
-    <button class="trash-toggle" onclick="toggleTrash()">🗑 Deleted items (<span id="trash-count">0</span>) — tap to view</button>
-    <div id="trash-cols" style="display:none">
-      <div class="global-cols-wrap" id="trash-col-wrap"></div>
-      <div style="font-size:11px;color:#505050;text-align:center;margin-top:4px">Items auto-delete after 30 days</div>
-    </div>
-  </div>
-  </div><!-- end desktop-task-view -->
 </div>
+
 
 <!-- GOALS -->
 <div id="goals" class="page">
@@ -949,608 +881,670 @@ function renderPrayerPage(){
 //  TASKS SYSTEM — COMPLETE REBUILD
 // ════════════════════════════════════════
 
-let _drag={taskId:null,fromColId:null,fromBizId:null};
-let _taskExpanded={};// taskId -> bool (subtask expanded)
 
-// ─ Helpers ─
+// ===== TASK SYSTEM =====
+let _drag = {id:null, colId:null, bizId:null};
+let _expanded = {}; // taskId -> bool
+let _mobCol = null;
+let _mobMoveId = null;
+
+// ── Store helpers ──
 function getTS(){return S.tasks2;}
-function allTasks(){return Object.values(getTS().tasks);}
+function saveTS(){ss('tasks2');}
+function allTasks(){return Object.values(getTS().tasks||{});}
 
-function getTasksInCol(colId,bizId){
-  let ts=getTS();
-  let biz=bizId||null;let items=allTasks().filter(t=>t.colId===colId&&(t.bizId||null)===biz&&!t._scheduledSubRef);
-  let order=ts.colOrder&&ts.colOrder[colId];
-  if(order&&order.length){
-    let orderMap={};order.forEach((id,i)=>orderMap[id]=i);
-    items.sort((a,b)=>{
-      let ai=orderMap[a.id]!==undefined?orderMap[a.id]:9999;
-      let bi=orderMap[b.id]!==undefined?orderMap[b.id]:9999;
-      return ai-bi;
-    });
+function getCol(colId, ts){
+  ts = ts||getTS();
+  for(let c of ts.globalCols||[]){ if(c.id===colId) return c; }
+  for(let b of BIZ_CFG){ let lane=ts.bizLanes[b.id]; if(lane){ for(let c of lane.cols){ if(c.id===colId) return c; } } }
+  for(let c of ts.personalCols||[]){ if(c.id===colId) return c; }
+  return null;
+}
+
+function getTasksInCol(colId, bizId){
+  let ts = getTS();
+  let biz = bizId||null;
+  let items = allTasks().filter(t => t.colId===colId && (t.bizId||null)===biz);
+  let order = ts.colOrder && ts.colOrder[colId];
+  if(order && order.length){
+    let map = {}; order.forEach((id,i) => map[id]=i);
+    items.sort((a,b) => (map[a.id]!==undefined?map[a.id]:9999) - (map[b.id]!==undefined?map[b.id]:9999));
   }
   return items;
 }
 
-function newId(){return 't_'+Math.random().toString(36).slice(2,12);}
+function ensureColOrder(colId, bizId){
+  let ts = getTS();
+  if(!ts.colOrder) ts.colOrder = {};
+  if(!ts.colOrder[colId]){
+    ts.colOrder[colId] = getTasksInCol(colId, bizId||null).map(t=>t.id);
+  }
+  return ts.colOrder[colId];
+}
 
-function saveTS(){ss('tasks2');}
-
-// ─ Get scheduled subtask refs shown in a global col ─
-// Returns [{task, sub, schedLabel}]
-function getScheduledSubsInCol(colId){
-  let res=[];
-  allTasks().forEach(task=>{
-    (task.subtasks||[]).forEach(sub=>{
-      if(sub.scheduledTo===colId)res.push({task,sub});
+function getScheduledSubs(colId){
+  let res = [];
+  allTasks().forEach(t => {
+    (t.subtasks||[]).forEach(s => {
+      if(s.scheduledTo === colId) res.push({task:t, sub:s});
     });
   });
   return res;
 }
 
-// ─ Add task ─
-function addTask2(colId,bizId){
-  let ts=getTS();
-  let nameEl=document.getElementById('tn2-'+colId);
-  let name=(nameEl?.value||'').trim();if(!name)return;
-  let pri=document.getElementById('tp2-'+colId)?.value||'medium';
-  let due=document.getElementById('td2b-'+colId)?.value||'';
-  let note=(document.getElementById('tnote2-'+colId)?.value||'').trim();
-  let task={id:newId(),title:name,priority:pri,due,note,pinned:false,colId,bizId:bizId||null,subtasks:[],added:td()};
-  ts.tasks[task.id]=task;
-  // clear
-  if(nameEl)nameEl.value='';
-  let ef=document.getElementById('tef-'+colId);if(ef)ef.classList.remove('open');
-  saveTS();renderTasks();renderDashboard();
-}
-
-// ─ Delete task ─
-function softDeleteTask2(taskId){
-  let ts=getTS();
-  let task=ts.tasks[taskId];if(!task)return;
-  task.deletedAt=new Date().toISOString();
-  ts.trash[taskId]=task;
-  delete ts.tasks[taskId];
-  saveTS();renderTasks();renderTrash();
-}
-function confirmHardDelete(taskId){
-  if(confirm('Permanently delete this task?'))hardDeleteTask2(taskId);
-}
-function hardDeleteTask2(taskId){
-  let ts=getTS();
-  delete ts.trash[taskId];
-  saveTS();renderTrash();
-}
-function restoreFromTrash(taskId){
-  let ts=getTS();
-  let task=ts.trash[taskId];if(!task)return;
-  delete task.deletedAt;
-  // restore to original col if it still exists, else Today
-  let colExists=findColDef(task.colId,task.bizId,ts);
-  if(!colExists){
-    let gc=ts.globalCols.find(c=>c.type==='today');
-    if(gc)task.colId=gc.id;
-    task.bizId=null;
-  }
-  ts.tasks[taskId]=task;
-  delete ts.trash[taskId];
-  saveTS();renderTasks();renderTrash();
-}
-function deleteTask2(taskId){
-  // legacy hard delete — keep for any existing calls
-  softDeleteTask2(taskId);
-}
-
-// ─ Done task ─
-function doneTask2(taskId){
-  let ts=getTS();let task=ts.tasks[taskId];if(!task)return;
-  // Find done col for this task's lane
-  let doneColId=findDoneCol(task.colId,task.bizId);
-  if(doneColId){task.colId=doneColId;task.doneAt=td();}
-  saveTS();spawnConfetti(false);renderTasks();renderDashboard();
-}
-
-// ─ Pin task ─
-function pinTask2(taskId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  task.pinned=!task.pinned;
-  saveTS();renderTasks();
-}
-
-// ─ Find appropriate done col ─
-function findDoneCol(colId,bizId){
-  let ts=getTS();
-  if(bizId){
-    let lane=ts.bizLanes[bizId];if(!lane)return null;
-    let dc=lane.cols.find(c=>c.isDone);return dc?dc.id:null;
-  }
-  // Check personal
-  let pc=ts.personalCols.find(c=>c.isDone);if(pc&&ts.personalCols.find(c=>c.id===colId))return pc.id;
-  // Global
-  let gc=ts.globalCols.find(c=>c.type==='done');return gc?gc.id:null;
-}
-
-// ─ Restore done task ─
-function restoreTask2(taskId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  delete task.doneAt;
-  // Put back to today in same lane
-  let ts=getTS();
-  if(task.bizId){let lane=ts.bizLanes[task.bizId];if(lane&&lane.cols[0])task.colId=lane.cols[0].id;}
-  else{let gc=ts.globalCols.find(c=>c.type==='today');if(gc)task.colId=gc.id;}
-  saveTS();renderTasks();
-}
-
-// ─ Subtasks ─
-function addSubtask(taskId){
-  let inp=document.getElementById('sub-inp-'+taskId);if(!inp)return;
-  let title=inp.value.trim();if(!title)return;
-  let task=getTS().tasks[taskId];if(!task)return;
-  if(!task.subtasks)task.subtasks=[];
-  task.subtasks.push({id:newId(),title,done:false,scheduledTo:null});
-  inp.value='';
-  saveTS();renderTasks();
-}
-
-function toggleSubtask(taskId,subId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  let sub=task.subtasks.find(s=>s.id===subId);if(!sub)return;
-  sub.done=!sub.done;
-  // Check if all done → auto-complete parent
-  let allDone=task.subtasks.length>0&&task.subtasks.every(s=>s.done);
-  if(allDone){doneTask2(taskId);return;}
-  saveTS();renderTasks();
-}
-
-function deleteSubtask(taskId,subId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  task.subtasks=task.subtasks.filter(s=>s.id!==subId);
-  saveTS();renderTasks();
-}
-
-function scheduleSubtask(taskId,subId,targetColId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  let sub=task.subtasks.find(s=>s.id===subId);if(!sub)return;
-  sub.scheduledTo=(sub.scheduledTo===targetColId)?null:targetColId;
-  saveTS();renderTasks();
-}
-
-function doneScheduledSub(taskId,subId){
-  toggleSubtask(taskId,subId);
-}
-
-function toggleSubExpand(taskId){
-  _taskExpanded[taskId]=!_taskExpanded[taskId];
-  renderTasks();
-}
-
-// ─ Trash ─
-let _trashOpen=false;
-function toggleTrash(){
-  _trashOpen=!_trashOpen;
-  let el=document.getElementById('trash-cols');
-  if(el)el.style.display=_trashOpen?'block':'none';
-  renderTrash();
-}
-function renderTrash(){
-  let ts=getTS();
-  let trashItems=Object.values(ts.trash||{});
-  let now=new Date();
-  trashItems=trashItems.filter(t=>{
-    if(!t.deletedAt)return true;
-    let days=(now-new Date(t.deletedAt))/(1000*60*60*24);
-    if(days>30){delete ts.trash[t.id];return false;}
-    return true;
+function getScheduledSubsInCol(colId){
+  let res=[];
+  Object.values(getTS().tasks).forEach(task=>{
+    (task.subtasks||[]).forEach(sub=>{
+      if(sub.scheduledTo===colId) res.push({task,sub});
+    });
   });
-  let countEl=document.getElementById('trash-count');
-  if(countEl)countEl.textContent=trashItems.length;
-  let wrap=document.getElementById('trash-col-wrap');
-  if(!wrap)return;
-  if(!_trashOpen){wrap.innerHTML='';return;}
-  if(!trashItems.length){
-    wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:10px 0">Nothing in trash</div>';
-    return;
-  }
-  let sorted=trashItems.sort((a,b)=>new Date(b.deletedAt||0)-new Date(a.deletedAt||0));
-  let cards=sorted.map(t=>{
-    let d=t.deletedAt?new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'-';
-    let p=PRI_CFG[t.priority||'medium'];
-    let subLine=t.subtasks&&t.subtasks.length?'<div style="font-size:10px;color:#505050;margin-top:3px">'+t.subtasks.length+' subtask'+(t.subtasks.length!==1?'s':'')+'</div>':'';
-    return '<div class="tc trashed">'
-      +'<div class="tc-title">'+t.title+'</div>'
-      +'<div class="tc-meta">'
-        +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span>'
-        +'<span style="font-size:10px;color:#505050;margin-left:4px">deleted '+d+'</span>'
-      +'</div>'
-      +subLine
-      +'<div class="tc-actions" style="margin-top:6px">'
-        +'<button class="tbtn" style="color:#3DAA4C;border-color:rgba(61,170,76,0.3)" data-tid="'+t.id+'" onclick="event.stopPropagation();restoreFromTrash(this.dataset.tid)">↩ Restore</button>'
-        +'<button class="tbtn del-btn" data-tid="'+t.id+'" onclick="event.stopPropagation();confirmHardDelete(this.dataset.tid)">Delete forever</button>'
-      +'</div>'
-    +'</div>';
-  }).join('');
-
-  wrap.innerHTML='<div class="tcol" style="min-width:280px;width:280px;opacity:1">'
-    +'<div class="tcol-head">'
-      +'<div class="tcol-dot" style="background:#444"></div>'
-      +'<span class="tcol-name">Deleted items</span>'
-      +'<span class="tcol-cnt">'+sorted.length+'</span>'
-    +'</div>'
-    +'<div class="tcol-cards">'+cards+'</div>'
-  +'</div>';
+  return res;
 }
 
-// ─ Move task up/down within column ─
-function getVisualOrder(colId){
-  // Read actual rendered card order from DOM - most reliable source of truth
-  let col=document.getElementById('tcol-'+colId);
-  if(!col)return null;
-  let cards=[...col.querySelectorAll('.tc[id^="tc-"]')];
-  return cards.map(c=>c.id.replace('tc-',''));
-}
-function moveTaskUp(taskId,colId,bizId){
-  bizId=bizId||null;
-  let ts=getTS();
-  if(!ts.colOrder)ts.colOrder={};
-  // Use DOM order as source of truth - avoids insertion order vs visual order mismatch
-  let order=getVisualOrder(colId)||getTasksInCol(colId,bizId).map(t=>t.id);
-  let idx=order.indexOf(taskId);
-  if(idx<=0)return;
-  [order[idx-1],order[idx]]=[order[idx],order[idx-1]];
-  ts.colOrder[colId]=order;
-  saveTS();renderSingleCol(colId,bizId);
-}
-function moveTaskDown(taskId,colId,bizId){
-  bizId=bizId||null;
-  let ts=getTS();
-  if(!ts.colOrder)ts.colOrder={};
-  let order=getVisualOrder(colId)||getTasksInCol(colId,bizId).map(t=>t.id);
-  let idx=order.indexOf(taskId);
-  if(idx===-1||idx>=order.length-1)return;
-  [order[idx+1],order[idx]]=[order[idx],order[idx+1]];
-  ts.colOrder[colId]=order;
-  saveTS();renderSingleCol(colId,bizId);
-}
-function renderSingleCol(colId,bizId){
-  // Re-render just one column instead of the whole board - much faster
-  bizId=bizId||null;
-  let ts=getTS();
-  let colDef=findColDef(colId,bizId,ts);
-  if(!colDef)return;
-  let q=(document.getElementById('task-search')?.value||'').trim();
-  let el=document.getElementById('tcol-'+colId);
-  if(!el)return;
-  el.outerHTML=buildCol2(colDef,bizId,q);
+function newId(){ return 't_' + Math.random().toString(36).slice(2,12); }
+
+function findDoneCol(colId, bizId){
+  let ts = getTS();
+  if(bizId){ let lane=ts.bizLanes[bizId]; if(lane){ let dc=lane.cols.find(c=>c.isDone); return dc?dc.id:null; } }
+  let pc = ts.personalCols.find(c=>c.isDone);
+  if(pc && ts.personalCols.find(c=>c.id===colId)) return pc.id;
+  let gc = ts.globalCols.find(c=>c.type==='done'); return gc?gc.id:null;
 }
 
-// ─ Move task to col ─
-function moveTask2(taskId,targetColId,targetBizId){
-  let task=getTS().tasks[taskId];if(!task)return;
-  task.colId=targetColId;
-  task.bizId=targetBizId||null;
-  saveTS();renderTasks();renderDashboard();
+// ── CRUD ──
+function addTask2(colId, bizId){
+  let ts = getTS();
+  let nameEl = document.getElementById('tn2-'+colId);
+  let name = (nameEl?.value||'').trim(); if(!name) return;
+  let pri = document.getElementById('tp2-'+colId)?.value||'medium';
+  let due = document.getElementById('td2b-'+colId)?.value||'';
+  let note = (document.getElementById('tnote2-'+colId)?.value||'').trim();
+  let task = {id:newId(), title:name, priority:pri, due, note, pinned:false, colId, bizId:bizId||null, subtasks:[], added:td()};
+  ts.tasks[task.id] = task;
+  if(nameEl) nameEl.value = '';
+  let form = document.getElementById('tmf-'+colId); if(form) form.classList.remove('open');
+  saveTS(); renderTasks(); renderDashboard();
 }
 
-// ─ Rename column ─
-function startRenameCol(colId){
-  let nameEl=document.getElementById('cnm-'+colId);
-  let inputEl=document.getElementById('cni-'+colId);
-  if(nameEl)nameEl.style.display='none';
-  if(inputEl){inputEl.style.display='block';inputEl.focus();inputEl.select();}
-}
-function finishRenameCol(colId,bizId){
-  let inputEl=document.getElementById('cni-'+colId);
-  let nameEl=document.getElementById('cnm-'+colId);
-  if(inputEl)inputEl.style.display='none';
-  if(nameEl)nameEl.style.display='';
-  let newName=inputEl?inputEl.value.trim():'';if(!newName)return;
-  // Update col name
-  let ts=getTS();
-  let col=findColDef(colId,bizId,ts);
-  if(col)col.name=newName;
-  saveTS();renderTasks();
-}
-function findColDef(colId,bizId,ts){
-  if(bizId){let lane=ts.bizLanes[bizId];if(lane)return lane.cols.find(c=>c.id===colId);}
-  let gc=ts.globalCols.find(c=>c.id===colId);if(gc)return gc;
-  return ts.personalCols.find(c=>c.id===colId);
+function doneTask2(taskId){
+  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
+  let dc = findDoneCol(task.colId, task.bizId);
+  if(dc){ task.colId=dc; task.doneAt=td(); }
+  saveTS(); spawnConfetti(false); renderTasks(); renderDashboard();
 }
 
-// ─ Delete column ─
-function deleteCol2(colId,bizId){
-  if(!confirm('Delete this column? Tasks will be moved to the first column.'))return;
-  let ts=getTS();
-  let cols=bizId?ts.bizLanes[bizId]?.cols:ts.personalCols;
-  if(!cols||cols.length<=1)return;
-  let idx=cols.findIndex(c=>c.id===colId);if(idx===-1)return;
-  let fallback=cols.find(c=>c.id!==colId);
-  cols.splice(idx,1);
-  // Move orphaned tasks
-  Object.values(ts.tasks).forEach(t=>{if(t.colId===colId)t.colId=fallback.id;});
-  saveTS();renderTasks();
+function restoreTask2(taskId){
+  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
+  delete task.doneAt;
+  let gc = ts.globalCols.find(c=>c.type==='today'); if(gc) task.colId=gc.id;
+  saveTS(); renderTasks(); renderDashboard();
 }
 
-// ─ Add column ─
+function pinTask2(taskId){
+  let task = getTS().tasks[taskId]; if(!task) return;
+  task.pinned = !task.pinned; saveTS(); renderTasks();
+}
+
+function softDeleteTask2(taskId){
+  let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
+  task.deletedAt = new Date().toISOString();
+  if(!ts.trash) ts.trash={};
+  ts.trash[taskId] = task;
+  delete ts.tasks[taskId];
+  saveTS(); renderTasks(); renderTrash();
+}
+
+function hardDeleteTask2(taskId){
+  let ts = getTS(); delete ts.trash[taskId]; saveTS(); renderTrash();
+}
+
+function confirmHardDelete(taskId){ if(confirm('Permanently delete?')) hardDeleteTask2(taskId); }
+
+function restoreFromTrash(taskId){
+  let ts = getTS(); let task = ts.trash[taskId]; if(!task) return;
+  delete task.deletedAt;
+  let colOk = getCol(task.colId, ts);
+  if(!colOk){ let gc=ts.globalCols.find(c=>c.type==='today'); if(gc){task.colId=gc.id; task.bizId=null;} }
+  ts.tasks[taskId] = task; delete ts.trash[taskId];
+  saveTS(); renderTasks(); renderTrash();
+}
+
+// ── Subtasks ──
+function addSubtask(taskId){
+  let inp = document.getElementById('sub-inp-'+taskId); if(!inp) return;
+  let title = inp.value.trim(); if(!title) return;
+  let task = getTS().tasks[taskId]; if(!task) return;
+  if(!task.subtasks) task.subtasks=[];
+  task.subtasks.push({id:newId(), title, done:false, scheduledTo:null});
+  inp.value = ''; saveTS(); renderTasks();
+}
+
+function toggleSubtask(taskId, subId){
+  let task = getTS().tasks[taskId]; if(!task) return;
+  let sub = task.subtasks.find(s=>s.id===subId); if(!sub) return;
+  sub.done = !sub.done;
+  if(task.subtasks.length > 0 && task.subtasks.every(s=>s.done)){ doneTask2(taskId); return; }
+  saveTS(); renderTasks();
+}
+
+function deleteSubtask(taskId, subId){
+  let task = getTS().tasks[taskId]; if(!task) return;
+  task.subtasks = task.subtasks.filter(s=>s.id!==subId);
+  saveTS(); renderTasks();
+}
+
+function scheduleSubtask(taskId, subId, val){
+  let task = getTS().tasks[taskId]; if(!task) return;
+  let sub = task.subtasks.find(s=>s.id===subId); if(!sub) return;
+  sub.scheduledTo = val||null; saveTS(); renderTasks();
+}
+
+function toggleExpand(taskId){ _expanded[taskId]=!_expanded[taskId]; renderTasks(); }
+
+// ── Ordering ──
+function getColVisualIds(colId, bizId){
+  let tasks = getTasksInCol(colId, bizId||null);
+  let pinned = tasks.filter(t=>t.pinned);
+  let unpinned = tasks.filter(t=>!t.pinned);
+  return [...pinned, ...unpinned].map(t=>t.id);
+}
+function reRenderCol(colId, bizId){
+  let ts = getTS();
+  let colDef = findColDef(colId, bizId||null, ts);
+  if(!colDef) { renderTasks(); return; }
+  let q = (document.getElementById('task-search')?.value||'').trim();
+  let el = document.getElementById('tcol-'+colId);
+  if(!el) { renderTasks(); return; }
+  el.outerHTML = buildCol2(colDef, bizId||null, q);
+}
+function moveTaskUp(taskId, colId, bizId){
+  bizId = bizId||null;
+  let ts = getTS();
+  if(!ts.colOrder) ts.colOrder = {};
+  let ids = getColVisualIds(colId, bizId);
+  let idx = ids.indexOf(taskId);
+  if(idx <= 0) return;
+  [ids[idx-1], ids[idx]] = [ids[idx], ids[idx-1]];
+  ts.colOrder[colId] = ids;
+  saveTS(); reRenderCol(colId, bizId);
+}
+function moveTaskDown(taskId, colId, bizId){
+  bizId = bizId||null;
+  let ts = getTS();
+  if(!ts.colOrder) ts.colOrder = {};
+  let ids = getColVisualIds(colId, bizId);
+  let idx = ids.indexOf(taskId);
+  if(idx === -1 || idx >= ids.length-1) return;
+  [ids[idx+1], ids[idx]] = [ids[idx], ids[idx+1]];
+  ts.colOrder[colId] = ids;
+  saveTS(); reRenderCol(colId, bizId);
+}
+
+// ── Column management ──
 function addBizCol(bizId){
-  let ts=getTS();let lane=ts.bizLanes[bizId];if(!lane)return;
-  let name=prompt('Column name:');if(!name||!name.trim())return;
-  let accent=BIZ_COL_ACCENT[bizId]||'#888';
-  lane.cols.push({id:bizId+'_'+newId(),name:name.trim(),accent,isDone:false});
-  saveTS();renderTasks();
-}
-function addPersonalCol(){
-  let ts=getTS();
-  let name=prompt('Column name:');if(!name||!name.trim())return;
-  ts.personalCols.push({id:'pers_'+newId(),name:name.trim(),accent:'#C9A84C',isDone:false});
-  saveTS();renderTasks();
+  let name = prompt('Column name:'); if(!name||!name.trim()) return;
+  let ts = getTS(); let lane = ts.bizLanes[bizId]; if(!lane) return;
+  lane.cols.push({id:bizId+'_'+newId(), name:name.trim(), accent:BIZ_COL_ACCENT[bizId]||'#888'});
+  saveTS(); renderTasks();
 }
 
-// ─ Drag & drop ─
-function onTC_DragStart(e,taskId,colId,bizId){
-  _drag={taskId,fromColId:colId,fromBizId:bizId||null};
-  setTimeout(()=>{let el=document.getElementById('tc-'+taskId);if(el)el.classList.add('dragging');},0);
+function addPersonalCol(){
+  let name = prompt('Column name:'); if(!name||!name.trim()) return;
+  let ts = getTS();
+  ts.personalCols.push({id:'pers_'+newId(), name:name.trim(), accent:'#C9A84C'});
+  saveTS(); renderTasks();
 }
-function onTC_DragEnd(e,taskId){
-  let el=document.getElementById('tc-'+taskId);if(el)el.classList.remove('dragging');
-  document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
+
+function deleteCol2(colId, bizId){
+  if(!confirm('Delete this column? Tasks will move to first column.')) return;
+  let ts = getTS();
+  let cols = bizId ? ts.bizLanes[bizId]?.cols : ts.personalCols;
+  if(!cols || cols.length <= 1) return;
+  let idx = cols.findIndex(c=>c.id===colId); if(idx===-1) return;
+  let fallback = cols.find(c=>c.id!==colId);
+  cols.splice(idx,1);
+  allTasks().forEach(t=>{ if(t.colId===colId) t.colId=fallback.id; });
+  saveTS(); renderTasks();
 }
-function onCol_DragOver(e,colId){
+
+function startRenameCol(colId){
+  let nm=document.getElementById('cnm-'+colId), inp=document.getElementById('cni-'+colId);
+  if(nm) nm.style.display='none'; if(inp){inp.style.display='block';inp.focus();inp.select();}
+}
+
+function finishRenameCol(colId, bizId){
+  let nm=document.getElementById('cnm-'+colId), inp=document.getElementById('cni-'+colId);
+  if(inp) inp.style.display='none'; if(nm) nm.style.display='';
+  let newName = inp?.value.trim(); if(!newName) return;
+  let col = getCol(colId);
+  if(col) col.name = newName;
+  saveTS(); renderTasks();
+}
+
+// ── Drag & Drop (desktop only) ──
+function onTC_DragStart(e, taskId, colId, bizId){
+  _drag = {id:taskId, colId, bizId:bizId||null};
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(()=>{ let el=document.getElementById('tc-'+taskId); if(el) el.classList.add('dragging'); }, 0);
+}
+
+function onTC_DragEnd(e, taskId){
+  let el = document.getElementById('tc-'+taskId); if(el) el.classList.remove('dragging');
+  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+}
+
+function onCol_DragOver(e, colId){
   e.preventDefault();
-  document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
   document.getElementById('tcol-'+colId)?.classList.add('drag-over');
 }
-function onCol_Drop(e,colId,bizId){
+
+function onCard_DragOver(e, taskId){
+  // Allow drag - don't stopPropagation so column also gets dragover
   e.preventDefault();
-  document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
-  if(!_drag.taskId)return;
-  let fromColId=_drag.fromColId;
-  let fromBizId=_drag.fromBizId;
-  let ts=getTS();
-  let task=ts.tasks[_drag.taskId];if(!task)return;
-  task.colId=colId;task.bizId=bizId||null;
-  if(!ts.colOrder)ts.colOrder={};
-  let existing=(ts.colOrder[colId]||[]).filter(id=>id!==_drag.taskId);
-  existing.push(_drag.taskId);
-  ts.colOrder[colId]=existing;
-  // Remove from old col order
-  if(ts.colOrder[fromColId]){
-    ts.colOrder[fromColId]=ts.colOrder[fromColId].filter(id=>id!==_drag.taskId);
+  if(!_drag.id || _drag.id===taskId){
+    // Hovering over self - still need to allow drop on column
+    return;
   }
-  _drag={taskId:null,fromColId:null,fromBizId:null};
-  saveTS();
-  // Only re-render affected cols for speed - fall back to full render if cols not found
-  let fromEl=document.getElementById('tcol-'+fromColId);
-  let toEl=document.getElementById('tcol-'+colId);
-  if(fromEl&&toEl&&fromColId!==colId){
-    renderSingleCol(fromColId,fromBizId);
-    renderSingleCol(colId,bizId||null);
+  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+  document.getElementById('tc-'+taskId)?.classList.add('drag-over-top');
+}
+
+function onCard_Drop(e, taskId, colId, bizId){
+  e.preventDefault(); e.stopPropagation();
+  document.querySelectorAll('.tc.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  if(!_drag.id || _drag.id===taskId) return;
+  let ts = getTS();
+  if(!ts.colOrder) ts.colOrder = {};
+  let task = ts.tasks[_drag.id]; if(!task) return;
+  let fromCol=_drag.colId, fromBiz=_drag.bizId;
+  let toCol=colId, toBiz=bizId||null;
+  task.colId=toCol; task.bizId=toBiz;
+  // Remove from source col order
+  ts.colOrder[fromCol] = getColVisualIds(fromCol, fromBiz).filter(id=>id!==_drag.id);
+  // Insert before target in dest col
+  let toIds = getColVisualIds(toCol, toBiz).filter(id=>id!==_drag.id);
+  let targetIdx = toIds.indexOf(taskId);
+  if(targetIdx === -1) toIds.push(_drag.id); else toIds.splice(targetIdx, 0, _drag.id);
+  ts.colOrder[toCol] = toIds;
+  _drag = {id:null, colId:null, bizId:null};
+  saveTS(); renderTasks(); renderDashboard();
+}
+
+function onCol_Drop(e, colId, bizId){
+  e.preventDefault();
+  document.querySelectorAll('.tcol.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  if(!_drag.id) return;
+  let ts = getTS(); let task = ts.tasks[_drag.id]; if(!task) return;
+  let fromCol=_drag.colId, fromBiz=_drag.bizId;
+  task.colId=colId; task.bizId=bizId||null;
+  // Update colOrder for both cols
+  if(!ts.colOrder) ts.colOrder = {};
+  ts.colOrder[fromCol] = getColVisualIds(fromCol, fromBiz).filter(id=>id!==_drag.id);
+  ts.colOrder[colId] = [...(ts.colOrder[colId]||[]).filter(id=>id!==_drag.id), _drag.id];
+  _drag = {id:null, colId:null, bizId:null};
+  saveTS(); renderTasks(); renderDashboard();
+}
+
+// ── Build card HTML ──
+function buildTaskCard(task, colDef, isDone){
+  let p = PRI_CFG[task.priority||'medium'];
+  let isOD = task.due && task.due < td() && !isDone;
+  let subs = task.subtasks||[];
+  let doneSubs = subs.filter(s=>s.done).length;
+  let subPct = subs.length ? Math.round(doneSubs/subs.length*100) : 0;
+  let isExp = !!_expanded[task.id];
+  let biz = task.bizId||'';
+
+  // Subtask section
+  let subHtml = '';
+  if(subs.length > 0){
+    let schedOpts = getTS().globalCols.filter(c=>c.type!=='done')
+      .map(c=>`<option value="${c.id}" ${subs[0]?.scheduledTo===c.id?'selected':''}>${c.name}</option>`).join('') +
+      `<option value="">Backlog</option>`;
+    subHtml = `<div class="tc-sub-bar" onclick="event.stopPropagation();toggleExpand('${task.id}')">
+      <div class="tc-sub-prog"><div class="tc-sub-fill" style="width:${subPct}%"></div></div>
+      <span class="tc-sub-lbl">${doneSubs}/${subs.length}</span>
+      <span style="font-size:9px;color:var(--text3)">${isExp?'▲':'▼'}</span>
+    </div>
+    <div class="tc-subtasks ${isExp?'open':''}">
+      ${subs.map(sub => `<div class="sub-row">
+        <input type="checkbox" class="sub-chk" ${sub.done?'checked':''} onchange="event.stopPropagation();toggleSubtask('${task.id}','${sub.id}')">
+        <span class="sub-title ${sub.done?'done':''}">${sub.title}</span>
+        <select class="sub-sched" onchange="event.stopPropagation();scheduleSubtask('${task.id}','${sub.id}',this.value)">
+          ${getTS().globalCols.filter(c=>c.type!=='done').map(c=>`<option value="${c.id}" ${sub.scheduledTo===c.id?'selected':''}>${c.name}</option>`).join('')}
+          <option value="" ${!sub.scheduledTo?'selected':''}>Backlog</option>
+        </select>
+        <button class="sub-del" onclick="event.stopPropagation();deleteSubtask('${task.id}','${sub.id}')">×</button>
+      </div>`).join('')}
+      <div class="sub-add-row">
+        <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter'){event.stopPropagation();addSubtask('${task.id}')}">
+        <button onclick="event.stopPropagation();addSubtask('${task.id}')">+</button>
+      </div>
+    </div>`;
   } else {
-    renderTasks();
-  }
-  renderDashboard();
-}
-
-// ─ Search filter ─
-function taskMatchesSearch(task,q){
-  if(!q)return true;
-  q=q.toLowerCase();
-  if(task.title.toLowerCase().includes(q))return true;
-  if(task.note&&task.note.toLowerCase().includes(q))return true;
-  if((task.subtasks||[]).some(s=>s.title.toLowerCase().includes(q)))return true;
-  return false;
-}
-
-// ─ Build task card HTML ─
-function buildTaskCard(task,colDef,isDone){
-  let p=PRI_CFG[task.priority||'medium'];
-  let today=td();
-  let isOD=task.due&&task.due<today&&!isDone;
-  let subtasks=task.subtasks||[];
-  let doneSubs=subtasks.filter(s=>s.done).length;
-  let totalSubs=subtasks.length;
-  let subPct=totalSubs?Math.round((doneSubs/totalSubs)*100):0;
-  let isExpanded=!!_taskExpanded[task.id];
-
-  let subtaskSection='';
-  if(totalSubs>0){
-    let schedOpts=`<option value="">No schedule</option>`;
-    getTS().globalCols.forEach(c=>{if(c.type!=='done')schedOpts+=`<option value="${c.id}">${c.name}</option>`;});
-
-    subtaskSection=`
-      <div class="tc-subtask-bar" onclick="toggleSubExpand('${task.id}')">
-        <div class="tc-subtask-progress"><div class="tc-subtask-progress-fill" style="width:${subPct}%"></div></div>
-        <span class="tc-subtask-label">${doneSubs}/${totalSubs}</span>
-        <button class="tc-subtask-toggle">${isExpanded?'▲':'▼'}</button>
+    subHtml = `<div class="tc-subtasks ${isExp?'open':''}">
+      <div class="sub-add-row">
+        <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter'){event.stopPropagation();addSubtask('${task.id}')}">
+        <button onclick="event.stopPropagation();addSubtask('${task.id}')">+</button>
       </div>
-      <div class="tc-subtasks ${isExpanded?'open':''}">
-        ${subtasks.map(sub=>{
-          let locLabel='';
-          if(sub.scheduledTo){
-            let gc=getTS().globalCols.find(c=>c.id===sub.scheduledTo);
-            locLabel=gc?`<span class="subtask-loc">${gc.name}</span>`:'';
-          }
-          return `<div class="subtask-row">
-            <input type="checkbox" class="subtask-check" ${sub.done?'checked':''} onchange="toggleSubtask('${task.id}','${sub.id}')">
-            <span class="subtask-title ${sub.done?'done':''}">${sub.title}</span>
-            ${locLabel}
-            <select class="subtask-schedule" onchange="scheduleSubtask('${task.id}','${sub.id}',this.value)" title="Schedule to...">
-              ${getTS().globalCols.filter(c=>c.type!=='done').map(c=>`<option value="${c.id}" ${sub.scheduledTo===c.id?'selected':''}>${c.name}</option>`).join('')}
-              <option value="" ${!sub.scheduledTo?'selected':''}>📌 Backlog</option>
-            </select>
-            <button class="subtask-del" onclick="deleteSubtask('${task.id}','${sub.id}')">×</button>
-          </div>`;
-        }).join('')}
-        <div class="subtask-add-row">
-          <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')">
-          <button onclick="addSubtask('${task.id}')">+ Add</button>
-        </div>
-      </div>`;
-  }else{
-    subtaskSection=`
-      <div class="tc-subtasks ${isExpanded?'open':''}">
-        <div class="subtask-add-row">
-          <input type="text" id="sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')">
-          <button onclick="addSubtask('${task.id}')">+ Add</button>
-        </div>
-      </div>
-      <button class="tbtn" onclick="toggleSubExpand('${task.id}')" style="font-size:10px;margin-top:4px">${isExpanded?'▲ Hide':'+ Subtasks'}</button>`;
+    </div>`;
   }
 
   return `<div class="tc ${task.pinned?'pinned':''}" id="tc-${task.id}"
     draggable="true"
-    ondragstart="onTC_DragStart(event,'${task.id}','${colDef.id}','${task.bizId||''}')"
-    ondragend="onTC_DragEnd(event,'${task.id}')">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:2px">
-      <div class="tc-title ${isDone?'done-title':''}" style="margin-bottom:0;flex:1">${task.title}</div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
-        <span class="tc-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-        ${task.pinned?'<span style="font-size:9px">📌</span>':''}
-      </div>
+    ondragstart="onTC_DragStart(event,'${task.id}','${colDef.id}','${biz}')"
+    ondragend="onTC_DragEnd(event,'${task.id}')"
+    ondragover="onCard_DragOver(event,'${task.id}')"
+    ondrop="onCard_Drop(event,'${task.id}','${colDef.id}','${biz}')">
+    <div class="tc-row1">
+      <span class="tc-title ${isDone?'done':''}">${task.title}</span>
+      <span class="tc-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
     </div>
-    ${task.due?`<div style="margin-bottom:2px"><span class="tc-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
+    ${task.due?`<div><span class="tc-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
     ${task.note?`<div class="tc-note">${task.note}</div>`:''}
-    ${subtaskSection}
-    <div class="tc-actions" style="margin-top:3px;display:flex;flex-wrap:wrap;gap:2px">
+    ${subHtml}
+    <div class="tc-actions">
       ${isDone
-        ?`<button class="tbtn" onclick="event.stopPropagation();restoreTask2('${task.id}')">↩ Restore</button>`
+        ?`<button class="tbtn" onclick="event.stopPropagation();restoreTask2('${task.id}')">↩</button>`
         :`<button class="tbtn done-btn" onclick="event.stopPropagation();doneTask2('${task.id}')">✓ Done</button>`
       }
-      <button class="tbtn pin-btn" onclick="event.stopPropagation();pinTask2('${task.id}')">${task.pinned?'Unpin':'📌'}</button>
-      <button class="tbtn" data-tid="${task.id}" data-col="${colDef.id}" data-biz="${task.bizId||''}" onclick="event.stopPropagation();moveTaskUp(this.dataset.tid,this.dataset.col,this.dataset.biz)" title="Move up" style="font-size:12px;padding:1px 5px">↑</button>
-      <button class="tbtn" data-tid="${task.id}" data-col="${colDef.id}" data-biz="${task.bizId||''}" onclick="event.stopPropagation();moveTaskDown(this.dataset.tid,this.dataset.col,this.dataset.biz)" title="Move down" style="font-size:12px;padding:1px 5px">↓</button>
-      <button class="tbtn del-btn" onclick="event.stopPropagation();softDeleteTask2('${task.id}')">Delete</button>
+      <button class="tbtn arr" data-id="${task.id}" data-col="${colDef.id}" data-biz="${biz}" onclick="event.stopPropagation();moveTaskUp(this.dataset.id,this.dataset.col,this.dataset.biz)">↑</button>
+      <button class="tbtn arr" data-id="${task.id}" data-col="${colDef.id}" data-biz="${biz}" onclick="event.stopPropagation();moveTaskDown(this.dataset.id,this.dataset.col,this.dataset.biz)">↓</button>
+      <button class="tbtn pin-btn" onclick="event.stopPropagation();pinTask2('${task.id}')">${task.pinned?'📌 Unpin':'📌'}</button>
+      <button class="tbtn" onclick="event.stopPropagation();toggleExpand('${task.id}')">${isExp?'▲ Sub':'+ Sub'}</button>
+      <button class="tbtn del-btn" onclick="event.stopPropagation();softDeleteTask2('${task.id}')">Del</button>
     </div>
   </div>`;
 }
 
-// ─ Build scheduled subtask card (appears in Today/Tomorrow) ─
-function buildScheduledSubCard(task,sub,colDef){
-  return `<div class="tc is-subtask">
-    <div class="tc-subtask-parent">↳ ${task.title}</div>
-    <div class="tc-title ${sub.done?'done-title':''}">${sub.title}</div>
-    <div class="tc-actions" style="margin-top:5px">
-      <button class="tbtn done-btn" onclick="event.stopPropagation();toggleSubtask('${task.id}','${sub.id}')">${sub.done?'✓ Done':'Mark done'}</button>
-      <button class="tbtn" onclick="event.stopPropagation();scheduleSubtask('${task.id}','${sub.id}','')">Remove from here</button>
+function buildSchedSubCard(task, sub){
+  return `<div class="tc is-sub">
+    <div class="tc-sub-parent">↳ ${task.title}</div>
+    <div class="tc-row1"><span class="tc-title ${sub.done?'done':''}">${sub.title}</span></div>
+    <div class="tc-actions">
+      <button class="tbtn done-btn" onclick="event.stopPropagation();toggleSubtask('${task.id}','${sub.id}')">✓ Done</button>
+      <button class="tbtn" onclick="event.stopPropagation();scheduleSubtask('${task.id}','${sub.id}','')">Remove</button>
     </div>
   </div>`;
 }
 
-// ─ Build a column ─
-function buildCol2(colDef,bizId,q){
-  let isDone=!!colDef.isDone||(colDef.type==='done');
-  let tasks=getTasksInCol(colDef.id,bizId||null).filter(t=>taskMatchesSearch(t,q));
-  // Pinned float to top but respect manual colOrder otherwise
-  let pinned=tasks.filter(t=>t.pinned);
-  let unpinned=tasks.filter(t=>!t.pinned);
-  tasks=[...pinned,...unpinned];
+// ── Build column ──
+function buildCol2(colDef, bizId, q){
+  let isDone = !!colDef.isDone || colDef.type==='done';
+  let tasks = getTasksInCol(colDef.id, bizId||null).filter(t=>taskMatchesSearch(t,q));
+  // Pinned float to top
+  let pinned = tasks.filter(t=>t.pinned);
+  let rest = tasks.filter(t=>!t.pinned);
+  tasks = [...pinned, ...rest];
 
-  // Scheduled subtasks for global cols
-  let scheduledHtml='';
-  if(!bizId&&(colDef.type==='today'||colDef.type==='tomorrow'||colDef.type==='brain')){
-    let subs=getScheduledSubsInCol(colDef.id).filter(({task,sub})=>!sub.done&&taskMatchesSearch(task,q));
-    scheduledHtml=subs.map(({task,sub})=>buildScheduledSubCard(task,sub,colDef)).join('');
+  let schedHtml = '';
+  if(!bizId && (colDef.type==='today'||colDef.type==='tomorrow'||colDef.type==='brain')){
+    schedHtml = getScheduledSubs(colDef.id).filter(({sub})=>!sub.done&&taskMatchesSearch({title:sub.title},q))
+      .map(({task,sub})=>buildSchedSubCard(task,sub)).join('');
   }
 
-  let cardsHtml=tasks.map(t=>buildTaskCard(t,colDef,isDone)).join('');
-  let totalVisible=tasks.length+(scheduledHtml?getScheduledSubsInCol(colDef.id).filter(({sub})=>!sub.done).length:0);
+  let cardsHtml = tasks.map(t=>buildTaskCard(t,colDef,isDone)).join('');
+  let total = tasks.length + (schedHtml ? getScheduledSubs(colDef.id).filter(({sub})=>!sub.done).length : 0);
 
-  // Quick add
-  let addHtml='';
-  if(!isDone){
-    addHtml=`
-      <div class="tcol-quick-add">
-        <input type="text" id="tn2-${colDef.id}" placeholder="+ Quick add..." onkeydown="if(event.key==='Enter')addTask2('${colDef.id}','${bizId||''}')">
-      </div>
-      <button class="tcol-expand-btn" onclick="document.getElementById('tef-${colDef.id}').classList.toggle('open')">⚙ More options</button>
-      <div class="tcol-expand-form" id="tef-${colDef.id}">
-        <select id="tp2-${colDef.id}">
-          <option value="high">🔴 High</option>
-          <option value="medium" selected>🟡 Medium</option>
-          <option value="low">🟢 Low</option>
-        </select>
-        <input type="date" id="td2b-${colDef.id}">
-        <textarea id="tnote2-${colDef.id}" placeholder="Notes..."></textarea>
-        <button class="tcol-expand-submit" onclick="addTask2('${colDef.id}','${bizId||''}')">Add task</button>
-      </div>`;
-  }
+  let addHtml = isDone ? '' : `
+    <div class="tcol-qadd">
+      <input type="text" id="tn2-${colDef.id}" placeholder="+ Quick add..." onkeydown="if(event.key==='Enter')addTask2('${colDef.id}','${bizId||''}')">
+    </div>
+    <button class="tcol-more-btn" onclick="document.getElementById('tmf-${colDef.id}').classList.toggle('open')">⚙ More options</button>
+    <div class="tcol-more-form" id="tmf-${colDef.id}">
+      <select id="tp2-${colDef.id}"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>
+      <input type="date" id="td2b-${colDef.id}">
+      <textarea id="tnote2-${colDef.id}" placeholder="Notes..."></textarea>
+      <button class="tcol-add-submit" onclick="addTask2('${colDef.id}','${bizId||''}')">Add task</button>
+    </div>`;
 
-  // Column rename support
-  let canDelete=!isDone&&!colDef.type;// don't delete global typed cols or done cols
-  let headButtons=canDelete?`<button class="tcol-del" onclick="deleteCol2('${colDef.id}','${bizId||''}')" title="Delete column">×</button>`:'';
+  let canDel = !isDone && !colDef.type;
+  let delBtn = canDel ? `<button class="tcol-del" onclick="deleteCol2('${colDef.id}','${bizId||''}')">×</button>` : '';
 
   return `<div class="tcol ${isDone?'done-col':''}" id="tcol-${colDef.id}"
     ondragover="onCol_DragOver(event,'${colDef.id}')"
     ondrop="onCol_Drop(event,'${colDef.id}','${bizId||''}')">
     <div class="tcol-head">
       <div class="tcol-dot" style="background:${colDef.accent}"></div>
-      <div style="flex:1;min-width:0">
-        <span class="tcol-name" id="cnm-${colDef.id}" ondblclick="startRenameCol('${colDef.id}')" title="${colDef.desc||'Double-tap to rename'}" style="display:block">${colDef.name}</span>
-      </div>
-      <input class="tcol-name-input" id="cni-${colDef.id}" style="display:none" value="${colDef.name}" onblur="finishRenameCol('${colDef.id}','${bizId||''}')" onkeydown="if(event.key==='Enter')finishRenameCol('${colDef.id}','${bizId||''}')">
-      <span class="tcol-cnt">${totalVisible}</span>
-      ${headButtons}
+      <span class="tcol-name" id="cnm-${colDef.id}" ondblclick="startRenameCol('${colDef.id}')" title="Double-tap to rename">${colDef.name}</span>
+      <input class="tcol-name-input" id="cni-${colDef.id}" style="display:none" value="${colDef.name}"
+        onblur="finishRenameCol('${colDef.id}','${bizId||''}')"
+        onkeydown="if(event.key==='Enter')finishRenameCol('${colDef.id}','${bizId||''}')">
+      <span class="tcol-cnt">${total}</span>
+      ${delBtn}
     </div>
-    <div class="tcol-cards">${scheduledHtml}${cardsHtml||`<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;font-style:italic">${isDone?'None yet':'Empty'}</div>`}</div>
+    <div class="tcol-cards">${schedHtml}${cardsHtml||`<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;font-style:italic">${isDone?'None':'Empty'}</div>`}</div>
     ${addHtml}
   </div>`;
 }
 
-// ─ Main render ─
-function renderTasks(){
-  let ts=getTS();
-  let q=(document.getElementById('task-search')?.value||'').trim();
+// ── Main render ──
+function taskMatchesSearch(task, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  return task.title?.toLowerCase().includes(q) || task.note?.toLowerCase().includes(q) ||
+    (task.subtasks||[]).some(s=>s.title.toLowerCase().includes(q));
+}
 
-  // Global cols
-  let globalEl=document.getElementById('global-cols');
+function renderTasks(){
+  let ts = getTS();
+  let q = (document.getElementById('task-search')?.value||'').trim();
+
+  let globalEl = document.getElementById('global-cols');
   if(globalEl){
-    globalEl.innerHTML=ts.globalCols.map(c=>buildCol2(c,null,q)).join('');
+    // Exclude brain from global zone (shown separately)
+    let gcols = ts.globalCols.filter(c=>c.type!=='brain');
+    globalEl.innerHTML = gcols.map(c=>buildCol2(c,null,q)).join('');
   }
 
-  // Biz lanes
-  let bizEl=document.getElementById('biz-task-lanes');
+  let bizEl = document.getElementById('biz-task-lanes');
   if(bizEl){
-    bizEl.innerHTML=BIZ_CFG.map(b=>{
-      let lane=ts.bizLanes[b.id];if(!lane)return '';
-      let logo=S.logos[b.id];
-      let logoHtml=logo?`<img class="biz-lane-logo" src="${logo}" alt="${b.name}">`:'';
-      let colsHtml=lane.cols.map(c=>buildCol2(c,b.id,q)).join('');
+    bizEl.innerHTML = BIZ_CFG.map(b=>{
+      let lane = ts.bizLanes[b.id]; if(!lane) return '';
+      let logo = S.logos[b.id];
+      let logoHtml = logo ? `<img style="width:20px;height:20px;object-fit:contain;border-radius:3px" src="${logo}" alt="${b.name}">` : '';
       return `<div class="biz-lane task-section">
         <div class="task-section-header">
-          <span class="task-section-title biz" style="color:${b.color}">${b.id==='slp'?'🔴':b.id==='cb'?'🟢':'🟠'} ${b.name}</span>
+          <span class="task-section-title biz" style="color:${b.color}">${b.id==='slp'||b.id==='biz1'?'🔴':b.id==='cb'||b.id==='biz2'?'🟢':'🟠'} ${b.name}</span>
           ${logoHtml}
-          <button class="biz-lane-add-col" onclick="addBizCol('${b.id}')">+ Add column</button>
+          <button class="tcol-add-col-btn" onclick="addBizCol('${b.id}')">+ Column</button>
         </div>
-        <div class="biz-lane-cols">${colsHtml}</div>
+        <div class="biz-lane-cols">${lane.cols.map(c=>buildCol2(c,b.id,q)).join('')}</div>
       </div>`;
     }).join('');
   }
 
-  // Personal cols
-  let persEl=document.getElementById('personal-cols');
+  let persEl = document.getElementById('personal-cols');
   if(persEl){
-    persEl.innerHTML=ts.personalCols.map(c=>buildCol2(c,null,q)).join('');
-  }
-  let addPersBtn=document.getElementById('add-pers-col-btn');
-  if(!addPersBtn){
-    let btn=document.createElement('button');
-    btn.id='add-pers-col-btn';
-    btn.textContent='+ Add personal column';
-    btn.setAttribute('style','background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all .15s');
-    btn.onclick=addPersonalCol;
-    if(persEl&&persEl.parentNode)persEl.parentNode.insertBefore(btn,persEl.nextSibling);
+    let ts2 = getTS();
+    persEl.innerHTML = ts2.personalCols.map(c=>buildCol2(c,null,q)).join('');
+    // Remove any previously added button
+    let existing = document.getElementById('pers-add-col-btn');
+    if(existing) existing.remove();
+    let btn = document.createElement('button');
+    btn.id = 'pers-add-col-btn';
+    btn.className = 'tcol-add-col-btn';
+    btn.style.cssText = 'margin-top:6px;width:auto';
+    btn.textContent = '+ Add column';
+    btn.onclick = addPersonalCol;
+    persEl.after(btn);
   }
 
-  // Brain cols - just the brain dump global col
-  let brainEl=document.getElementById('brain-cols');
+  let brainEl = document.getElementById('brain-cols');
   if(brainEl){
-    let brainCol=ts.globalCols.find(c=>c.type==='brain');
-    brainEl.innerHTML=brainCol?buildCol2(brainCol,null,q):'';
+    let bc = getTS().globalCols.find(c=>c.type==='brain');
+    brainEl.innerHTML = bc ? buildCol2(bc,null,q) : '';
   }
-  // Trash count
+
   renderTrash();
-  // Mobile view
-  if(window.innerWidth<=767) setTimeout(renderMobView,0);
+
+  // Update mobile if visible
+  if(window.innerWidth <= 767) renderMobView();
 }
 
+// ── Trash ──
+let _trashOpen = false;
+function toggleTrash(){ _trashOpen=!_trashOpen; let el=document.getElementById('trash-cols'); if(el) el.style.display=_trashOpen?'block':'none'; renderTrash(); }
+
+function renderTrash(){
+  let ts = getTS();
+  let items = Object.values(ts.trash||{});
+  let now = new Date();
+  items = items.filter(t=>{
+    if(!t.deletedAt) return true;
+    if((now-new Date(t.deletedAt))/(86400000) > 30){ delete ts.trash[t.id]; return false; }
+    return true;
+  });
+  let cnt = document.getElementById('trash-count'); if(cnt) cnt.textContent = items.length;
+  let wrap = document.getElementById('trash-col-wrap'); if(!wrap||!_trashOpen) return;
+  if(!items.length){ wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:8px">Nothing deleted</div>'; return; }
+  let cards = items.sort((a,b)=>new Date(b.deletedAt||0)-new Date(a.deletedAt||0)).map(t=>{
+    let p = PRI_CFG[t.priority||'medium'];
+    let d = t.deletedAt ? new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+    return '<div class="tc" style="opacity:0.7">'
+      +'<div class="tc-row1"><span class="tc-title" style="text-decoration:line-through;color:var(--text3)">'+t.title+'</span>'
+      +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span></div>'
+      +'<div style="font-size:9px;color:#505050;margin:2px 0">deleted '+d+(t.subtasks?.length?' · '+t.subtasks.length+' subtasks':'')+'</div>'
+      +'<div class="tc-actions">'
+      +'<button class="tbtn" style="color:var(--green);border-color:rgba(61,170,76,0.3)" data-id="'+t.id+'" onclick="restoreFromTrash(this.dataset.id)">↩ Restore</button>'
+      +'<button class="tbtn del-btn" data-id="'+t.id+'" onclick="confirmHardDelete(this.dataset.id)">Delete forever</button>'
+      +'</div></div>';
+  }).join('');
+  wrap.innerHTML = '<div class="tcol" style="min-width:260px;width:260px"><div class="tcol-head"><div class="tcol-dot" style="background:#444"></div><span class="tcol-name">Deleted</span><span class="tcol-cnt">'+items.length+'</span></div><div class="tcol-cards">'+cards+'</div></div>';
+}
+
+// ── MOBILE VIEW ──
+function getMobColList(){
+  let ts = getTS(); let cols = [];
+  ts.globalCols.forEach(c=>{ if(c.type!=='done') cols.push({...c,bizId:null,bizColor:null}); });
+  BIZ_CFG.forEach(b=>{ let lane=ts.bizLanes[b.id]; if(lane) lane.cols.forEach(c=>{ if(!c.isDone) cols.push({...c,bizId:b.id,bizColor:b.color}); }); });
+  ts.personalCols.forEach(c=>{ if(!c.isDone) cols.push({...c,bizId:null,bizColor:null}); });
+  return cols;
+}
+
+function renderMobView(){
+  let cols = getMobColList();
+  if(!_mobCol || !cols.find(c=>c.id===_mobCol)) _mobCol = cols[0]?.id;
+  // Tabs
+  let tabsEl = document.getElementById('mob-tabs'); if(!tabsEl) return;
+  tabsEl.innerHTML = cols.map(c=>{
+    let cnt = getTasksInCol(c.id,c.bizId||null).length;
+    let subs = (c.type==='today'||c.type==='tomorrow') ? getScheduledSubs(c.id).filter(({sub})=>!sub.done).length : 0;
+    let total = cnt + subs;
+    let dot = c.bizColor ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${c.bizColor};margin-right:4px;vertical-align:middle"></span>` : '';
+    return `<button class="mob-tab ${_mobCol===c.id?'active':''}" onclick="setMobCol('${c.id}')">${dot}${c.name}${total>0?`<span class="mob-tab-cnt">${total}</span>`:''}</button>`;
+  }).join('');
+  // List
+  let col = cols.find(c=>c.id===_mobCol); if(!col) return;
+  let isDone = !!col.isDone || col.type==='done';
+  let tasks = getTasksInCol(col.id, col.bizId||null);
+  let pinned = tasks.filter(t=>t.pinned); let rest = tasks.filter(t=>!t.pinned);
+  tasks = [...pinned,...rest];
+  let listEl = document.getElementById('mob-list'); if(!listEl) return;
+  let html = '';
+  // Scheduled subs
+  if(col.type==='today'||col.type==='tomorrow'){
+    getScheduledSubs(col.id).filter(({sub})=>!sub.done).forEach(({task,sub})=>{
+      html += `<div class="mob-card" style="border-left:3px solid var(--blue)">
+        <div style="font-size:10px;color:var(--blue);margin-bottom:4px">↳ ${task.title}</div>
+        <div class="mob-card-top"><div class="mob-chk" onclick="toggleSubtask('${task.id}','${sub.id}')"></div><div class="mob-card-title">${sub.title}</div></div>
+        <div class="mob-actions"><button class="mbtn done-btn" onclick="toggleSubtask('${task.id}','${sub.id}')">✓ Done</button><button class="mbtn" onclick="scheduleSubtask('${task.id}','${sub.id}','')">Remove</button></div>
+      </div>`;
+    });
+  }
+  tasks.forEach(task=>{
+    let p = PRI_CFG[task.priority||'medium'];
+    let isOD = task.due && task.due < td() && !isDone;
+    let subs = task.subtasks||[];
+    let doneSubs = subs.filter(s=>s.done).length;
+    let subPct = subs.length ? Math.round(doneSubs/subs.length*100) : 0;
+    let isExp = !!_expanded[task.id];
+    let subSection = '';
+    if(subs.length>0){
+      subSection = `<div class="mob-sub-bar" onclick="toggleExpand('${task.id}')">
+        <div class="mob-sub-prog"><div class="mob-sub-fill" style="width:${subPct}%"></div></div>
+        <span class="mob-sub-lbl">${doneSubs}/${subs.length}</span>
+        <span style="font-size:10px;color:var(--text3)">${isExp?'▲':'▼'}</span>
+      </div>
+      <div class="mob-subs ${isExp?'open':''}">
+        ${subs.map(s=>`<div class="mob-sub-row"><input type="checkbox" class="mob-sub-chk" ${s.done?'checked':''} onchange="toggleSubtask('${task.id}','${s.id}')"><span class="mob-sub-txt ${s.done?'done':''}">${s.title}</span></div>`).join('')}
+        <div class="mob-sub-add"><input type="text" id="mob-sub-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button onclick="addSubtask('${task.id}')">+</button></div>
+      </div>`;
+    } else {
+      subSection = `<div class="mob-subs ${isExp?'open':''}"><div class="mob-sub-add"><input type="text" id="mob-sub-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button onclick="addSubtask('${task.id}')">+</button></div></div>`;
+    }
+    html += `<div class="mob-card ${task.pinned?'pinned':''}">
+      <div class="mob-card-top">
+        <div class="mob-chk ${isDone?'done':''}" onclick="${isDone?`restoreTask2('${task.id}')`:`doneTask2('${task.id}')`}">${isDone?'✓':''}</div>
+        <div class="mob-card-title ${isDone?'done':''}">${task.title}</div>
+        <span class="mob-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
+      </div>
+      ${task.due?`<div class="mob-card-meta"><span class="mob-due ${isOD?'od':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
+      ${task.note?`<div class="mob-note">${task.note}</div>`:''}
+      ${subSection}
+      <div class="mob-actions">
+        ${isDone
+          ?`<button class="mbtn done-btn" onclick="restoreTask2('${task.id}')">↩ Restore</button>`
+          :`<button class="mbtn done-btn" onclick="doneTask2('${task.id}')">✓ Done</button>`
+        }
+        <button class="mbtn" onclick="openMobMove('${task.id}')">Move →</button>
+        <button class="mbtn arr-btn" data-id="${task.id}" data-col="${col.id}" data-biz="${col.bizId||''}" onclick="moveTaskUp(this.dataset.id,this.dataset.col,this.dataset.biz)">↑</button>
+        <button class="mbtn arr-btn" data-id="${task.id}" data-col="${col.id}" data-biz="${col.bizId||''}" onclick="moveTaskDown(this.dataset.id,this.dataset.col,this.dataset.biz)">↓</button>
+        <button class="mbtn" onclick="toggleExpand('${task.id}')">${isExp?'▲':'+ Sub'}</button>
+        <button class="mbtn del-btn" onclick="softDeleteTask2('${task.id}')">Del</button>
+      </div>
+    </div>`;
+  });
+  if(!html) html = `<div style="font-size:14px;color:var(--text3);text-align:center;padding:24px 0">${isDone?'Nothing done yet':'Empty — add a task above'}</div>`;
+  listEl.innerHTML = html;
+}
+
+function setMobCol(colId){ _mobCol=colId; renderMobView(); }
+
+function mobAdd(){
+  let inp=document.getElementById('mob-inp'), pri=document.getElementById('mob-pri');
+  let name=(inp?.value||'').trim(); if(!name) return;
+  let cols=getMobColList(); let col=cols.find(c=>c.id===_mobCol); if(!col) return;
+  let ts=getTS();
+  let task={id:newId(),title:name,priority:pri?.value||'medium',due:'',note:'',pinned:false,colId:col.id,bizId:col.bizId||null,subtasks:[],added:td()};
+  ts.tasks[task.id]=task; inp.value='';
+  saveTS(); renderTasks(); renderDashboard();
+}
+
+function openMobMove(taskId){
+  _mobMoveId=taskId;
+  let ts=getTS(); let task=ts.tasks[taskId];
+  let cols=getMobColList();
+  let el=document.getElementById('mob-move-opts'); if(!el) return;
+  let lastBiz='';
+  el.innerHTML=cols.filter(c=>c.id!==task?.colId).map(c=>{
+    let grp=''; let curBiz=c.bizId||'global';
+    if(curBiz!==lastBiz){lastBiz=curBiz;let gname=c.bizId?(BIZ_CFG.find(b=>b.id===c.bizId)?.name||'Business'):c.group==='personal'?'Personal':'Execution';grp=`<div class="mob-section-lbl">${gname}</div>`;}
+    let dot=c.bizColor?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.bizColor};margin-right:8px"></span>`:'';
+    return grp+`<button class="mob-move-opt" data-col="${c.id}" data-biz="${c.bizId||''}" onclick="mobMoveTask(this.dataset.col,this.dataset.biz)">${dot}${c.name}</button>`;
+  }).join('');
+  document.getElementById('mob-move-sheet').classList.add('open');
+}
+
+function mobMoveTask(colId,bizId){
+  if(!_mobMoveId) return;
+  let ts=getTS(); let task=ts.tasks[_mobMoveId]; if(!task) return;
+  let fromCol=task.colId; let fromBiz=task.bizId;
+  task.colId=colId; task.bizId=bizId||null;
+  let fromIds=ensureColOrder(fromCol,fromBiz).filter(id=>id!==_mobMoveId);
+  ts.colOrder[fromCol]=fromIds;
+  let toIds=ensureColOrder(colId,bizId||null).filter(id=>id!==_mobMoveId);
+  toIds.push(_mobMoveId); ts.colOrder[colId]=toIds;
+  _mobMoveId=null; closeMobMove(); saveTS(); renderTasks(); renderDashboard();
+}
+
+function closeMobMove(){ document.getElementById('mob-move-sheet').classList.remove('open'); _mobMoveId=null; }
+
+// ── Confetti ──
 // ── Confetti ──
 function spawnConfetti(big){
   let canvas=document.getElementById('confetti-canvas');if(!canvas)return;
@@ -1807,223 +1801,6 @@ function importData(input){let file=input.files[0];if(!file)return;let r=new Fil
 function clearAllData(){if(!confirm('Clear ALL data? Export first!'))return;Object.values(KEY_MAP).forEach(k=>lsClear(k));location.reload();}
 
 
-// ===== MOBILE TASK VIEW =====
-let _mobActiveCol = null;
-let _mobMoveTaskId = null;
-let _mobExpandedTask = {};
-
-function getMobCols(){
-  let ts = getTS();
-  let cols = [];
-  // Global cols first (except brain dump and done - put at end)
-  ts.globalCols.forEach(c=>{
-    if(c.type!=='brain'&&c.type!=='done') cols.push({...c, bizId:null, group:'global'});
-  });
-  // Biz lanes
-  BIZ_CFG.forEach(b=>{
-    let lane=ts.bizLanes[b.id];
-    if(!lane)return;
-    lane.cols.forEach(c=>{
-      if(!c.isDone) cols.push({...c, bizId:b.id, group:'biz', bizName:b.name, bizColor:b.color});
-    });
-  });
-  // Personal
-  ts.personalCols.forEach(c=>{
-    if(!c.isDone) cols.push({...c, bizId:null, group:'personal'});
-  });
-  // Brain dump + done cols at end
-  ts.globalCols.forEach(c=>{
-    if(c.type==='brain'||c.type==='done') cols.push({...c, bizId:null, group:'global'});
-  });
-  return cols;
-}
-
-function renderMobTabs(){
-  let ts = getTS();
-  let cols = getMobCols();
-  if(!_mobActiveCol) _mobActiveCol = cols[0]?.id || 'g_today';
-  let el = document.getElementById('mob-col-tabs');
-  if(!el) return;
-  el.innerHTML = cols.map(c=>{
-    let cnt = getTasksInCol(c.id, c.bizId||null).length;
-    // Add scheduled subtasks for today/tomorrow
-    if(c.type==='today'||c.type==='tomorrow') cnt += getScheduledSubsInCol(c.id).filter(({sub})=>!sub.done).length;
-    let isActive = _mobActiveCol === c.id;
-    let dot = c.bizColor ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${c.bizColor};margin-right:4px;vertical-align:middle"></span>` : '';
-    return `<button class="mob-tab ${isActive?'active':''}" onclick="setMobCol('${c.id}')">${dot}${c.name}${cnt>0?`<span class="mob-tab-cnt">${cnt}</span>`:''}</button>`;
-  }).join('');
-}
-
-function setMobCol(colId){
-  _mobActiveCol = colId;
-  renderMobView();
-}
-
-function renderMobView(){
-  renderMobTabs();
-  let ts = getTS();
-  let cols = getMobCols();
-  let col = cols.find(c=>c.id===_mobActiveCol);
-  if(!col) { col = cols[0]; _mobActiveCol = col?.id; }
-  if(!col) return;
-  let isDone = !!col.isDone || col.type==='done';
-
-  let tasks = getTasksInCol(col.id, col.bizId||null);
-  // For today/tomorrow also show scheduled subtasks
-  let scheduledSubs = [];
-  if(col.type==='today'||col.type==='tomorrow'){
-    scheduledSubs = getScheduledSubsInCol(col.id).filter(({sub})=>!sub.done);
-  }
-
-  let el = document.getElementById('mob-task-list');
-  if(!el) return;
-
-  let html = '';
-
-  // Scheduled subtask cards first
-  scheduledSubs.forEach(({task, sub})=>{
-    html += `<div class="mob-task is-subtask" style="border-left:3px solid var(--blue)">
-      <div style="font-size:10px;color:var(--blue);margin-bottom:4px;font-weight:500">↳ ${task.title}</div>
-      <div class="mob-task-top">
-        <div class="mob-task-check ${sub.done?'checked':''}" onclick="toggleSubtask('${task.id}','${sub.id}')">${sub.done?'✓':''}</div>
-        <div class="mob-task-title ${sub.done?'done':''}">${sub.title}</div>
-      </div>
-      <div class="mob-task-actions">
-        <button class="mob-btn done-btn" onclick="toggleSubtask('${task.id}','${sub.id}')">✓ Done</button>
-        <button class="mob-btn" onclick="scheduleSubtask('${task.id}','${sub.id}','')">Remove</button>
-      </div>
-    </div>`;
-  });
-
-  // Main tasks
-  tasks.forEach(task=>{
-    let p = PRI_CFG[task.priority||'medium'];
-    let today = td();
-    let isOD = task.due && task.due < today && !isDone;
-    let subs = task.subtasks||[];
-    let doneSubs = subs.filter(s=>s.done).length;
-    let subPct = subs.length ? Math.round((doneSubs/subs.length)*100) : 0;
-    let isExpanded = !!_mobExpandedTask[task.id];
-
-    let subSection = '';
-    if(subs.length > 0){
-      subSection = `<div class="mob-task-sub-bar" onclick="mobToggleExpand('${task.id}')">
-        <div class="mob-task-sub-prog"><div class="mob-task-sub-prog-fill" style="width:${subPct}%"></div></div>
-        <span class="mob-task-sub-label">${doneSubs}/${subs.length}</span>
-        <span style="font-size:10px;color:var(--text3)">${isExpanded?'▲':'▼'}</span>
-      </div>
-      <div class="mob-subtasks ${isExpanded?'open':''}">
-        ${subs.map(sub=>`<div class="mob-sub-row">
-          <input type="checkbox" class="mob-sub-check" ${sub.done?'checked':''} onchange="toggleSubtask('${task.id}','${sub.id}')">
-          <span class="mob-sub-title ${sub.done?'done':''}">${sub.title}</span>
-        </div>`).join('')}
-        <div class="mob-sub-add">
-          <input type="text" id="mob-sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')">
-          <button onclick="addSubtask('${task.id}')">+ Add</button>
-        </div>
-      </div>`;
-    } else {
-      subSection = `<div class="mob-subtasks ${isExpanded?'open':''}">
-        <div class="mob-sub-add">
-          <input type="text" id="mob-sub-inp-${task.id}" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addSubtask('${task.id}')">
-          <button onclick="addSubtask('${task.id}')">+ Add</button>
-        </div>
-      </div>`;
-    }
-
-    html += `<div class="mob-task ${task.pinned?'pinned':''} ${isDone?'done-task':''}" id="mob-tc-${task.id}">
-      <div class="mob-task-top">
-        <div class="mob-task-check ${isDone?'checked':''}" onclick="${isDone?`restoreTask2('${task.id}')`:`doneTask2('${task.id}')`}">${isDone?'✓':''}</div>
-        <div class="mob-task-title ${isDone?'done':''}">${task.title}</div>
-        <span class="mob-task-pri" style="background:${p.bg};color:${p.color}">${p.label}</span>
-      </div>
-      ${task.due?`<div class="mob-task-meta"><span class="mob-task-due ${isOD?'overdue':''}">${isOD?'⚠ ':''}${task.due}</span></div>`:''}
-      ${task.note?`<div class="mob-task-note">${task.note}</div>`:''}
-      ${subSection}
-      <div class="mob-task-actions">
-        ${isDone
-          ?`<button class="mob-btn done-btn" onclick="restoreTask2('${task.id}')">↩ Restore</button>`
-          :`<button class="mob-btn done-btn" onclick="doneTask2('${task.id}')">✓ Done</button>`
-        }
-        <button class="mob-btn move-btn" onclick="openMobMove('${task.id}')">Move →</button>
-        <button class="mob-btn move-btn" onclick="mobToggleExpand('${task.id}')">${isExpanded?'▲':'+ Sub'}</button>
-        <button class="mob-btn" onclick="moveTaskUp('${task.id}','${col.id}','${col.bizId||''}')" style="font-size:14px;padding:4px 10px">↑</button>
-        <button class="mob-btn" onclick="moveTaskDown('${task.id}','${col.id}','${col.bizId||''}')" style="font-size:14px;padding:4px 10px">↓</button>
-        <button class="mob-btn del-btn" onclick="softDeleteTask2('${task.id}')">Delete</button>
-      </div>
-    </div>`;
-  });
-
-  if(!html) html = `<div style="font-size:14px;color:var(--text3);text-align:center;padding:24px 0">${isDone?'Nothing done yet':'Empty — add a task above'}</div>`;
-  el.innerHTML = html;
-}
-
-function mobToggleExpand(taskId){
-  _mobExpandedTask[taskId] = !_mobExpandedTask[taskId];
-  renderMobView();
-}
-
-function mobQuickAdd(){
-  let inp = document.getElementById('mob-quick-input');
-  let pri = document.getElementById('mob-quick-pri');
-  let name = (inp?.value||'').trim();
-  if(!name) return;
-  let ts = getTS();
-  let cols = getMobCols();
-  let col = cols.find(c=>c.id===_mobActiveCol);
-  if(!col) return;
-  let task = {
-    id: newId(), title: name, priority: pri?.value||'medium',
-    due:'', note:'', pinned:false,
-    colId: col.id, bizId: col.bizId||null,
-    subtasks:[], added: td()
-  };
-  ts.tasks[task.id] = task;
-  inp.value = '';
-  saveTS();
-  renderMobView();
-  renderDashboard();
-}
-
-function openMobMove(taskId){
-  _mobMoveTaskId = taskId;
-  let ts = getTS();
-  let task = ts.tasks[taskId];
-  let cols = getMobCols();
-  let el = document.getElementById('mob-move-opts');
-  if(!el) return;
-
-  let lastGroup = '';
-  el.innerHTML = cols.map(c=>{
-    if(c.id === task?.colId) return '';
-    let groupLabel = '';
-    if(c.group !== lastGroup){
-      lastGroup = c.group;
-      let gName = c.group==='biz'?(c.bizName||'Business'):c.group==='personal'?'Personal':'Execution';
-      groupLabel = `<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:8px 0 4px;padding-left:2px">${gName}</div>`;
-    }
-    let dot = c.bizColor||c.accent ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.bizColor||c.accent};margin-right:8px"></span>` : '';
-    return groupLabel + `<button class="mob-move-opt" onclick="mobMoveTask('${c.id}','${c.bizId||''}')">${dot}${c.name}</button>`;
-  }).join('');
-
-  document.getElementById('mob-move-sheet').classList.add('open');
-}
-
-function mobMoveTask(colId, bizId){
-  if(!_mobMoveTaskId) return;
-  moveTask2(_mobMoveTaskId, colId, bizId||null);
-  _mobMoveTaskId = null;
-  closeMobMove();
-  renderMobView();
-}
-
-function closeMobMove(){
-  document.getElementById('mob-move-sheet').classList.remove('open');
-  _mobMoveTaskId = null;
-}
-
-// Override renderTasks to also update mobile view
-// ===== END MOBILE TASK VIEW =====
 
 // ── Init ──
 function renderQuote(){let el=document.getElementById('quote-display');if(!el)return;let q=QUOTES[new Date().getDay()%QUOTES.length];el.innerHTML=`<div class="qt">"${q.t}"</div><div class="qa">${q.a}</div>`;}
