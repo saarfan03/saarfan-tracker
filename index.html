@@ -971,19 +971,20 @@ function doneTask2(taskId){
   let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
   let dc = findDoneCol(task.colId, task.bizId);
   if(dc){ task.colId=dc; task.doneAt=td(); }
-  saveTS(); spawnConfetti(false); renderTasks(); renderDashboard();
+  saveTS(); spawnConfetti(false);
+  setTimeout(()=>{ renderTasks(); renderDashboard(); }, 0);
 }
 
 function restoreTask2(taskId){
   let ts = getTS(); let task = ts.tasks[taskId]; if(!task) return;
   delete task.doneAt;
   let gc = ts.globalCols.find(c=>c.type==='today'); if(gc) task.colId=gc.id;
-  saveTS(); renderTasks(); renderDashboard();
+  saveTS(); setTimeout(()=>{ renderTasks(); renderDashboard(); },0);
 }
 
 function pinTask2(taskId){
   let task = getTS().tasks[taskId]; if(!task) return;
-  task.pinned = !task.pinned; saveTS(); renderTasks();
+  task.pinned = !task.pinned; saveTS(); setTimeout(()=>renderTasks(),0);
 }
 
 function softDeleteTask2(taskId){
@@ -992,7 +993,8 @@ function softDeleteTask2(taskId){
   if(!ts.trash) ts.trash={};
   ts.trash[taskId] = task;
   delete ts.tasks[taskId];
-  saveTS(); renderTasks(); renderTrash();
+  saveTS();
+  setTimeout(()=>{ renderTasks(); renderTrash(); }, 0);
 }
 
 function hardDeleteTask2(taskId){
@@ -1017,7 +1019,9 @@ function addSubtask(taskId){
   let task = getTS().tasks[taskId]; if(!task) return;
   if(!task.subtasks) task.subtasks=[];
   task.subtasks.push({id:newId(), title, done:false, scheduledTo:null});
-  inp.value = ''; saveTS(); renderTasks();
+  let val = inp.value; inp.value = '';
+  saveTS();
+  setTimeout(()=>{ renderTasks(); }, 0);
 }
 
 function toggleSubtask(taskId, subId){
@@ -1025,7 +1029,7 @@ function toggleSubtask(taskId, subId){
   let sub = task.subtasks.find(s=>s.id===subId); if(!sub) return;
   sub.done = !sub.done;
   if(task.subtasks.length > 0 && task.subtasks.every(s=>s.done)){ doneTask2(taskId); return; }
-  saveTS(); renderTasks();
+  saveTS(); setTimeout(()=>renderTasks(), 0);
 }
 
 function deleteSubtask(taskId, subId){
@@ -1041,6 +1045,28 @@ function scheduleSubtask(taskId, subId, val){
 }
 
 function toggleExpand(taskId){ _expanded[taskId]=!_expanded[taskId]; renderTasks(); }
+
+// ── Col lookup ──
+function findColDef(colId, bizId, ts){
+  ts = ts || getTS();
+  if(bizId){
+    let lane = ts.bizLanes[bizId];
+    if(lane){ let c = lane.cols.find(c=>c.id===colId); if(c) return c; }
+  }
+  let gc = ts.globalCols.find(c=>c.id===colId);
+  if(gc) return gc;
+  return ts.personalCols.find(c=>c.id===colId) || null;
+}
+function moveTask2(taskId, toColId, toBizId){
+  let ts = getTS();
+  if(!ts.colOrder) ts.colOrder = {};
+  let task = ts.tasks[taskId]; if(!task) return;
+  let fromCol = task.colId, fromBiz = task.bizId;
+  task.colId = toColId; task.bizId = toBizId||null;
+  ts.colOrder[fromCol] = (ts.colOrder[fromCol]||[]).filter(id=>id!==taskId);
+  ts.colOrder[toColId] = [...((ts.colOrder[toColId]||[]).filter(id=>id!==taskId)), taskId];
+  saveTS(); renderTasks(); renderDashboard();
+}
 
 // ── Ordering ──
 function getColVisualIds(colId, bizId){
