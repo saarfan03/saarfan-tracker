@@ -1180,37 +1180,46 @@ function renderTrash(){
 }
 
 // ─ Move task up/down within column ─
+function getVisualOrder(colId){
+  // Read actual rendered card order from DOM - most reliable source of truth
+  let col=document.getElementById('tcol-'+colId);
+  if(!col)return null;
+  let cards=[...col.querySelectorAll('.tc[id^="tc-"]')];
+  return cards.map(c=>c.id.replace('tc-',''));
+}
 function moveTaskUp(taskId,colId,bizId){
   bizId=bizId||null;
   let ts=getTS();
   if(!ts.colOrder)ts.colOrder={};
-  // Ensure colOrder is initialised from current visual order
-  if(!ts.colOrder[colId]){
-    ts.colOrder[colId]=getTasksInCol(colId,bizId).map(t=>t.id);
-  }
-  let tasks=getTasksInCol(colId,bizId);
-  let idx=tasks.findIndex(t=>t.id===taskId);
+  // Use DOM order as source of truth - avoids insertion order vs visual order mismatch
+  let order=getVisualOrder(colId)||getTasksInCol(colId,bizId).map(t=>t.id);
+  let idx=order.indexOf(taskId);
   if(idx<=0)return;
-  let order=tasks.map(t=>t.id);
   [order[idx-1],order[idx]]=[order[idx],order[idx-1]];
   ts.colOrder[colId]=order;
-  saveTS();renderTasks();
+  saveTS();renderSingleCol(colId,bizId);
 }
 function moveTaskDown(taskId,colId,bizId){
   bizId=bizId||null;
   let ts=getTS();
   if(!ts.colOrder)ts.colOrder={};
-  // Ensure colOrder is initialised from current visual order
-  if(!ts.colOrder[colId]){
-    ts.colOrder[colId]=getTasksInCol(colId,bizId).map(t=>t.id);
-  }
-  let tasks=getTasksInCol(colId,bizId);
-  let idx=tasks.findIndex(t=>t.id===taskId);
-  if(idx===-1||idx>=tasks.length-1)return;
-  let order=tasks.map(t=>t.id);
+  let order=getVisualOrder(colId)||getTasksInCol(colId,bizId).map(t=>t.id);
+  let idx=order.indexOf(taskId);
+  if(idx===-1||idx>=order.length-1)return;
   [order[idx+1],order[idx]]=[order[idx],order[idx+1]];
   ts.colOrder[colId]=order;
-  saveTS();renderTasks();
+  saveTS();renderSingleCol(colId,bizId);
+}
+function renderSingleCol(colId,bizId){
+  // Re-render just one column instead of the whole board - much faster
+  bizId=bizId||null;
+  let ts=getTS();
+  let colDef=findColDef(colId,bizId,ts);
+  if(!colDef)return;
+  let q=(document.getElementById('task-search')?.value||'').trim();
+  let el=document.getElementById('tcol-'+colId);
+  if(!el)return;
+  el.outerHTML=buildCol2(colDef,bizId,q);
 }
 
 // ─ Move task to col ─
@@ -1293,6 +1302,8 @@ function onCol_Drop(e,colId,bizId){
   e.preventDefault();
   document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
   if(!_drag.taskId)return;
+  let fromColId=_drag.fromColId;
+  let fromBizId=_drag.fromBizId;
   let ts=getTS();
   let task=ts.tasks[_drag.taskId];if(!task)return;
   task.colId=colId;task.bizId=bizId||null;
@@ -1300,8 +1311,22 @@ function onCol_Drop(e,colId,bizId){
   let existing=(ts.colOrder[colId]||[]).filter(id=>id!==_drag.taskId);
   existing.push(_drag.taskId);
   ts.colOrder[colId]=existing;
+  // Remove from old col order
+  if(ts.colOrder[fromColId]){
+    ts.colOrder[fromColId]=ts.colOrder[fromColId].filter(id=>id!==_drag.taskId);
+  }
   _drag={taskId:null,fromColId:null,fromBizId:null};
-  saveTS();renderTasks();renderDashboard();
+  saveTS();
+  // Only re-render affected cols for speed - fall back to full render if cols not found
+  let fromEl=document.getElementById('tcol-'+fromColId);
+  let toEl=document.getElementById('tcol-'+colId);
+  if(fromEl&&toEl&&fromColId!==colId){
+    renderSingleCol(fromColId,fromBizId);
+    renderSingleCol(colId,bizId||null);
+  } else {
+    renderTasks();
+  }
+  renderDashboard();
 }
 
 // ─ Search filter ─
