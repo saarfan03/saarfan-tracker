@@ -1077,6 +1077,30 @@ function renderTrash(){
   wrap.innerHTML=html;
 }
 
+// ─ Move task up/down within column ─
+function moveTaskUp(taskId,colId,bizId){
+  let ts=getTS();
+  let tasks=getTasksInCol(colId,bizId||null);
+  let idx=tasks.findIndex(t=>t.id===taskId);
+  if(idx<=0)return;
+  let order=tasks.map(t=>t.id);
+  let tmp=order[idx-1];order[idx-1]=order[idx];order[idx]=tmp;
+  if(!ts.colOrder)ts.colOrder={};
+  ts.colOrder[colId]=order;
+  saveTS();renderTasks();
+}
+function moveTaskDown(taskId,colId,bizId){
+  let ts=getTS();
+  let tasks=getTasksInCol(colId,bizId||null);
+  let idx=tasks.findIndex(t=>t.id===taskId);
+  if(idx===-1||idx>=tasks.length-1)return;
+  let order=tasks.map(t=>t.id);
+  let tmp=order[idx+1];order[idx+1]=order[idx];order[idx]=tmp;
+  if(!ts.colOrder)ts.colOrder={};
+  ts.colOrder[colId]=order;
+  saveTS();renderTasks();
+}
+
 // ─ Move task to col ─
 function moveTask2(taskId,targetColId,targetBizId){
   let task=getTS().tasks[taskId];if(!task)return;
@@ -1207,14 +1231,12 @@ function onCol_Drop(e,colId,bizId){
   e.preventDefault();
   document.querySelectorAll('.tcol').forEach(c=>c.classList.remove('drag-over'));
   if(!_drag.taskId)return;
-  // Only fire if not already handled by a card-level drop
   let ts=getTS();
   let task=ts.tasks[_drag.taskId];if(!task)return;
   task.colId=colId;task.bizId=bizId||null;
-  // Append to end of col order
   if(!ts.colOrder)ts.colOrder={};
-  let existing=ts.colOrder[colId]||getTasksInCol(colId,bizId||null).map(t=>t.id);
-  if(!existing.includes(_drag.taskId))existing.push(_drag.taskId);
+  let existing=(ts.colOrder[colId]||[]).filter(id=>id!==_drag.taskId);
+  existing.push(_drag.taskId);
   ts.colOrder[colId]=existing;
   _drag={taskId:null,fromColId:null,fromBizId:null};
   saveTS();renderTasks();renderDashboard();
@@ -1289,10 +1311,7 @@ function buildTaskCard(task,colDef,isDone){
   return `<div class="tc ${task.pinned?'pinned':''}" id="tc-${task.id}"
     draggable="true"
     ondragstart="onTC_DragStart(event,'${task.id}','${colDef.id}','${task.bizId||''}')"
-    ondragend="onTC_DragEnd(event,'${task.id}')"
-    ondragover="onTC_DragOver(event,'${task.id}')"
-    ondrop="onTC_Drop(event,'${task.id}','${colDef.id}','${task.bizId||''}')"
-    onclick="event.stopPropagation()">
+    ondragend="onTC_DragEnd(event,'${task.id}')">
     ${task.pinned?'<span class="tc-pin">📌</span>':''}
     <div class="tc-title ${isDone?'done-title':''}">${task.title}</div>
     <div class="tc-meta">
@@ -1301,12 +1320,14 @@ function buildTaskCard(task,colDef,isDone){
     </div>
     ${task.note?`<div class="tc-note">${task.note}</div>`:''}
     ${subtaskSection}
-    <div class="tc-actions" style="margin-top:5px" ondragstart="event.stopPropagation()" draggable="false">
+    <div class="tc-actions" style="margin-top:5px">
       ${isDone
         ?`<button class="tbtn" onclick="event.stopPropagation();restoreTask2('${task.id}')">↩ Restore</button>`
         :`<button class="tbtn done-btn" onclick="event.stopPropagation();doneTask2('${task.id}')">✓ Done</button>`
       }
       <button class="tbtn pin-btn" onclick="event.stopPropagation();pinTask2('${task.id}')">${task.pinned?'Unpin':'📌'}</button>
+      <button class="tbtn" onclick="event.stopPropagation();moveTaskUp('${task.id}','${colDef.id}','${task.bizId||''}')" title="Move up" style="font-size:13px">↑</button>
+      <button class="tbtn" onclick="event.stopPropagation();moveTaskDown('${task.id}','${colDef.id}','${task.bizId||''}')" title="Move down" style="font-size:13px">↓</button>
       <button class="tbtn del-btn" onclick="event.stopPropagation();softDeleteTask2('${task.id}')">Delete</button>
     </div>
   </div>`;
