@@ -159,140 +159,100 @@ input[type=file]{display:none}
 
 /* ===== TASK SYSTEM ===== */
 #todo{padding:0 12px}
+/* Task system */
+#tasks{padding:0}
+.task-toolbar{display:flex;gap:8px;margin-bottom:12px}
+.task-toolbar input{flex:1;background:var(--bg2)}
 .task-section{margin-bottom:20px}
-.task-section-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
-.task-section-title.biz{font-size:17px;font-weight:800;letter-spacing:-0.5px}
-.task-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
-.biz-lane{margin-bottom:28px}
-.biz-lane-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.biz-lane-cols::-webkit-scrollbar{height:4px}
-.biz-lane-cols::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.global-cols-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.global-cols-wrap::-webkit-scrollbar{height:4px}
-.global-cols-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.tcol{min-width:215px;width:215px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:9px;flex-shrink:0;transition:border-color .2s}
-.tcol.drag-over{border-color:var(--gold)!important;background:rgba(201,168,76,0.04)}
-.tcol.done-col{opacity:0.8}
-.tcol-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.tcol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.tcol-name{font-size:12px;font-weight:700;color:var(--text2);flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.tcol-name-input{font-size:12px;font-weight:700;color:var(--text);background:transparent;border:none;border-bottom:1px solid var(--gold);outline:none;width:100%;padding:0;font-family:inherit}
-.tcol-cnt{font-size:10px;padding:1px 6px;border-radius:5px;background:var(--bg4);color:var(--text3);font-weight:600;flex-shrink:0}
-.tcol-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 2px;opacity:0.5;font-family:inherit;flex-shrink:0}
-.tcol-del:hover{color:var(--red);opacity:1}
-.tcol-cards{min-height:10px}
-.tc{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;margin-bottom:3px;cursor:grab;user-select:none;position:relative;transition:border-color .15s,opacity .15s}
-.tc:hover{border-color:var(--border2)}
-.tc.pinned{border-color:var(--gold-b)!important}
-.tc.dragging{opacity:0.4;cursor:grabbing}
-.tc.drag-over-top{border-top:2px solid var(--gold)}
-.tc.is-sub{border-left:3px solid var(--blue)}
-.tc-sub-parent{font-size:9px;color:var(--blue);margin-bottom:3px;font-weight:500}
-.tc-row1{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:2px}
-.tc-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;flex:1}
-.tc-title.done{text-decoration:line-through;color:var(--text3)}
-.tc-pri{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;flex-shrink:0;margin-top:1px}
-.tc-due{font-size:9px;padding:1px 5px;background:var(--bg4);border-radius:4px;color:var(--text3);margin-bottom:2px;display:inline-block}
-.tc-due.overdue{color:#FF6B6B;background:rgba(255,107,107,0.12)}
-.tc-note{font-size:10px;color:var(--text3);font-style:italic;margin-bottom:3px;line-height:1.4}
-.tc-sub-bar{display:flex;align-items:center;gap:4px;margin:3px 0 2px;cursor:pointer}
-.tc-sub-prog{flex:1;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
-.tc-sub-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
-.tc-sub-lbl{font-size:9px;color:var(--text3);font-weight:600;white-space:nowrap}
-.tc-subtasks{display:none;border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
-.tc-subtasks.open{display:block}
-.sub-row{display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--border)}
-.sub-row:last-of-type{border-bottom:none}
-.sub-chk{width:13px;height:13px;flex-shrink:0;cursor:pointer;accent-color:var(--green)}
-.sub-title{font-size:11px;color:var(--text2);flex:1;line-height:1.3}
+.task-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 10px}
+.task-section-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.2px}
+.columns{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.column{width:235px;min-width:235px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:9px;transition:border-color .15s,background .15s}
+.column.drag-over{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.column.done{opacity:.85}
+.col-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.col-title{font-size:12px;font-weight:800;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-title[contenteditable=true]{outline:none;border-bottom:1px solid var(--gold);color:var(--text)}
+.count{font-size:10px;color:var(--text3);background:var(--bg4);border-radius:6px;padding:1px 6px}
+.icon-btn{border:none;background:transparent;color:var(--text3);font-size:14px;padding:2px 4px}
+.icon-btn:hover{color:var(--red)}
+.cards{min-height:18px}
+.empty{font-size:11px;color:var(--text3);text-align:center;padding:12px 0;font-style:italic}
+.task-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:5px;user-select:none}
+.task-card:hover{border-color:var(--border2)}
+.task-card.dragging{opacity:.4}
+.task-card.drop-above{border-top:3px solid var(--gold)}
+.task-card.pinned{border-color:rgba(201,168,76,.45)}
+.task-card.subref{border-left:3px solid var(--blue)}
+.task-top{display:flex;align-items:flex-start;gap:6px}
+.task-title{font-size:12px;line-height:1.35;color:var(--text);font-weight:600;flex:1;overflow-wrap:anywhere}
+.task-title.done{text-decoration:line-through;color:var(--text3)}
+.priority{font-size:9px;font-weight:800;border-radius:5px;padding:2px 6px;flex-shrink:0}
+.due,.note,.parent-label{display:inline-block;font-size:10px;color:var(--text3);margin-top:4px}
+.due.overdue{color:#ff767a;background:rgba(224,40,46,.14);padding:2px 6px;border-radius:5px}
+.note{display:block;line-height:1.4;font-style:italic}
+.sub-progress{display:flex;align-items:center;gap:6px;margin-top:6px}
+.mini-bar{height:4px;background:var(--bg4);border-radius:999px;overflow:hidden;flex:1}
+.mini-bar span{display:block;height:100%;background:var(--green)}
+.sub-count{font-size:10px;color:var(--text3);font-weight:700}
+.subtasks{display:none;margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
+.subtasks.open{display:block}
+.sub-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)}
+.sub-row:last-child{border-bottom:none}
+.sub-row input{width:14px;height:14px;accent-color:var(--green);flex-shrink:0}
+.sub-title{font-size:11px;color:var(--text2);line-height:1.3;flex:1}
 .sub-title.done{text-decoration:line-through;color:var(--text3)}
-.sub-sched{font-size:9px;border:1px solid var(--border2);background:transparent;border-radius:4px;color:var(--text3);padding:1px 4px;cursor:pointer;font-family:inherit;flex-shrink:0;max-width:70px}
-.sub-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0;font-family:inherit;flex-shrink:0;line-height:1}
-.sub-del:hover{color:var(--red)}
-.sub-add-row{display:flex;gap:5px;margin-top:6px}
-.sub-add-row input{flex:1;font-size:11px;padding:5px 8px;border-radius:6px}
-.sub-add-row button{padding:5px 9px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
-.tc-actions{display:flex;gap:2px;flex-wrap:wrap;margin-top:4px}
-.tbtn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.tbtn:hover{background:var(--bg3)}
-.tbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.3)}
-.tbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
-.tbtn.pin-btn{color:var(--gold);border-color:rgba(201,168,76,0.3)}
-.tbtn.arr{font-size:11px;padding:1px 6px}
-.tcol-qadd{margin-top:5px}
-.tcol-qadd input{font-size:12px;padding:6px 8px;border-radius:7px;background:var(--bg4);border:1px dashed var(--border2);width:100%}
-.tcol-qadd input:focus{border-color:var(--gold);background:var(--bg3)}
-.tcol-more-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--text3);font-size:11px;padding:5px;cursor:pointer;font-family:inherit;text-align:left;margin-top:4px;transition:all .15s}
-.tcol-more-btn:hover{border-color:var(--gold-b);color:var(--gold)}
-.tcol-more-form{display:none;margin-top:5px}
-.tcol-more-form.open{display:block}
-.tcol-more-form select,.tcol-more-form input[type=date],.tcol-more-form textarea{margin-bottom:5px;font-size:12px;padding:6px 8px}
-.tcol-more-form textarea{min-height:45px}
-.tcol-add-submit{width:100%;padding:7px;background:linear-gradient(135deg,var(--red),#A01A1E);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.tcol-add-col-btn{background:transparent;border:1px dashed var(--border2);border-radius:7px;color:var(--text3);font-size:11px;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s}
-.tcol-add-col-btn:hover{border-color:var(--gold-b);color:var(--gold)}
-.trash-section{margin-top:16px;opacity:0.7}
-.trash-section:hover{opacity:1}
-.trash-toggle{background:transparent;border:1px dashed var(--border);border-radius:9px;color:var(--text3);font-size:12px;padding:8px 14px;cursor:pointer;font-family:inherit;width:100%;text-align:left;transition:all .2s;margin-bottom:6px}
-.tasks-focus-banner{background:linear-gradient(135deg,rgba(224,40,46,0.07),rgba(201,168,76,0.06));border:1px solid var(--border2);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
-.tasks-focus-banner-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.tasks-focus-banner-text{font-size:12px;color:var(--text3);line-height:1.6}
-.tasks-focus-banner-text strong{color:var(--text2);display:block;margin-bottom:2px;font-size:12px}
-.tasks-search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
-.tasks-search-bar input{flex:1;font-size:13px;padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text)}
-.tasks-search-bar input:focus{border-color:var(--gold)}
-.mob-view{display:none}
-.desk-view{display:block}
-@media(max-width:767px){.mob-view{display:block}.desk-view{display:none}#todo{padding:0 10px}}
-.mob-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
-.mob-tabs::-webkit-scrollbar{display:none}
-.mob-tab{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;touch-action:manipulation}
-.mob-tab.active{background:var(--red);border-color:var(--red);color:#fff}
-.mob-tab-cnt{display:inline-block;background:rgba(255,255,255,0.2);border-radius:8px;padding:0 5px;font-size:10px;margin-left:3px}
-.mob-qadd{background:var(--bg2);border:1.5px solid var(--border2);border-radius:12px;padding:10px 12px;margin-bottom:10px}
-.mob-qadd input{background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;width:100%}
-.mob-qadd-btns{display:flex;gap:8px;margin-top:8px}
-.mob-qadd-btns select{flex:1;font-size:12px;padding:6px 8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit}
-.mob-qadd-btns button{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:none;background:var(--red);color:#fff;touch-action:manipulation}
-.mob-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:6px}
-.mob-card.pinned{border-color:var(--gold-b)}
-.mob-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
-.mob-chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:13px;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.mob-chk.done{background:var(--green);border-color:var(--green);color:#fff}
-.mob-card-title{flex:1;font-size:14px;font-weight:500;color:var(--text);line-height:1.4}
-.mob-card-title.done{text-decoration:line-through;color:var(--text3)}
-.mob-pri{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:700;flex-shrink:0;margin-top:2px}
-.mob-card-meta{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.mob-due{font-size:11px;color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:5px}
-.mob-due.od{color:#FF6B6B;background:rgba(255,107,107,0.12)}
-.mob-note{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:6px;line-height:1.4}
-.mob-sub-bar{display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;touch-action:manipulation}
-.mob-sub-prog{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
-.mob-sub-fill{height:100%;background:var(--green);border-radius:2px}
-.mob-sub-lbl{font-size:10px;color:var(--text3);font-weight:600}
-.mob-subs{display:none;background:var(--bg3);border-radius:8px;padding:8px 10px;margin-bottom:8px}
-.mob-subs.open{display:block}
-.mob-sub-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
-.mob-sub-row:last-of-type{border-bottom:none}
-.mob-sub-chk{width:18px;height:18px;flex-shrink:0;cursor:pointer;accent-color:var(--green);touch-action:manipulation}
-.mob-sub-txt{flex:1;font-size:13px;color:var(--text2);line-height:1.3}
-.mob-sub-txt.done{text-decoration:line-through;color:var(--text3)}
-.mob-sub-add{display:flex;gap:6px;margin-top:7px}
-.mob-sub-add input{flex:1;font-size:13px;padding:7px 10px;border-radius:8px}
-.mob-sub-add button{padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation}
-.mob-actions{display:flex;gap:6px;flex-wrap:wrap}
-.mbtn{min-height:34px;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
-.mbtn:active{background:var(--bg3)}
-.mbtn.done-btn{color:var(--green);border-color:rgba(61,170,76,0.35)}
-.mbtn.del-btn{color:#FF6B6B;border-color:rgba(255,107,107,0.3)}
-.mbtn.arr-btn{font-size:16px;padding:4px 10px;min-width:36px}
-.mob-move-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;align-items:flex-end;justify-content:center;pointer-events:none}
-.mob-move-sheet.open{display:flex;pointer-events:all}
-.mob-move-inner{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom,16px)+16px);width:100%;max-width:500px;max-height:75vh;overflow-y:auto}
-.mob-move-opt{display:block;width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:6px;text-align:left;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.mob-move-opt:active{background:var(--bg4)}
-.mob-section-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:10px 0 5px;padding-left:2px}
+.sub-row select{width:76px;font-size:10px;padding:3px 5px;border-radius:6px}
+.sub-add{display:flex;gap:5px;margin-top:6px}
+.sub-add input{font-size:11px;padding:6px 8px;border-radius:7px}
+.sub-add button{border:none;border-radius:7px;background:var(--green);color:#fff;padding:6px 9px;font-size:11px;font-weight:800}
+.actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.tiny{border:1px solid var(--border);background:transparent;color:var(--text3);border-radius:6px;font-size:10px;font-weight:700;padding:4px 7px}
+.tiny:hover{background:var(--bg3)}
+.tiny.good{color:var(--green);border-color:rgba(61,170,76,.35)}
+.tiny.gold{color:var(--gold);border-color:rgba(201,168,76,.35)}
+.tiny.bad{color:#ff767a;border-color:rgba(224,40,46,.35)}
+.quick-add{display:flex;gap:5px;margin-top:7px}
+.quick-add input{font-size:12px;padding:7px 8px;border-radius:8px;border-style:dashed}
+.more{display:none;margin-top:6px}
+.more.open{display:block}
+.more select,.more input,.more textarea{font-size:12px;padding:7px 8px;margin-bottom:5px;border-radius:8px}
+.more textarea{min-height:48px}
+.more button{width:100%}
+.add-col{border:1px dashed var(--border2);background:transparent;color:var(--text3);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700}
+.trash-toggle{width:100%;border:1px dashed var(--border);background:transparent;color:var(--text3);border-radius:10px;padding:9px 12px;text-align:left;font-size:12px}
+.mobile-only{display:none}
 
+@media(min-width:768px){
+  body{height:100vh;overflow:hidden}
+  .app{max-width:none;height:100vh;display:grid;grid-template-columns:220px 1fr;grid-template-rows:64px 1fr;padding:0}
+  .header{grid-column:1/3;grid-row:1;padding:0 28px;border-bottom:1.5px solid var(--border)}
+  .nav{grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:4px;padding:16px 12px;border-right:1.5px solid var(--border);background:var(--bg2);overflow-y:auto}
+  .nav button{text-align:left;border:none;border-radius:9px}
+  .nav button:not(.active):hover{background:var(--bg3);color:var(--text2)}
+  .pages{grid-column:2;grid-row:2;overflow-y:auto;padding:24px 28px 60px}
+  .desktop-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .desktop-grid>.card{margin-bottom:0}
+  .wide{grid-column:1/3}
+}
+@media(max-width:767px){
+  .task-toolbar{position:sticky;top:0;background:var(--bg);z-index:5;padding-top:2px}
+  .desktop-task-label{display:none}
+  .mobile-only{display:block}
+  .columns{display:block;overflow:visible}
+  .column{width:100%;min-width:0;margin-bottom:10px}
+  .task-section:not(.active-mobile){display:none}
+}
+.mobile-only{display:none}
+@media(max-width:767px){
+  .task-toolbar{position:sticky;top:0;background:var(--bg);z-index:5;padding-top:2px}
+  .desktop-task-label{display:none}
+  .mobile-only{display:block}
+  .columns{display:block;overflow:visible}
+  .column{width:100%;min-width:0;margin-bottom:10px}
+  .task-section:not(.active-mobile){display:none}
+}
 </style>
 </head>
 <body style="background:#0A0A0A !important;background-color:#0A0A0A !important">
@@ -483,52 +443,17 @@ input[type=file]{display:none}
 
 <!-- TASKS -->
 <div id="todo" class="page">
-  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none"></canvas>
-
-  <!-- MOBILE VIEW -->
-  <div class="mob-view">
-    <div id="mob-tabs" class="mob-tabs"></div>
-    <div class="mob-qadd">
-      <input type="text" id="mob-inp" placeholder="+ Add task..." onkeydown="if(event.key==='Enter')mobAdd()">
-      <div class="mob-qadd-btns">
-        <select id="mob-pri"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>
-        <button onclick="mobAdd()">Add</button>
-      </div>
-    </div>
-    <div id="mob-list"></div>
-  </div>
-
-  <!-- MOVE SHEET -->
-  <div class="mob-move-sheet" id="mob-move-sheet" onclick="if(event.target===this)closeMobMove()">
-    <div class="mob-move-inner">
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Move to...</div>
-      <div id="mob-move-opts"></div>
-      <button onclick="closeMobMove()" style="width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;touch-action:manipulation">Cancel</button>
-    </div>
-  </div>
-
-  <!-- DESKTOP VIEW -->
-  <div class="desk-view">
-    <div class="tasks-focus-banner">
-      <span class="tasks-focus-banner-icon">🎯</span>
-      <div class="tasks-focus-banner-text"><strong>Execution dashboard</strong>Your personal execution system. Get things done.</div>
-    </div>
-    <div class="tasks-search-bar">
-      <input type="text" id="task-search" placeholder="🔍 Search..." oninput="renderTasks()">
-      <button onclick="document.getElementById('task-search').value='';renderTasks()" style="background:var(--bg3);border:1.5px solid var(--border2);border-radius:8px;color:var(--text3);font-size:12px;padding:7px 10px;cursor:pointer;font-family:inherit;white-space:nowrap">Clear</button>
-    </div>
-    <div class="task-section"><div class="task-section-header"><span class="task-section-title">🚨 Execution Zone</span></div><div class="global-cols-wrap" id="global-cols"></div></div>
-    <div id="biz-task-lanes"></div>
-    <div class="task-section"><div class="task-section-header"><span class="task-section-title">👤 Personal</span></div><div class="global-cols-wrap" id="personal-cols"></div></div>
-    <div class="task-section"><div class="task-section-header"><span class="task-section-title">🧠 Brain Dump</span></div><div class="global-cols-wrap" id="brain-cols"></div></div>
-    <div class="trash-section" id="trash-section" style="margin-top:8px">
-      <button class="trash-toggle" onclick="toggleTrash()">🗑 Deleted (<span id="trash-count">0</span>) — tap to view</button>
-      <div id="trash-cols" style="display:none"><div class="global-cols-wrap" id="trash-col-wrap"></div><div style="font-size:11px;color:#505050;text-align:center;margin-top:4px">Auto-purged after 30 days</div></div>
-    </div>
-  </div>
+  <div class="task-toolbar">
+          <input id="taskSearch" placeholder="Search tasks...">
+          <button class="btn secondary" id="clearSearch">Clear</button>
+        </div>
+        <div class="mobile-only card" style="padding:10px">
+          <select id="mobileTaskJump"></select>
+        </div>
+        <div id="taskBoard"></div>
+        <button class="trash-toggle" id="trashToggle">Deleted (<span id="trashCount">0</span>) - tap to view</button>
+        <div id="trashBoard" style="display:none;margin-top:10px"></div>
 </div>
-
-
 <!-- GOALS -->
 <div id="goals" class="page">
   <div class="card" style="border-color:var(--red-b)"><div class="ct">Monthly goals</div><div id="monthly-goals"></div><div class="at" style="margin-top:10px"><input type="text" id="monthly-goal-input" placeholder="Add monthly goal..."><button onclick="addGoal('monthly')">Add</button></div></div>
@@ -629,7 +554,7 @@ async function loadFromCloud(){
   try{
     let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value',{headers:getSBH()});
     let rows=await r.json();if(!rows||!rows.length)return;
-    const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',td4:'tasks2',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
+    const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
     rows.forEach(row=>{try{let v=JSON.parse(row.value);localStorage.setItem(row.key,row.value);if(rm[row.key])S[rm[row.key]]=v;}catch(e){}});
     renderAll();fetchPrayerTimes();
   }catch(e){}
@@ -639,6 +564,10 @@ async function loadFromCloud(){
 function lsGet(k,def){try{let v=localStorage.getItem(k);if(v!==null)return JSON.parse(v);}catch(e){}return def;}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function lsClear(k){try{localStorage.removeItem(k);}catch(e){}}
+const esc=s=>{if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');};
+const TODAY=()=>td();
+const uid=()=>`t_${Math.random().toString(36).slice(2,10)}${Date.now().toString(36).slice(-4)}`;
+const save=(k,v)=>lsSet(k,v);
 
 // ── Date helpers ──
 function localDate(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -652,12 +581,12 @@ function getLast14(){let days=[];for(let i=13;i>=0;i--){let d=new Date();d.setDa
 let S={
   habits:lsGet('h3',{}),prayers:lsGet('pr3',{}),biz:lsGet('bz3',{}),
   workouts:lsGet('wo3',{}),
-  tasks2:initTaskStore2(lsGet('td4',null)),
+  tasks:migrateTasks(lsGet('tasks',null)),
   goals:lsGet('gl3',{monthly:[],longterm:[]}),refs:lsGet('rf3',{}),
   targets:lsGet('tg3',{cal:1600,prot:160}),weekly:lsGet('wk3',{}),logos:lsGet('logos3',{}),
   mood:lsGet('mood3',{}),reviews:lsGet('rev3',{}),food:lsGet('food3',{}),favs:lsGet('favs3',[])
 };
-const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',tasks2:'td4',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
+const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
 function ss(k){let v=S[k];lsSet(KEY_MAP[k],v);sbSet(KEY_MAP[k],v);flashSaved();}
 let _sf;
 function flashSaved(){let el=document.getElementById('save-indicator');if(!el)return;el.classList.add('show');clearTimeout(_sf);_sf=setTimeout(()=>el.classList.remove('show'),1500);}
@@ -779,875 +708,306 @@ function renderPrayerPage(){
 
 
 
-// ══════════════════════════════════════════════
-// TASK SYSTEM v3 — CLEAN REWRITE
-// ══════════════════════════════════════════════
-
-// ── Store defaults ──
-function defaultTaskStore(){
+// ── Task system (Codex) ──
+function defaultTasks(){
   return {
-    globalCols:[
-      {id:'g_today',    name:'Today',      accent:'#E0282E',type:'today'},
-      {id:'g_tomorrow', name:'Tomorrow',   accent:'#C9A84C',type:'tomorrow'},
-      {id:'g_overdue',  name:'Overdue',    accent:'#FF4444',type:'overdue'},
-      {id:'g_done',     name:'Done',       accent:'#3DAA4C',type:'done',isDone:true},
-      {id:'g_brain',    name:'Brain Dump', accent:'#7B6FD4',type:'brain'}
-    ],
-    bizLanes:{
-      slp:{cols:[
-        {id:'slp_asap',    name:'ASAP / Critical',       accent:'#FF4444'},
-        {id:'slp_week',    name:'This Week',              accent:'#E0282E'},
-        {id:'slp_content', name:'Content & Branding',    accent:'#C9A84C'},
-        {id:'slp_systems', name:'Systems & Automations', accent:'#2B7FD4'},
-        {id:'slp_growth',  name:'Growth Ideas',          accent:'#7B6FD4'},
-        {id:'slp_prog',    name:'In Progress',           accent:'#D4851A'},
-        {id:'slp_wait',    name:'Waiting On',            accent:'#909090'},
-        {id:'slp_done',    name:'Done',                  accent:'#3DAA4C',isDone:true}
+    groups:[
+      {id:"execution",name:"Execution Zone",cols:[
+        {id:"today",name:"Today",accent:"#e0282e",type:"today"},
+        {id:"tomorrow",name:"Tomorrow",accent:"#c9a84c",type:"tomorrow"},
+        {id:"overdue",name:"Overdue",accent:"#ff4444",type:"overdue"},
+        {id:"done",name:"Done",accent:"#3daa4c",type:"done",done:true}
       ]},
-      cb:{cols:[
-        {id:'cb_pri',    name:'Priority',         accent:'#1A8A3C'},
-        {id:'cb_out',    name:'Outreach',         accent:'#2B7FD4'},
-        {id:'cb_content',name:'Content',          accent:'#C9A84C'},
-        {id:'cb_future', name:'Future Expansion', accent:'#7B6FD4'},
-        {id:'cb_prog',   name:'In Progress',      accent:'#D4851A'},
-        {id:'cb_done',   name:'Done',             accent:'#3DAA4C',isDone:true}
+      {id:"slp",name:"Swift Leads Pro",bizId:"slp",cols:[
+        {id:"slp_asap",name:"ASAP / Critical",accent:"#ff4444"},
+        {id:"slp_week",name:"This Week",accent:"#e0282e"},
+        {id:"slp_content",name:"Content",accent:"#c9a84c"},
+        {id:"slp_systems",name:"Systems",accent:"#2b7fd4"},
+        {id:"slp_done",name:"Done",accent:"#3daa4c",done:true}
       ]},
-      h2h:{cols:[
-        {id:'h2h_pri',    name:'Priority',          accent:'#E05020'},
-        {id:'h2h_content',name:'Content & Branding',accent:'#C9A84C'},
-        {id:'h2h_plan',   name:'Business Planning', accent:'#2B7FD4'},
-        {id:'h2h_vision', name:'Future Vision',     accent:'#7B6FD4'},
-        {id:'h2h_prog',   name:'In Progress',       accent:'#D4851A'},
-        {id:'h2h_done',   name:'Done',              accent:'#3DAA4C',isDone:true}
+      {id:"cb",name:"Capital Bros",bizId:"cb",cols:[
+        {id:"cb_priority",name:"Priority",accent:"#1a8a3c"},
+        {id:"cb_outreach",name:"Outreach",accent:"#2b7fd4"},
+        {id:"cb_content",name:"Content",accent:"#c9a84c"},
+        {id:"cb_done",name:"Done",accent:"#3daa4c",done:true}
+      ]},
+      {id:"h2h",name:"Houses 2 Homes",bizId:"h2h",cols:[
+        {id:"h2h_priority",name:"Priority",accent:"#e05020"},
+        {id:"h2h_content",name:"Content",accent:"#c9a84c"},
+        {id:"h2h_plan",name:"Planning",accent:"#2b7fd4"},
+        {id:"h2h_done",name:"Done",accent:"#3daa4c",done:true}
+      ]},
+      {id:"personal",name:"Personal",cols:[
+        {id:"personal_admin",name:"Life Admin",accent:"#c9a84c"},
+        {id:"personal_health",name:"Health",accent:"#3daa4c"},
+        {id:"personal_dev",name:"Self Development",accent:"#2b7fd4"},
+        {id:"personal_done",name:"Done",accent:"#3daa4c",done:true}
+      ]},
+      {id:"brain",name:"Brain Dump",cols:[
+        {id:"brain_dump",name:"Brain Dump",accent:"#7b6fd4"}
       ]}
-    },
-    personalCols:[
-      {id:'pers_admin', name:'Life Admin',       accent:'#C9A84C'},
-      {id:'pers_health',name:'Health & Fitness', accent:'#3DAA4C'},
-      {id:'pers_dev',   name:'Self Development', accent:'#2B7FD4'},
-      {id:'pers_done',  name:'Done',             accent:'#3DAA4C',isDone:true}
     ],
     tasks:{},
-    trash:{},
-    colOrder:{}
+    order:{},
+    trash:{}
   };
 }
-
-function initTaskStore2(raw){
-  if(!raw||typeof raw!=='object'||!raw.tasks) return defaultTaskStore();
-  var d=defaultTaskStore();
-  if(!raw.globalCols)   raw.globalCols=d.globalCols;
-  if(!raw.bizLanes)     raw.bizLanes=d.bizLanes;
-  if(!raw.personalCols) raw.personalCols=d.personalCols;
-  if(!raw.trash)        raw.trash={};
-  if(!raw.colOrder)     raw.colOrder={};
-  // Migrate old biz columns
-  ['slp','cb','h2h'].forEach(function(bid){
-    if(!raw.bizLanes[bid]) { raw.bizLanes[bid]=d.bizLanes[bid]; return; }
-    var eIds=(raw.bizLanes[bid].cols||[]).map(function(c){return c.id;});
-    var nIds=d.bizLanes[bid].cols.map(function(c){return c.id;});
-    if(!nIds.some(function(id){return eIds.indexOf(id)!==-1;})){
-      var first=d.bizLanes[bid].cols[0];
-      Object.values(raw.tasks).forEach(function(t){if(t.bizId===bid)t.colId=first.id;});
-      raw.bizLanes[bid].cols=d.bizLanes[bid].cols;
-    }
-  });
-  var ep=(raw.personalCols||[]).map(function(c){return c.id;});
-  var np=d.personalCols.map(function(c){return c.id;});
-  if(!np.some(function(id){return ep.indexOf(id)!==-1;})) raw.personalCols=d.personalCols;
-  return raw;
-}
-
-// ── Core helpers ──
-function getTS(){ return S.tasks2; }
-function saveTS(){ ss('tasks2'); }
-function newId(){ return 't_'+Math.random().toString(36).slice(2,12); }
-function allTasks(){ return Object.values(getTS().tasks); }
-
-function getTasksInCol(colId,bizId){
-  var biz=bizId||null;
-  var items=allTasks().filter(function(t){
-    return t.colId===colId&&(t.bizId||null)===biz;
-  });
-  var order=(getTS().colOrder||{})[colId];
-  if(order&&order.length){
-    var map={};order.forEach(function(id,i){map[id]=i;});
-    items.sort(function(a,b){
-      return (map[a.id]!==undefined?map[a.id]:9999)-(map[b.id]!==undefined?map[b.id]:9999);
+function migrateTasks(raw){
+  const base=defaultTasks();
+  if(!raw||typeof raw!=="object")return base;
+  if(raw.groups&&raw.tasks)return {...base,...raw,groups:raw.groups,trash:raw.trash||{},order:raw.order||{}};
+  const out=base;
+  if(raw.tasks){
+    Object.values(raw.tasks).forEach(t=>{
+      const biz=t.bizId||null;
+      const id=t.id||uid();
+      let col=t.colId||"today";
+      const valid=allCols(out).some(c=>c.id===col);
+      if(!valid) col=biz?`${biz}_priority`:"today";
+      out.tasks[id]={id,title:t.title||"Untitled task",priority:t.priority||"medium",due:t.due||"",note:t.note||"",pinned:!!t.pinned,colId:col,bizId:biz,subtasks:(t.subtasks||[]).map(s=>({id:s.id||uid(),title:s.title||"Subtask",done:!!s.done,scheduledTo:s.scheduledTo||""})),added:t.added||TODAY(),doneAt:t.doneAt||""};
     });
   }
-  return items;
+  return out;
 }
 
-function getSchedSubsInCol(colId){
-  var res=[];
-  allTasks().forEach(function(task){
-    (task.subtasks||[]).forEach(function(sub){
-      if(sub.scheduledTo===colId) res.push({task:task,sub:sub});
-    });
+
+function persist(key){
+  if(key==='tasks'){lsSet('tasks',S.tasks);try{sbSet('tasks',S.tasks);}catch(e){}}
+  else if(typeof ss==='function'&&S[key]!==undefined){try{ss(key);}catch(e){lsSet(key,S[key]);}}
+  else{lsSet(key,S[key]);}
+  flashSaved();
+}
+function allCols(store=S.tasks){return store.groups.flatMap(g=>g.cols.map(c=>({...c,groupId:g.id,bizId:g.bizId||null})))}
+function findCol(id){return allCols().find(c=>c.id===id)}
+function findGroupByCol(colId){return S.tasks.groups.find(g=>g.cols.some(c=>c.id===colId))}
+function doneColFor(task){const g=findGroupByCol(task.colId);return g?.cols.find(c=>c.done)?.id||"done"}
+function tasksInCol(colId){
+  const ids=S.tasks.order[colId]||[];
+  const arr=Object.values(S.tasks.tasks).filter(t=>t.colId===colId);
+  const pos=Object.fromEntries(ids.map((id,i)=>[id,i]));
+  arr.sort((a,b)=>{
+    if(a.pinned!==b.pinned)return a.pinned?-1:1;
+    return (pos[a.id]??99999)-(pos[b.id]??99999);
   });
-  return res;
+  return arr;
 }
-
-function getScheduledSubsInCol(colId){ return getSchedSubsInCol(colId); }
-
-function findColDef(colId,bizId){
-  var ts=getTS();
-  if(bizId){
-    var lane=ts.bizLanes[bizId];
-    if(lane){var c=lane.cols.find(function(c){return c.id===colId;});if(c)return c;}
-  }
-  var gc=ts.globalCols.find(function(c){return c.id===colId;});
-  if(gc) return gc;
-  return ts.personalCols.find(function(c){return c.id===colId;})||null;
+function setOrder(colId,ids){S.tasks.order[colId]=ids.filter(id=>S.tasks.tasks[id])}
+function matchesTask(t,q){
+  if(!q)return true;
+  q=q.toLowerCase();
+  return t.title.toLowerCase().includes(q)||(t.note||"").toLowerCase().includes(q)||(t.subtasks||[]).some(s=>s.title.toLowerCase().includes(q));
 }
-
-function findDoneCol(colId,bizId){
-  var ts=getTS();
-  if(bizId){
-    var lane=ts.bizLanes[bizId];
-    if(lane){var dc=lane.cols.find(function(c){return c.isDone;});if(dc)return dc.id;}
-  }
-  if(!bizId){
-    var pc=ts.personalCols.find(function(c){return c.isDone;});
-    if(pc&&ts.personalCols.find(function(c){return c.id===colId;})) return pc.id;
-  }
-  var gc=ts.globalCols.find(function(c){return c.isDone||c.type==='done';});
-  return gc?gc.id:null;
+function scheduledSubs(colId){
+  const out=[];
+  Object.values(S.tasks.tasks).forEach(t=>(t.subtasks||[]).forEach(s=>{if(s.scheduledTo===colId&&!s.done)out.push({task:t,sub:s})}));
+  return out;
 }
-
-// ── Visual order (pinned first, then by colOrder) ──
-function getVisualIds(colId,bizId){
-  var tasks=getTasksInCol(colId,bizId||null);
-  var p=tasks.filter(function(t){return t.pinned;});
-  var u=tasks.filter(function(t){return !t.pinned;});
-  return p.concat(u).map(function(t){return t.id;});
+let drag=null,trashOpen=false,expanded=new Set(),mobileSection="execution";
+function scheduleOptions(current){
+  return `<option value="">Backlog</option><option value="today" ${current==="today"?"selected":""}>Today</option><option value="tomorrow" ${current==="tomorrow"?"selected":""}>Tomorrow</option>`;
 }
-
-function saveOrder(colId,bizId,ids){
-  var ts=getTS();
-  if(!ts.colOrder)ts.colOrder={};
-  ts.colOrder[colId]=ids;
+function taskCard(t,col){
+  const p=PRI[t.priority]||PRI.medium,done=!!findCol(t.colId)?.done,isOverdue=t.due&&t.due<TODAY()&&!done;
+  const subs=t.subtasks||[],complete=subs.filter(s=>s.done).length,pct=subs.length?Math.round(complete/subs.length*100):0,isOpen=expanded.has(t.id);
+  const subHtml=`<div class="subtasks ${isOpen?"open":""}" data-subwrap="${t.id}">
+    ${subs.map(s=>`<div class="sub-row"><input type="checkbox" ${s.done?"checked":""} data-sub-toggle="${t.id}" data-sub-id="${s.id}"><span class="sub-title ${s.done?"done":""}">${esc(s.title)}</span><select data-sub-schedule="${t.id}" data-sub-id="${s.id}">${scheduleOptions(s.scheduledTo||"")}</select><button class="icon-btn" data-sub-delete="${t.id}" data-sub-id="${s.id}">x</button></div>`).join("")}
+    <div class="sub-add"><input placeholder="Add subtask..." data-sub-input="${t.id}"><button data-sub-add="${t.id}">Add</button></div>
+  </div>`;
+  return `<article class="task-card ${t.pinned?"pinned":""}" draggable="true" data-task="${t.id}" data-col="${col.id}">
+    <div class="task-top"><div class="task-title ${done?"done":""}">${t.pinned?"[PIN] ":""}${esc(t.title)}</div><span class="priority" style="background:${p.bg};color:${p.color}">${p.label}</span></div>
+    ${t.due?`<span class="due ${isOverdue?"overdue":""}">${isOverdue?"Overdue: ":""}${esc(t.due)}</span>`:""}
+    ${t.note?`<span class="note">${esc(t.note)}</span>`:""}
+    ${subs.length?`<button class="sub-progress tiny" data-expand="${t.id}" style="width:100%;border:none;padding:4px 0"><span class="mini-bar"><span style="width:${pct}%"></span></span><span class="sub-count">${complete}/${subs.length}</span></button>`:""}
+    ${subHtml}
+    <div class="actions">
+      ${done?`<button class="tiny good" data-restore="${t.id}">Restore</button>`:`<button class="tiny good" data-done="${t.id}">Done</button>`}
+      <button class="tiny" data-expand="${t.id}">${isOpen?"Hide":"Subtasks"}</button>
+      <button class="tiny gold" data-pin="${t.id}">${t.pinned?"Unpin":"Pin"}</button>
+      <button class="tiny" data-move-up="${t.id}">Up</button>
+      <button class="tiny" data-move-down="${t.id}">Down</button>
+      <button class="tiny bad" data-delete="${t.id}">Delete</button>
+    </div>
+  </article>`;
 }
-
-// ── CRUD ──
-function addTask2(colId,bizId){
-  var nameEl=document.getElementById('tn-'+colId);
-  var name=(nameEl?nameEl.value:'').trim();
-  if(!name)return;
-  var pri=(document.getElementById('tp-'+colId)||{}).value||'medium';
-  var due=(document.getElementById('td-'+colId)||{}).value||'';
-  var note=((document.getElementById('tnt-'+colId)||{}).value||'').trim();
-  var task={id:newId(),title:name,priority:pri,due:due,note:note,
-    pinned:false,colId:colId,bizId:bizId||null,subtasks:[],added:td()};
-  getTS().tasks[task.id]=task;
-  if(nameEl)nameEl.value='';
-  var ef=document.getElementById('tef-'+colId);
-  if(ef)ef.style.display='none';
-  saveTS();renderTasks();renderDashboard();
+function subRefCard(task,sub){
+  return `<article class="task-card subref"><span class="parent-label">From: ${esc(task.title)}</span><div class="task-top"><div class="task-title">${esc(sub.title)}</div></div><div class="actions"><button class="tiny good" data-sub-toggle="${task.id}" data-sub-id="${sub.id}">Done</button><button class="tiny" data-sub-unschedule="${task.id}" data-sub-id="${sub.id}">Unschedule</button></div></article>`;
 }
-
-function doneTask2(taskId){
-  var ts=getTS();
-  var task=ts.tasks[taskId];if(!task)return;
-  var dc=findDoneCol(task.colId,task.bizId);
-  if(dc){task.colId=dc;task.doneAt=td();}
-  saveTS();spawnConfetti(false);renderTasks();renderDashboard();
+function column(col,q){
+  const items=tasksInCol(col.id).filter(t=>matchesTask(t,q));
+  const refs=(col.id==="today"||col.id==="tomorrow")?scheduledSubs(col.id).filter(x=>matchesTask(x.task,q)):[];
+  const count=items.length+refs.length;
+  const add=!col.done?`<div class="quick-add"><input placeholder="+ Quick add..." data-quick="${col.id}"></div>
+    <button class="tiny" style="width:100%;margin-top:5px" data-more="${col.id}">More options</button>
+    <div class="more" id="more-${col.id}">
+      <select id="pri-${col.id}"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
+      <input type="date" id="due-${col.id}">
+      <textarea id="note-${col.id}" placeholder="Notes..."></textarea>
+      <button class="btn" data-add-full="${col.id}">Add task</button>
+    </div>`:"";
+  const canDelete=!["today","tomorrow","overdue","done","brain_dump"].includes(col.id)&&!col.done;
+  return `<div class="column ${col.done?"done":""}" data-drop-col="${col.id}">
+    <div class="col-head"><span class="dot" style="background:${col.accent}"></span><span class="col-title" contenteditable="true" spellcheck="false" data-col-name="${col.id}">${esc(col.name)}</span><span class="count">${count}</span>${canDelete?`<button class="icon-btn" data-delete-col="${col.id}">x</button>`:""}</div>
+    <div class="cards">${refs.map(x=>subRefCard(x.task,x.sub)).join("")}${items.map(t=>taskCard(t,col)).join("")||(!refs.length?`<div class="empty">Empty</div>`:"")}</div>
+    ${add}
+  </div>`;
 }
-
-function restoreTask2(taskId){
-  var ts=getTS();
-  var task=ts.tasks[taskId];if(!task)return;
-  delete task.doneAt;
-  var gc=ts.globalCols.find(function(c){return c.type==='today';});
-  if(gc)task.colId=gc.id;task.bizId=null;
-  saveTS();renderTasks();renderDashboard();
-}
-
-function softDeleteTask2(taskId){
-  var ts=getTS();
-  var task=ts.tasks[taskId];if(!task)return;
-  task.deletedAt=new Date().toISOString();
-  if(!ts.trash)ts.trash={};
-  ts.trash[taskId]=task;
-  delete ts.tasks[taskId];
-  saveTS();renderTasks();renderTrash();
-}
-
-function hardDeleteTask2(taskId){
-  delete getTS().trash[taskId];
-  saveTS();renderTrash();
-}
-
-function confirmHardDelete(taskId){
-  if(confirm('Permanently delete?'))hardDeleteTask2(taskId);
-}
-
-function restoreFromTrash(taskId){
-  var ts=getTS();
-  var task=ts.trash[taskId];if(!task)return;
-  delete task.deletedAt;
-  var gc=ts.globalCols.find(function(c){return c.type==='today';});
-  if(gc){task.colId=gc.id;task.bizId=null;}
-  ts.tasks[taskId]=task;
-  delete ts.trash[taskId];
-  saveTS();renderTasks();renderTrash();
-}
-
-function pinTask2(taskId){
-  var task=getTS().tasks[taskId];if(!task)return;
-  task.pinned=!task.pinned;
-  saveTS();renderTasks();
-}
-
-function moveTask2(taskId,toColId,toBizId){
-  var ts=getTS();
-  var task=ts.tasks[taskId];if(!task)return;
-  task.colId=toColId;task.bizId=toBizId||null;
-  saveTS();renderTasks();renderDashboard();
-}
-
-// ── Subtasks ──
-function addSubtask(taskId){
-  // Input could be in desktop or mobile view
-  var inp=document.getElementById('sub-inp-'+taskId)||document.getElementById('mob-sub-inp-'+taskId);
-  if(!inp)return;
-  var title=inp.value.trim();if(!title)return;
-  var task=getTS().tasks[taskId];if(!task)return;
-  if(!task.subtasks)task.subtasks=[];
-  task.subtasks.push({id:newId(),title:title,done:false,scheduledTo:null});
-  inp.value='';
-  saveTS();renderTasks();
-}
-
-function toggleSubtask(taskId,subId){
-  var task=getTS().tasks[taskId];if(!task)return;
-  var sub=(task.subtasks||[]).find(function(s){return s.id===subId;});if(!sub)return;
-  sub.done=!sub.done;
-  // Check if all done → complete parent
-  if(task.subtasks.length>0&&task.subtasks.every(function(s){return s.done;})){
-    doneTask2(taskId);return;
-  }
-  saveTS();renderTasks();
-}
-
-function schedSubtask(taskId,subId,colId){
-  var task=getTS().tasks[taskId];if(!task)return;
-  var sub=(task.subtasks||[]).find(function(s){return s.id===subId;});if(!sub)return;
-  sub.scheduledTo=colId||null;
-  saveTS();renderTasks();
-}
-
-function doneSchedSub(taskId,subId){
-  toggleSubtask(taskId,subId);
-}
-
-// ── Expand state ──
-var _exp={};
-function toggleExp(taskId){
-  _exp[taskId]=!_exp[taskId];
-  renderTasks();
-}
-
-// ── Move up/down ──
-function moveTaskUp(taskId,colId,bizId){
-  bizId=bizId||null;
-  var ts=getTS();if(!ts.colOrder)ts.colOrder={};
-  var ids=getVisualIds(colId,bizId);
-  var idx=ids.indexOf(taskId);
-  if(idx<=0)return;
-  var tmp=ids[idx-1];ids[idx-1]=ids[idx];ids[idx]=tmp;
-  saveOrder(colId,bizId,ids);
-  saveTS();renderTasks();
-}
-
-function moveTaskDown(taskId,colId,bizId){
-  bizId=bizId||null;
-  var ts=getTS();if(!ts.colOrder)ts.colOrder={};
-  var ids=getVisualIds(colId,bizId);
-  var idx=ids.indexOf(taskId);
-  if(idx===-1||idx>=ids.length-1)return;
-  var tmp=ids[idx+1];ids[idx+1]=ids[idx];ids[idx]=tmp;
-  saveOrder(colId,bizId,ids);
-  saveTS();renderTasks();
-}
-
-// ── Column management ──
-function startRenameCol(colId){
-  var nm=document.getElementById('cnm-'+colId);
-  var ni=document.getElementById('cni-'+colId);
-  if(nm)nm.style.display='none';
-  if(ni){ni.style.display='block';ni.focus();ni.select();}
-}
-function finishRenameCol(colId,bizId){
-  var ni=document.getElementById('cni-'+colId);
-  var nm=document.getElementById('cnm-'+colId);
-  if(ni)ni.style.display='none';
-  if(nm)nm.style.display='';
-  var newName=ni?ni.value.trim():'';if(!newName)return;
-  var col=findColDef(colId,bizId||null);
-  if(col)col.name=newName;
-  saveTS();renderTasks();
-}
-function deleteCol2(colId,bizId){
-  if(!confirm('Delete column? Tasks move to first column.'))return;
-  var ts=getTS();
-  var cols=bizId?(ts.bizLanes[bizId]||{}).cols:ts.personalCols;
-  if(!cols||cols.length<=1)return;
-  var idx=cols.findIndex(function(c){return c.id===colId;});if(idx===-1)return;
-  var fallback=cols.find(function(c){return c.id!==colId;});
-  cols.splice(idx,1);
-  allTasks().forEach(function(t){if(t.colId===colId){t.colId=fallback.id;t.bizId=bizId||null;}});
-  saveTS();renderTasks();
-}
-function addBizCol(bizId){
-  var ts=getTS();var lane=ts.bizLanes[bizId];if(!lane)return;
-  var name=prompt('Column name:');if(!name||!name.trim())return;
-  lane.cols.push({id:bizId+'_'+newId(),name:name.trim(),accent:'#C9A84C'});
-  saveTS();renderTasks();
-}
-function addPersonalCol(){
-  var ts=getTS();
-  var name=prompt('Column name:');if(!name||!name.trim())return;
-  ts.personalCols.push({id:'pers_'+newId(),name:name.trim(),accent:'#C9A84C'});
-  saveTS();renderTasks();
-}
-
-// ── Drag & Drop ──
-var _drag={id:null,colId:null,bizId:null};
-
-function onDragStart(e,taskId,colId,bizId){
-  _drag={id:taskId,colId:colId,bizId:bizId||null};
-  e.dataTransfer.effectAllowed='move';
-  e.dataTransfer.setData('text/plain',taskId);
-  var el=document.getElementById('tc-'+taskId);
-  if(el)setTimeout(function(){el.classList.add('dragging');},0);
-}
-
-function onDragEnd(e,taskId){
-  var el=document.getElementById('tc-'+taskId);
-  if(el)el.classList.remove('dragging');
-  document.querySelectorAll('.tcol.drag-over').forEach(function(c){c.classList.remove('drag-over');});
-  document.querySelectorAll('.tc.drop-above').forEach(function(c){c.classList.remove('drop-above');});
-}
-
-// Column-level drag over (for dropping into empty cols or bottom of col)
-function onColDragOver(e,colId){
-  e.preventDefault();
-  e.dataTransfer.dropEffect='move';
-  document.querySelectorAll('.tcol.drag-over').forEach(function(c){c.classList.remove('drag-over');});
-  var el=document.getElementById('tcol-'+colId);
-  if(el)el.classList.add('drag-over');
-}
-
-// Card-level drag over (for inserting above a specific card)
-function onCardDragOver(e,taskId){
-  e.preventDefault();
-  e.stopPropagation(); // prevent col dragover highlight when over a card
-  e.dataTransfer.dropEffect='move';
-  if(!_drag.id||_drag.id===taskId)return;
-  document.querySelectorAll('.tc.drop-above').forEach(function(c){c.classList.remove('drop-above');});
-  document.querySelectorAll('.tcol.drag-over').forEach(function(c){c.classList.remove('drag-over');});
-  var el=document.getElementById('tc-'+taskId);
-  if(el)el.classList.add('drop-above');
-}
-
-// Drop ON a card → insert above that card
-function onCardDrop(e,targetTaskId,colId,bizId){
-  e.preventDefault();
-  e.stopPropagation();
-  document.querySelectorAll('.tc.drop-above').forEach(function(c){c.classList.remove('drop-above');});
-  document.querySelectorAll('.tcol.drag-over').forEach(function(c){c.classList.remove('drag-over');});
-  if(!_drag.id||_drag.id===targetTaskId)return;
-
-  var ts=getTS();if(!ts.colOrder)ts.colOrder={};
-  var task=ts.tasks[_drag.id];if(!task)return;
-  var fromColId=_drag.colId,fromBizId=_drag.bizId;
-
-  // Move task to new col
-  task.colId=colId;task.bizId=bizId||null;
-
-  // Remove from source order
-  var fromIds=getVisualIds(fromColId,fromBizId).filter(function(id){return id!==_drag.id;});
-  saveOrder(fromColId,fromBizId,fromIds);
-
-  // Insert before target in dest
-  var toIds=getVisualIds(colId,bizId||null).filter(function(id){return id!==_drag.id;});
-  var tIdx=toIds.indexOf(targetTaskId);
-  if(tIdx===-1)toIds.push(_drag.id);else toIds.splice(tIdx,0,_drag.id);
-  saveOrder(colId,bizId||null,toIds);
-
-  _drag={id:null,colId:null,bizId:null};
-  saveTS();renderTasks();renderDashboard();
-}
-
-// Drop on column → append to bottom
-function onColDrop(e,colId,bizId){
-  e.preventDefault();
-  document.querySelectorAll('.tcol.drag-over').forEach(function(c){c.classList.remove('drag-over');});
-  document.querySelectorAll('.tc.drop-above').forEach(function(c){c.classList.remove('drop-above');});
-  if(!_drag.id)return;
-
-  var ts=getTS();if(!ts.colOrder)ts.colOrder={};
-  var task=ts.tasks[_drag.id];if(!task)return;
-  var fromColId=_drag.colId,fromBizId=_drag.bizId;
-
-  task.colId=colId;task.bizId=bizId||null;
-
-  // Remove from source
-  var fromIds=getVisualIds(fromColId,fromBizId).filter(function(id){return id!==_drag.id;});
-  saveOrder(fromColId,fromBizId,fromIds);
-
-  // Append to dest
-  var toIds=getVisualIds(colId,bizId||null).filter(function(id){return id!==_drag.id;});
-  toIds.push(_drag.id);
-  saveOrder(colId,bizId||null,toIds);
-
-  _drag={id:null,colId:null,bizId:null};
-  saveTS();renderTasks();renderDashboard();
-}
-
-// ── Trash ──
-var _trashOpen=false;
-function toggleTrash(){
-  _trashOpen=!_trashOpen;
-  var el=document.getElementById('trash-cols');
-  if(el)el.style.display=_trashOpen?'block':'none';
+function renderTasks(){
+  const q=document.getElementById("taskSearch")?.value.trim()||"";
+  document.getElementById("taskBoard").innerHTML=S.tasks.groups.map(g=>`<section class="task-section" data-section="${g.id}">
+    <div class="task-section-head"><h2 class="task-section-title">${esc(g.name)}</h2>${!["execution","brain"].includes(g.id)?`<button class="add-col" data-add-col="${g.id}">+ Column</button>`:""}</div>
+    <div class="columns">${g.cols.map(c=>column(c,q)).join("")}</div>
+  </section>`).join("");
+  const jump=document.getElementById("mobileTaskJump");
+  jump.innerHTML=S.tasks.groups.map(g=>`<option value="${g.id}" ${g.id===mobileSection?"selected":""}>${esc(g.name)}</option>`).join("");
+  const selected=mobileSection||"execution";
+  document.querySelectorAll(".task-section").forEach(s=>s.classList.toggle("active-mobile",s.dataset.section===selected));
   renderTrash();
 }
 function renderTrash(){
-  var ts=getTS();
-  var items=Object.values(ts.trash||{});
-  var now=new Date();
-  items=items.filter(function(t){
-    if(!t.deletedAt)return true;
-    if((now-new Date(t.deletedAt))/(864e5)>30){delete ts.trash[t.id];return false;}
-    return true;
-  });
-  var countEl=document.getElementById('trash-count');
-  if(countEl)countEl.textContent=items.length;
-  var wrap=document.getElementById('trash-col-wrap');
-  if(!wrap||!_trashOpen)return;
-  if(!items.length){wrap.innerHTML='<div style="font-size:13px;color:#505050;padding:10px">Nothing in trash</div>';return;}
-  items.sort(function(a,b){return new Date(b.deletedAt||0)-new Date(a.deletedAt||0);});
-  var html='<div class="tcol" style="min-width:280px;width:280px"><div class="tcol-head">'
-    +'<div class="tcol-dot" style="background:#555"></div>'
-    +'<span class="tcol-name">Deleted ('+items.length+')</span></div><div class="tcol-cards">';
-  items.forEach(function(t){
-    var p=PRI_CFG[t.priority||'medium'];
-    var d=t.deletedAt?new Date(t.deletedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-    html+='<div class="tc" style="opacity:0.7">'
-      +'<div class="tc-row1"><span class="tc-title done">'+t.title+'</span>'
-      +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span></div>'
-      +'<div style="font-size:10px;color:#555;margin:3px 0">deleted '+d+'</div>'
-      +'<div class="tc-actions">'
-      +'<button class="tbtn" style="color:#3DAA4C;border-color:rgba(61,170,76,0.3)" data-tid="'+t.id+'" onclick="restoreFromTrash(this.dataset.tid)">↩ Restore</button>'
-      +'<button class="tbtn del-btn" data-tid="'+t.id+'" onclick="confirmHardDelete(this.dataset.tid)">Delete forever</button>'
-      +'</div></div>';
-  });
-  html+='</div></div>';
-  wrap.innerHTML=html;
+  const trash=Object.values(S.tasks.trash||{}).sort((a,b)=>(b.deletedAt||"").localeCompare(a.deletedAt||""));
+  document.getElementById("trashCount").textContent=trash.length;
+  document.getElementById("trashBoard").style.display=trashOpen?"block":"none";
+  document.getElementById("trashBoard").innerHTML=trashOpen?(trash.length?`<div class="columns"><div class="column"><div class="col-head"><span class="dot" style="background:#666"></span><span class="col-title">Deleted</span><span class="count">${trash.length}</span></div>${trash.map(t=>`<article class="task-card"><div class="task-title done">${esc(t.title)}</div><div class="actions"><button class="tiny good" data-trash-restore="${t.id}">Restore</button><button class="tiny bad" data-trash-delete="${t.id}">Delete forever</button></div></article>`).join("")}</div></div>`:`<div class="empty">Trash is empty</div>`):"";
+}
+function addTask(colId,full=false){
+  const quick=document.querySelector(`[data-quick="${colId}"]`);
+  const title=(quick?.value||"").trim();
+  if(!title)return;
+  const group=findGroupByCol(colId);
+  const task={id:uid(),title,priority:full?document.getElementById(`pri-${colId}`).value:"medium",due:full?document.getElementById(`due-${colId}`).value:"",note:full?document.getElementById(`note-${colId}`).value.trim():"",pinned:false,colId,bizId:group?.bizId||null,subtasks:[],added:TODAY(),doneAt:""};
+  S.tasks.tasks[task.id]=task;
+  const order=S.tasks.order[colId]||tasksInCol(colId).map(t=>t.id);
+  order.push(task.id);setOrder(colId,order);
+  quick.value="";
+  persist("tasks");renderAll();
+}
+function moveTask(id,toCol){
+  const t=S.tasks.tasks[id];if(!t)return;
+  const from=t.colId;t.colId=toCol;t.bizId=findGroupByCol(toCol)?.bizId||null;
+  setOrder(from,(S.tasks.order[from]||tasksInCol(from).map(x=>x.id)).filter(x=>x!==id));
+  const dest=(S.tasks.order[toCol]||tasksInCol(toCol).map(x=>x.id)).filter(x=>x!==id);dest.push(id);setOrder(toCol,dest);
+}
+function moveWithin(id,dir){
+  const t=S.tasks.tasks[id];if(!t)return;
+  const ids=tasksInCol(t.colId).map(x=>x.id),i=ids.indexOf(id),j=i+dir;
+  if(i<0||j<0||j>=ids.length)return;
+  [ids[i],ids[j]]=[ids[j],ids[i]];setOrder(t.colId,ids);persist("tasks");renderAll();
+}
+function completeTask(id){
+  const t=S.tasks.tasks[id];if(!t)return;
+  const done=doneColFor(t);moveTask(id,done);t.doneAt=TODAY();persist("tasks");renderAll();
+}
+function restoreTask(id){
+  const t=S.tasks.tasks[id];if(!t)return;
+  const target=t.bizId?`${t.bizId}_priority`:"today";
+  moveTask(id,findCol(target)?target:"today");t.doneAt="";persist("tasks");renderAll();
+}
+function softDelete(id){
+  const t=S.tasks.tasks[id];if(!t)return;
+  t.deletedAt=new Date().toISOString();
+  S.tasks.trash[id]=t;delete S.tasks.tasks[id];
+  setOrder(t.colId,(S.tasks.order[t.colId]||[]).filter(x=>x!==id));
+  persist("tasks");renderAll();
+}
+function restoreTrash(id){
+  const t=S.tasks.trash[id];if(!t)return;
+  delete t.deletedAt;t.colId=findCol(t.colId)?t.colId:"today";
+  S.tasks.tasks[id]=t;delete S.tasks.trash[id];persist("tasks");renderAll();
+}
+function addSub(id){
+  const input=document.querySelector(`[data-sub-input="${id}"]`),t=S.tasks.tasks[id];
+  const title=(input?.value||"").trim();if(!title||!t)return;
+  t.subtasks=t.subtasks||[];t.subtasks.push({id:uid(),title,done:false,scheduledTo:""});expanded.add(id);persist("tasks");renderAll();
+}
+function toggleSub(tid,sid){
+  const t=S.tasks.tasks[tid],s=t?.subtasks?.find(x=>x.id===sid);if(!s)return;
+  s.done=!s.done;
+  if(t.subtasks.length&&t.subtasks.every(x=>x.done)){completeTask(tid);return}
+  persist("tasks");renderAll();
+}
+function scheduleSub(tid,sid,val){
+  const t=S.tasks.tasks[tid],s=t?.subtasks?.find(x=>x.id===sid);if(!s)return;
+  s.scheduledTo=val;persist("tasks");renderAll();
+}
+function renderShell(){
+  // Alias for saarfan compatibility
+  if(typeof setDate==='function')setDate();
+  if(typeof renderDashboard==='function')renderDashboard();
+}
+function renderReflect(){
+  if(typeof renderReflectLog==='function')renderReflectLog();
+}
+function renderAll(){
+  renderShell();renderDashboard();renderHabits();renderCalories();renderBusiness();renderTasks();renderReflect();renderSettings();
 }
 
-// ── Search ──
-function taskMatchesSearch(task,q){
-  if(!q)return true;
-  q=q.toLowerCase();
-  if(task.title.toLowerCase().indexOf(q)!==-1)return true;
-  if(task.note&&task.note.toLowerCase().indexOf(q)!==-1)return true;
-  return (task.subtasks||[]).some(function(s){return s.title.toLowerCase().indexOf(q)!==-1;});
-}
+document.addEventListener("click",e=>{
+  const nav=e.target.closest("[data-page]");if(nav){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));document.getElementById(nav.dataset.page).classList.add("active");nav.classList.add("active");renderAll();return}
+  const habit=e.target.closest("[data-habit]");if(habit&&!habit.disabled){const d=TODAY();S.habits[d]=S.habits[d]||{};S.habits[d][habit.dataset.habit]=!S.habits[d][habit.dataset.habit];persist("habits");renderAll();return}
+  const biz=e.target.closest("[data-save-biz]");if(biz){const id=biz.dataset.saveBiz;S.biz[id]=S.biz[id]||{};S.biz[id][TODAY()]={hours:document.getElementById(`bizHours-${id}`).value,notes:document.getElementById(`bizNotes-${id}`).value};persist("biz");renderAll();return}
+  const delFood=e.target.closest("[data-del-food]");if(delFood){S.food[TODAY()]=(S.food[TODAY()]||[]).filter(f=>String(f.id)!==delFood.dataset.delFood);persist("food");renderAll();return}
+  const full=e.target.closest("[data-add-full]");if(full){addTask(full.dataset.addFull,true);return}
+  const more=e.target.closest("[data-more]");if(more){document.getElementById(`more-${more.dataset.more}`)?.classList.toggle("open");return}
+  const done=e.target.closest("[data-done]");if(done){completeTask(done.dataset.done);return}
+  const restore=e.target.closest("[data-restore]");if(restore){restoreTask(restore.dataset.restore);return}
+  const del=e.target.closest("[data-delete]");if(del){softDelete(del.dataset.delete);return}
+  const pin=e.target.closest("[data-pin]");if(pin){const t=S.tasks.tasks[pin.dataset.pin];if(t)t.pinned=!t.pinned;persist("tasks");renderAll();return}
+  const up=e.target.closest("[data-move-up]");if(up){moveWithin(up.dataset.moveUp,-1);return}
+  const down=e.target.closest("[data-move-down]");if(down){moveWithin(down.dataset.moveDown,1);return}
+  const exp=e.target.closest("[data-expand]");if(exp){expanded.has(exp.dataset.expand)?expanded.delete(exp.dataset.expand):expanded.add(exp.dataset.expand);renderTasks();return}
+  const subAdd=e.target.closest("[data-sub-add]");if(subAdd){addSub(subAdd.dataset.subAdd);return}
+  const subToggle=e.target.closest("[data-sub-toggle]");if(subToggle){toggleSub(subToggle.dataset.subToggle,subToggle.dataset.subId);return}
+  const subUns=e.target.closest("[data-sub-unschedule]");if(subUns){scheduleSub(subUns.dataset.subUnschedule,subUns.dataset.subId,"");return}
+  const subDel=e.target.closest("[data-sub-delete]");if(subDel){const t=S.tasks.tasks[subDel.dataset.subDelete];if(t)t.subtasks=t.subtasks.filter(s=>s.id!==subDel.dataset.subId);persist("tasks");renderAll();return}
+  const addCol=e.target.closest("[data-add-col]");if(addCol){const name=prompt("Column name:");if(!name?.trim())return;const g=S.tasks.groups.find(x=>x.id===addCol.dataset.addCol);g.cols.push({id:`${g.id}_${uid()}`,name:name.trim(),accent:"#c9a84c"});persist("tasks");renderAll();return}
+  const delCol=e.target.closest("[data-delete-col]");if(delCol){const colId=delCol.dataset.deleteCol,g=findGroupByCol(colId);if(!g||!confirm("Delete this column? Tasks will move to the first column."))return;const fallback=g.cols.find(c=>c.id!==colId)?.id;g.cols=g.cols.filter(c=>c.id!==colId);Object.values(S.tasks.tasks).forEach(t=>{if(t.colId===colId)t.colId=fallback});persist("tasks");renderAll();return}
+  const tr=e.target.closest("[data-trash-restore]");if(tr){restoreTrash(tr.dataset.trashRestore);return}
+  const td=e.target.closest("[data-trash-delete]");if(td){delete S.tasks.trash[td.dataset.trashDelete];persist("tasks");renderAll();return}
+});
+document.addEventListener("keydown",e=>{
+  const quick=e.target.closest("[data-quick]");if(quick&&e.key==="Enter")addTask(quick.dataset.quick,false);
+  const sub=e.target.closest("[data-sub-input]");if(sub&&e.key==="Enter")addSub(sub.dataset.subInput);
+});
+document.addEventListener("change",e=>{
+  const sched=e.target.closest("[data-sub-schedule]");if(sched)scheduleSub(sched.dataset.subSchedule,sched.dataset.subId,sched.value);
+  const jump=e.target.closest("#mobileTaskJump");if(jump){mobileSection=jump.value;renderTasks()}
+});
+document.addEventListener("blur",e=>{
+  const name=e.target.closest("[data-col-name]");if(!name)return;
+  const col=findCol(name.dataset.colName);if(col)col.name=name.textContent.trim()||col.name;
+  persist("tasks");renderTasks();
+},true);
+document.addEventListener("dragstart",e=>{
+  const card=e.target.closest("[data-task]");if(!card)return;
+  drag={id:card.dataset.task,from:card.dataset.col};card.classList.add("dragging");e.dataTransfer.setData("text/plain",drag.id);
+});
+document.addEventListener("dragend",e=>{document.querySelectorAll(".dragging,.drop-above,.drag-over").forEach(x=>x.classList.remove("dragging","drop-above","drag-over"));drag=null});
+document.addEventListener("dragover",e=>{
+  if(!drag)return;
+  const card=e.target.closest("[data-task]"),col=e.target.closest("[data-drop-col]");
+  if(card&&card.dataset.task!==drag.id){e.preventDefault();document.querySelectorAll(".drop-above").forEach(x=>x.classList.remove("drop-above"));card.classList.add("drop-above");return}
+  if(col){e.preventDefault();document.querySelectorAll(".drag-over").forEach(x=>x.classList.remove("drag-over"));col.classList.add("drag-over")}
+});
+document.addEventListener("drop",e=>{
+  if(!drag)return;
+  const targetCard=e.target.closest("[data-task]"),targetCol=e.target.closest("[data-drop-col]");
+  e.preventDefault();
+  const t=S.tasks.tasks[drag.id];if(!t)return;
+  let dest=targetCard?.dataset.col||targetCol?.dataset.dropCol;if(!dest)return;
+  const old=t.colId;t.colId=dest;t.bizId=findGroupByCol(dest)?.bizId||null;
+  setOrder(old,(S.tasks.order[old]||tasksInCol(old).map(x=>x.id)).filter(id=>id!==drag.id));
+  const ids=(S.tasks.order[dest]||tasksInCol(dest).map(x=>x.id)).filter(id=>id!==drag.id);
+  if(targetCard){const i=ids.indexOf(targetCard.dataset.task);i>=0?ids.splice(i,0,drag.id):ids.push(drag.id)}else ids.push(drag.id);
+  setOrder(dest,ids);persist("tasks");renderAll();
+});
+document.getElementById("taskSearch").addEventListener("input",renderTasks);
+document.getElementById("clearSearch").addEventListener("click",()=>{document.getElementById("taskSearch").value="";renderTasks()});
+document.getElementById("trashToggle").addEventListener("click",()=>{trashOpen=!trashOpen;renderTrash()});
 
-// ── Build task card ──
-function buildCard(task,colDef,isDone){
-  var biz=task.bizId||'';
-  var p=PRI_CFG[task.priority||'medium'];
-  var today2=td();
-  var isOD=!!(task.due&&task.due<today2&&!isDone);
-  var subs=task.subtasks||[];
-  var doneSubs=subs.filter(function(s){return s.done;}).length;
-  var totalSubs=subs.length;
-  var subPct=totalSubs?Math.round((doneSubs/totalSubs)*100):0;
-  var isExp=!!_exp[task.id];
 
-  // Subtask rows
-  var subRows='';
-  if(totalSubs>0){
-    subs.forEach(function(sub){
-      var schedOpts='<option value="">📌 Backlog</option>';
-      getTS().globalCols.filter(function(c){return c.type==='today'||c.type==='tomorrow';}).forEach(function(c){
-        schedOpts+='<option value="'+c.id+'"'+(sub.scheduledTo===c.id?' selected':'')+'>→ '+c.name+'</option>';
-      });
-      subRows+='<div class="sub-row">'
-        +'<input type="checkbox" class="sub-chk"'+(sub.done?' checked':'')
-        +' data-tid="'+task.id+'" data-sid="'+sub.id+'" onchange="toggleSubtask(this.dataset.tid,this.dataset.sid)">'
-        +'<span class="sub-title'+(sub.done?' done':'')+'">'+sub.title+'</span>'
-        +'<select class="sub-sched" data-tid="'+task.id+'" data-sid="'+sub.id+'" onchange="schedSubtask(this.dataset.tid,this.dataset.sid,this.value)">'+schedOpts+'</select>'
-        +'</div>';
-    });
-  }
 
-  var subSection='';
-  if(totalSubs>0){
-    subSection='<div class="tc-sub-bar" data-tid="'+task.id+'" onclick="toggleExp(this.dataset.tid)">'
-      +'<div class="tc-sub-prog"><div class="tc-sub-fill" style="width:'+subPct+'%"></div></div>'
-      +'<span class="tc-sub-lbl">'+doneSubs+'/'+totalSubs+'</span>'
-      +'<span class="tc-sub-arr">'+(isExp?'▲':'▼')+'</span>'
-      +'</div>'
-      +'<div class="sub-list'+(isExp?' open':'')+'">'
-      +subRows
-      +'<div class="sub-add-row">'
-      +'<input type="text" class="sub-inp" id="sub-inp-'+task.id+'" placeholder="Add subtask..." '
-      +'data-tid="'+task.id+'" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();addSubtask(this.dataset.tid)}">'
-      +'<button class="sub-add-btn" data-tid="'+task.id+'" onclick="event.stopPropagation();addSubtask(this.dataset.tid)">+</button>'
-      +'</div></div>';
-  } else {
-    // No subtasks yet - show collapsed add row, expand to show it
-    subSection='<div class="sub-list'+(isExp?' open':'')+'">'
-      +'<div class="sub-add-row">'
-      +'<input type="text" class="sub-inp" id="sub-inp-'+task.id+'" placeholder="Add subtask..." '
-      +'data-tid="'+task.id+'" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();addSubtask(this.dataset.tid)}">'
-      +'<button class="sub-add-btn" data-tid="'+task.id+'" onclick="event.stopPropagation();addSubtask(this.dataset.tid)">+</button>'
-      +'</div></div>';
-  }
 
-  var actions='<div class="tc-actions">';
-  if(isDone){
-    actions+='<button class="tbtn" data-tid="'+task.id+'" onclick="restoreTask2(this.dataset.tid)">↩</button>';
-  } else {
-    actions+='<button class="tbtn done-btn" data-tid="'+task.id+'" onclick="doneTask2(this.dataset.tid)">✓ Done</button>';
-  }
-  actions+='<button class="tbtn" data-tid="'+task.id+'" onclick="toggleExp(this.dataset.tid)">'+(isExp?'▲':'+ Sub')+'</button>';
-  actions+='<button class="tbtn arr" data-tid="'+task.id+'" data-col="'+colDef.id+'" data-biz="'+biz+'" onclick="moveTaskUp(this.dataset.tid,this.dataset.col,this.dataset.biz)">↑</button>';
-  actions+='<button class="tbtn arr" data-tid="'+task.id+'" data-col="'+colDef.id+'" data-biz="'+biz+'" onclick="moveTaskDown(this.dataset.tid,this.dataset.col,this.dataset.biz)">↓</button>';
-  actions+='<button class="tbtn pin-btn" data-tid="'+task.id+'" onclick="pinTask2(this.dataset.tid)">'+(task.pinned?'📌':'📌')+'</button>';
-  actions+='<button class="tbtn del-btn" data-tid="'+task.id+'" onclick="softDeleteTask2(this.dataset.tid)">Del</button>';
-  actions+='</div>';
 
-  return '<div class="tc'+(task.pinned?' pinned':'')+'" id="tc-'+task.id+'"'
-    +' draggable="true"'
-    +' ondragstart="onDragStart(event,\''+task.id+'\',\''+colDef.id+'\',\''+biz+'\')"'
-    +' ondragend="onDragEnd(event,\''+task.id+'\')"'
-    +' ondragover="onCardDragOver(event,\''+task.id+'\')"'
-    +' ondrop="onCardDrop(event,\''+task.id+'\',\''+colDef.id+'\',\''+biz+'\')">'
-    +'<div class="tc-row1">'
-    +'<span class="tc-title'+(isDone?' done':'')+'">'+(task.pinned?'📌 ':'')+task.title+'</span>'
-    +'<span class="tc-pri" style="background:'+p.bg+';color:'+p.color+'">'+p.label+'</span>'
-    +'</div>'
-    +(task.due?'<div><span class="tc-due'+(isOD?' overdue':'')+'">'+( isOD?'⚠ ':'')+task.due+'</span></div>':'')
-    +(task.note?'<div class="tc-note">'+task.note+'</div>':'')
-    +subSection
-    +actions
-    +'</div>';
-}
-
-// Scheduled subtask reference card (appears in Today/Tomorrow)
-function buildSubRefCard(task,sub){
-  return '<div class="tc is-sub">'
-    +'<div class="tc-sub-parent">↳ '+task.title+'</div>'
-    +'<div class="tc-row1">'
-    +'<span class="tc-title'+(sub.done?' done':'')+'">'+sub.title+'</span>'
-    +'</div>'
-    +'<div class="tc-actions">'
-    +'<button class="tbtn done-btn" data-tid="'+task.id+'" data-sid="'+sub.id+'" onclick="doneSchedSub(this.dataset.tid,this.dataset.sid)">'+(sub.done?'✓ Done':'Mark done')+'</button>'
-    +'<button class="tbtn" data-tid="'+task.id+'" data-sid="'+sub.id+'" onclick="schedSubtask(this.dataset.tid,this.dataset.sid,\'\')">Remove</button>'
-    +'</div></div>';
-}
-
-// ── Build column ──
-function buildCol(colDef,bizId,q){
-  var isDone=!!(colDef.isDone||colDef.type==='done');
-  var biz=bizId||'';
-  var tasks=getTasksInCol(colDef.id,bizId||null).filter(function(t){return taskMatchesSearch(t,q);});
-  // Pinned first
-  var pinned=tasks.filter(function(t){return t.pinned;});
-  var unpinned=tasks.filter(function(t){return !t.pinned;});
-  tasks=pinned.concat(unpinned);
-
-  // Scheduled sub refs for today/tomorrow
-  var schedHtml='';
-  if(!bizId&&(colDef.type==='today'||colDef.type==='tomorrow')){
-    getSchedSubsInCol(colDef.id).filter(function(x){return !x.sub.done;}).forEach(function(x){
-      if(taskMatchesSearch(x.task,q)) schedHtml+=buildSubRefCard(x.task,x.sub);
-    });
-  }
-
-  var cardsHtml=tasks.map(function(t){return buildCard(t,colDef,isDone);}).join('');
-  var total=tasks.length+(schedHtml?getSchedSubsInCol(colDef.id).filter(function(x){return !x.sub.done;}).length:0);
-  var emptyMsg=isDone?'None yet':'Empty';
-
-  // Add form
-  var addHtml='';
-  if(!isDone){
-    addHtml='<div class="tcol-quick-add">'
-      +'<input type="text" id="tn-'+colDef.id+'" placeholder="+ Quick add..." '
-      +'onkeydown="if(event.key===\'Enter\')addTask2(\''+colDef.id+'\',\''+biz+'\')">'
-      +'</div>'
-      +'<button class="tcol-expand-btn" onclick="var f=document.getElementById(\'tef-'+colDef.id+'\');f.style.display=f.style.display===\'block\'?\'none\':\'block\'">⚙ More</button>'
-      +'<div class="tcol-expand-form" id="tef-'+colDef.id+'" style="display:none">'
-      +'<select id="tp-'+colDef.id+'"><option value="high">🔴 High</option><option value="medium" selected>🟡 Med</option><option value="low">🟢 Low</option></select>'
-      +'<input type="date" id="td-'+colDef.id+'">'
-      +'<textarea id="tnt-'+colDef.id+'" placeholder="Notes..." style="min-height:40px"></textarea>'
-      +'<button class="tcol-expand-submit" onclick="addTask2(\''+colDef.id+'\',\''+biz+'\')">Add task</button>'
-      +'</div>';
-  }
-
-  var canDel=!isDone&&!colDef.type;
-  var delBtn=canDel?'<button class="tcol-del" data-col="'+colDef.id+'" data-biz="'+biz+'" onclick="deleteCol2(this.dataset.col,this.dataset.biz)" title="Delete">×</button>':'';
-
-  return '<div class="tcol'+(isDone?' done-col':'')+'" id="tcol-'+colDef.id+'"'
-    +' ondragover="onColDragOver(event,\''+colDef.id+'\')"'
-    +' ondrop="onColDrop(event,\''+colDef.id+'\',\''+biz+'\')">'
-    +'<div class="tcol-head">'
-    +'<div class="tcol-dot" style="background:'+colDef.accent+'"></div>'
-    +'<span class="tcol-name" id="cnm-'+colDef.id+'" ondblclick="startRenameCol(\''+colDef.id+'\')">'+colDef.name+'</span>'
-    +'<input class="tcol-name-input" id="cni-'+colDef.id+'" style="display:none" value="'+colDef.name+'"'
-    +' data-col="'+colDef.id+'" data-biz="'+biz+'"'
-    +' onblur="finishRenameCol(this.dataset.col,this.dataset.biz)"'
-    +' onkeydown="if(event.key===\'Enter\')finishRenameCol(this.dataset.col,this.dataset.biz)">'
-    +'<span class="tcol-cnt">'+total+'</span>'
-    +delBtn
-    +'</div>'
-    +'<div class="tcol-cards">'+(schedHtml+cardsHtml||'<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;font-style:italic">'+emptyMsg+'</div>')+'</div>'
-    +addHtml
-    +'</div>';
-}
-
-// ── Main render ──
-function renderTasks(){
-  var ts=getTS();
-  var q=((document.getElementById('task-search')||{}).value||'').trim();
-
-  // Global execution zone (exclude brain, shown separately)
-  var gEl=document.getElementById('global-cols');
-  if(gEl){
-    var gcols=ts.globalCols.filter(function(c){return c.type!=='brain';});
-    gEl.innerHTML=gcols.map(function(c){return buildCol(c,null,q);}).join('');
-  }
-
-  // Biz lanes
-  var bEl=document.getElementById('biz-task-lanes');
-  if(bEl){
-    bEl.innerHTML=BIZ_CFG.map(function(b){
-      var lane=ts.bizLanes[b.id];if(!lane)return'';
-      var logo=S.logos[b.id];
-      var logoHtml=logo?'<img class="biz-lane-logo" src="'+logo+'" alt="'+b.name+'">':'';
-      var emoji=b.id==='slp'?'🔴':b.id==='cb'?'🟢':'🟠';
-      return '<div class="biz-lane task-section">'
-        +'<div class="task-section-header">'
-        +'<span class="task-section-title biz" style="color:'+b.color+'">'+emoji+' '+b.name+'</span>'
-        +logoHtml
-        +'<button class="biz-lane-add-col" onclick="addBizCol(\''+b.id+'\')">+ Col</button>'
-        +'</div><div class="biz-lane-cols">'
-        +lane.cols.map(function(c){return buildCol(c,b.id,q);}).join('')
-        +'</div></div>';
-    }).join('');
-  }
-
-  // Personal
-  var pEl=document.getElementById('personal-cols');
-  if(pEl){
-    pEl.innerHTML=ts.personalCols.map(function(c){return buildCol(c,null,q);}).join('');
-    // Add column button
-    if(!document.getElementById('add-pers-col-btn')){
-      var addColBtn=document.createElement('button');
-      addColBtn.id='add-pers-col-btn';
-      addColBtn.textContent='+ Add column';
-      addColBtn.style.cssText='background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all .15s;display:block';
-      addColBtn.onclick=addPersonalCol;
-      pEl.parentNode.insertBefore(addColBtn,pEl.nextSibling);
-    }
-  }
-
-  // Brain dump
-  var brEl=document.getElementById('brain-cols');
-  if(brEl){
-    var brainCol=ts.globalCols.find(function(c){return c.type==='brain';});
-    brEl.innerHTML=brainCol?buildCol(brainCol,null,q):'';
-  }
-
-  renderTrash();
-  if(window.innerWidth<=767)renderMobView();
-}
-
-// ── Mobile view ──
-var _mobCol=null;
-var _mobMoveId=null;
-
-function getMobCols(){
-  var ts=getTS(),cols=[];
-  ts.globalCols.filter(function(c){return c.type!=='brain'&&!c.isDone&&c.type!=='done';}).forEach(function(c){cols.push({col:c,bizId:null});});
-  BIZ_CFG.forEach(function(b){
-    var lane=ts.bizLanes[b.id];if(!lane)return;
-    lane.cols.filter(function(c){return !c.isDone;}).forEach(function(c){cols.push({col:c,bizId:b.id,bizColor:b.color,bizName:b.name});});
-  });
-  ts.personalCols.filter(function(c){return !c.isDone;}).forEach(function(c){cols.push({col:c,bizId:null});});
-  ts.globalCols.filter(function(c){return c.isDone||c.type==='done'||c.type==='brain';}).forEach(function(c){cols.push({col:c,bizId:null});});
-  return cols;
-}
-
-function setMobCol(colId){_mobCol=colId;renderMobView();}
-
-function mobAdd(){
-  var inp=document.getElementById('mob-inp');
-  var pri=(document.getElementById('mob-pri')||{}).value||'medium';
-  var name=(inp?inp.value:'').trim();if(!name)return;
-  var cols=getMobCols();
-  var entry=cols.find(function(e){return e.col.id===_mobCol;})||cols[0];
-  if(!entry)return;
-  var task={id:newId(),title:name,priority:pri,due:'',note:'',pinned:false,
-    colId:entry.col.id,bizId:entry.bizId||null,subtasks:[],added:td()};
-  getTS().tasks[task.id]=task;
-  if(inp)inp.value='';
-  saveTS();renderMobView();renderDashboard();
-}
-
-function openMobMove(taskId){
-  _mobMoveId=taskId;
-  var task=getTS().tasks[taskId];if(!task)return;
-  var el=document.getElementById('mob-move-opts');if(!el)return;
-  el.innerHTML='';
-  getMobCols().forEach(function(e){
-    if(e.col.id===task.colId)return;
-    var btn=document.createElement('button');
-    btn.style.cssText='display:block;width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:6px;text-align:left;touch-action:manipulation';
-    btn.textContent=e.col.name;
-    (function(entry){btn.addEventListener('click',function(){moveTask2(task.id,entry.col.id,entry.bizId||null);_mobMoveId=null;closeMobMove();renderMobView();});})(e);
-    el.appendChild(btn);
-  });
-  document.getElementById('mob-move-sheet').classList.add('open');
-}
-function closeMobMove(){document.getElementById('mob-move-sheet').classList.remove('open');_mobMoveId=null;}
-
-function renderMobView(){
-  if(!_mobCol){var gc=getTS().globalCols.find(function(c){return c.type==='today';});_mobCol=gc?gc.id:null;}
-  var cols=getMobCols();
-  var entry=cols.find(function(e){return e.col.id===_mobCol;})||cols[0];
-  if(!entry)return;_mobCol=entry.col.id;
-
-  // Tabs
-  var tabsEl=document.getElementById('mob-tabs');
-  if(tabsEl){
-    tabsEl.innerHTML='';
-    cols.forEach(function(e){
-      var cnt=getTasksInCol(e.col.id,e.bizId||null).length;
-      var btn=document.createElement('button');
-      btn.className='mob-tab'+(e.col.id===_mobCol?' active':'');
-      btn.textContent=e.col.name+(cnt>0?' ('+cnt+')':'');
-      (function(cid){btn.addEventListener('click',function(){setMobCol(cid);});})(e.col.id);
-      tabsEl.appendChild(btn);
-    });
-  }
-
-  // List
-  var listEl=document.getElementById('mob-list');if(!listEl)return;
-  listEl.innerHTML='';
-  var col=entry.col,bizId=entry.bizId||null;
-  var isDone=!!(col.isDone||col.type==='done');
-  var tasks=getTasksInCol(col.id,bizId);
-  var pinned=tasks.filter(function(t){return t.pinned;});
-  var unpinned=tasks.filter(function(t){return !t.pinned;});
-  tasks=pinned.concat(unpinned);
-
-  if(!tasks.length){
-    var empty=document.createElement('div');
-    empty.style.cssText='font-size:14px;color:var(--text3);text-align:center;padding:24px 0';
-    empty.textContent=isDone?'Nothing done yet':'Empty — add a task above';
-    listEl.appendChild(empty);return;
-  }
-
-  tasks.forEach(function(task){
-    var p=PRI_CFG[task.priority||'medium'];
-    var isOD=task.due&&task.due<td()&&!isDone;
-    var subs=task.subtasks||[];
-    var doneSubs=subs.filter(function(s){return s.done;}).length;
-    var isExp=!!_exp[task.id];
-
-    var card=document.createElement('div');
-    card.className='mob-task'+(task.pinned?' pinned':'');
-
-    // Title row
-    var row=document.createElement('div');row.className='mob-task-row';
-    var chk=document.createElement('div');chk.className='mob-check'+(isDone?' checked':'');chk.textContent=isDone?'✓':'';
-    (function(t,d){chk.addEventListener('click',function(){d?restoreTask2(t.id):doneTask2(t.id);});})(task,isDone);
-    var ttl=document.createElement('span');ttl.className='mob-title'+(isDone?' done':'');ttl.textContent=(task.pinned?'📌 ':'')+task.title;
-    var pri=document.createElement('span');pri.className='mob-pri';pri.style.cssText='background:'+p.bg+';color:'+p.color;pri.textContent=p.label;
-    row.appendChild(chk);row.appendChild(ttl);row.appendChild(pri);card.appendChild(row);
-
-    if(task.due){var dd=document.createElement('div');dd.innerHTML='<span class="tc-due'+(isOD?' overdue':'')+'">'+( isOD?'⚠ ':'')+task.due+'</span>';card.appendChild(dd);}
-    if(task.note){var nn=document.createElement('div');nn.style.cssText='font-size:11px;color:var(--text3);font-style:italic;margin-bottom:5px';nn.textContent=task.note;card.appendChild(nn);}
-
-    // Subtask section
-    if(subs.length>0){
-      var subPct=Math.round((doneSubs/subs.length)*100);
-      var sbar=document.createElement('div');sbar.className='mob-sub-bar';
-      (function(tid){sbar.addEventListener('click',function(){toggleExp(tid);});})(task.id);
-      sbar.innerHTML='<div class="mob-sub-prog"><div style="height:100%;width:'+subPct+'%;background:var(--green);border-radius:2px"></div></div>'
-        +'<span style="font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap">'+doneSubs+'/'+subs.length+'</span>'
-        +'<span style="font-size:10px;color:var(--text3)">'+(isExp?'▲':'▼')+'</span>';
-      card.appendChild(sbar);
-    }
-
-    // Expandable subtask list + add
-    var slist=document.createElement('div');slist.className='mob-subs'+(isExp?' open':'');
-    subs.forEach(function(sub){
-      var sr=document.createElement('div');sr.className='mob-sub-row';
-      var sc=document.createElement('input');sc.type='checkbox';sc.checked=sub.done;
-      sc.style.cssText='width:16px;height:16px;cursor:pointer;accent-color:var(--green);flex-shrink:0;touch-action:manipulation';
-      (function(tid,sid){sc.addEventListener('change',function(){toggleSubtask(tid,sid);});})(task.id,sub.id);
-      var st=document.createElement('span');
-      st.style.cssText='font-size:13px;color:var(--text2);flex:1;'+(sub.done?'text-decoration:line-through;color:var(--text3)':'');
-      st.textContent=sub.title;
-      sr.appendChild(sc);sr.appendChild(st);slist.appendChild(sr);
-    });
-    var sadd=document.createElement('div');sadd.className='mob-sub-add';
-    var sinp=document.createElement('input');sinp.type='text';sinp.id='mob-sub-inp-'+task.id;
-    sinp.placeholder='Add subtask...';sinp.style.cssText='flex:1;font-size:12px;padding:6px 10px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;outline:none';
-    (function(tid){sinp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){
-      var t=getTS().tasks[tid];if(!t)return;if(!t.subtasks)t.subtasks=[];
-      var v=sinp.value.trim();if(!v)return;
-      t.subtasks.push({id:newId(),title:v,done:false,scheduledTo:null});
-      sinp.value='';saveTS();renderMobView();
-    }});})(task.id);
-    var sabtn=document.createElement('button');
-    sabtn.style.cssText='padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;touch-action:manipulation;flex-shrink:0';
-    sabtn.textContent='+ Add';
-    (function(tid,inp){sabtn.addEventListener('click',function(){
-      var t=getTS().tasks[tid];if(!t)return;if(!t.subtasks)t.subtasks=[];
-      var v=inp.value.trim();if(!v)return;
-      t.subtasks.push({id:newId(),title:v,done:false,scheduledTo:null});
-      inp.value='';saveTS();renderMobView();
-    });})(task.id,sinp);
-    sadd.appendChild(sinp);sadd.appendChild(sabtn);
-    slist.appendChild(sadd);
-    card.appendChild(slist);
-
-    // Actions
-    var acts=document.createElement('div');acts.className='mob-actions';
-    function mkBtn(cls,txt,fn){
-      var b=document.createElement('button');
-      b.className='mob-btn'+(cls?' '+cls:'');
-      b.textContent=txt;
-      b.style.cssText='touch-action:manipulation;-webkit-tap-highlight-color:transparent';
-      b.addEventListener('click',fn);return b;
-    }
-    if(isDone){
-      acts.appendChild(mkBtn('','↩ Restore',function(){restoreTask2(task.id);}));
-    } else {
-      acts.appendChild(mkBtn('mob-done','✓ Done',function(){doneTask2(task.id);}));
-    }
-    acts.appendChild(mkBtn('','Move →',function(){openMobMove(task.id);}));
-    acts.appendChild(mkBtn('',isExp?'▲':'+ Sub',function(){toggleExp(task.id);}));
-    var upBtn=mkBtn('','↑',function(){moveTaskUp(task.id,col.id,bizId);});
-    upBtn.style.cssText='touch-action:manipulation;font-size:14px;padding:4px 10px';
-    var dnBtn=mkBtn('','↓',function(){moveTaskDown(task.id,col.id,bizId);});
-    dnBtn.style.cssText='touch-action:manipulation;font-size:14px;padding:4px 10px';
-    acts.appendChild(upBtn);acts.appendChild(dnBtn);
-    acts.appendChild(mkBtn('mob-del','Del',function(){softDeleteTask2(task.id);}));
-    card.appendChild(acts);
-    listEl.appendChild(card);
-  });
-}
 
 
 
@@ -1857,13 +1217,14 @@ function renderDashboard(){
   // Today's tasks from new system
   let dtl=document.getElementById('d-todo-list');
   if(dtl){
-    let ts=getTS();
-    let todayCol=ts.globalCols.find(c=>c.type==='today');
-    let items=todayCol?getTasksInCol(todayCol.id,null).filter(t=>!t.doneAt):[];
-    let scheduledSubs=todayCol?getScheduledSubsInCol(todayCol.id).filter(({sub})=>!sub.done):[];
-    let allItems=[...items,...scheduledSubs.map(({task,sub})=>({title:sub.title,priority:'medium',_sub:true}))];
-    if(!allItems.length){dtl.innerHTML='<span style="color:var(--text3);font-size:14px">No tasks today</span>';}
-    else{const po={high:0,medium:1,low:2};let sorted=[...items].sort((a,b)=>(po[a.priority]||1)-(po[b.priority]||1));dtl.innerHTML=sorted.slice(0,5).map(t=>{let p=PRI_CFG[t.priority||'medium'];return `<div style="display:flex;align-items:center;gap:7px;padding:3px 0;font-size:13px"><div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${p.color}"></div><span style="color:var(--text)">${t.title}</span></div>`;}).join('');}
+    let items=tasksInCol('today').filter(t=>!t.doneAt);
+    let subs=scheduledSubs('today').filter(x=>!x.sub.done);
+    if(!items.length&&!subs.length){dtl.innerHTML='<span style="color:var(--text3);font-size:14px">No tasks today</span>';}
+    else{
+      const po={high:0,medium:1,low:2};
+      let sorted=[...items].sort((a,b)=>(po[a.priority]||1)-(po[b.priority]||1));
+      dtl.innerHTML=sorted.slice(0,5).map(t=>{let p=PRI[t.priority||'medium']||PRI.medium;return `<div style="display:flex;align-items:center;gap:7px;padding:3px 0;font-size:13px"><div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${p.color}"></div><span style="color:var(--text)">${esc(t.title)}</span></div>`;}).join('');
+    }
   }
   renderDashboardPrayer();
 }
@@ -1915,7 +1276,7 @@ function renderSettings(){
 
 // ── Export / Import ──
 function exportData(){
-  let exp={habits:S.habits,prayers:S.prayers,biz:S.biz,workouts:S.workouts,tasks2:S.tasks2,goals:S.goals,refs:S.refs,targets:S.targets,weekly:S.weekly,mood:S.mood,reviews:S.reviews,food:S.food,favs:S.favs};
+  let exp={habits:S.habits,prayers:S.prayers,biz:S.biz,workouts:S.workouts,tasks:S.tasks,goals:S.goals,refs:S.refs,targets:S.targets,weekly:S.weekly,mood:S.mood,reviews:S.reviews,food:S.food,favs:S.favs};
   let blob=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download='saarfan-backup-'+td()+'.json';a.click();URL.revokeObjectURL(url);}
 function importData(input){let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{try{let data=JSON.parse(e.target.result);Object.keys(data).forEach(k=>{if(k!=='logos')S[k]=data[k];});if(S.tasks2)S.tasks2=initTaskStore2(S.tasks2);Object.keys(KEY_MAP).forEach(k=>{if(k!=='logos')lsSet(KEY_MAP[k],S[k]);});let st=document.getElementById('import-status');if(st){st.style.display='block';setTimeout(()=>st.style.display='none',3000);}renderAll();}catch(err){alert('Invalid backup file.');}};r.readAsText(file);}
 function copyAppCode(){
@@ -1964,25 +1325,8 @@ function renderAll(){
   renderPrayerPage();renderCalories();
 }
 
-const SEED_TASKS = {"globalCols": [{"id": "g_today", "name": "Today", "accent": "#E0282E", "type": "today"}, {"id": "g_tomorrow", "name": "Tomorrow", "accent": "#C9A84C", "type": "tomorrow"}, {"id": "g_overdue", "name": "Overdue", "accent": "#FF4444", "type": "overdue"}, {"id": "g_done", "name": "Done", "accent": "#3DAA4C", "type": "done"}, {"id": "g_brain", "name": "Brain Dump", "accent": "#7B6FD4", "type": "brain"}], "bizLanes": {"slp": {"cols": [{"id": "slp_asap", "name": "ASAP / Critical", "accent": "#FF4444"}, {"id": "slp_week", "name": "This Week", "accent": "#E0282E"}, {"id": "slp_content", "name": "Content & Branding", "accent": "#C9A84C"}, {"id": "slp_systems", "name": "Systems & Automations", "accent": "#2B7FD4"}, {"id": "slp_growth", "name": "Growth Ideas", "accent": "#7B6FD4"}, {"id": "slp_prog", "name": "In Progress", "accent": "#D4851A"}, {"id": "slp_wait", "name": "Waiting On", "accent": "#909090"}, {"id": "slp_done", "name": "Done", "accent": "#3DAA4C", "isDone": true}]}, "cb": {"cols": [{"id": "cb_pri", "name": "Priority", "accent": "#1A8A3C"}, {"id": "cb_out", "name": "Outreach", "accent": "#2B7FD4"}, {"id": "cb_content", "name": "Content", "accent": "#C9A84C"}, {"id": "cb_future", "name": "Future Expansion", "accent": "#7B6FD4"}, {"id": "cb_prog", "name": "In Progress", "accent": "#D4851A"}, {"id": "cb_done", "name": "Done", "accent": "#3DAA4C", "isDone": true}]}, "h2h": {"cols": [{"id": "h2h_pri", "name": "Priority", "accent": "#E05020"}, {"id": "h2h_content", "name": "Content & Branding", "accent": "#C9A84C"}, {"id": "h2h_plan", "name": "Business Planning", "accent": "#2B7FD4"}, {"id": "h2h_vision", "name": "Future Vision", "accent": "#7B6FD4"}, {"id": "h2h_prog", "name": "In Progress", "accent": "#D4851A"}, {"id": "h2h_done", "name": "Done", "accent": "#3DAA4C", "isDone": true}]}}, "personalCols": [{"id": "pers_admin", "name": "Life Admin", "accent": "#C9A84C"}, {"id": "pers_health", "name": "Health & Fitness", "accent": "#3DAA4C"}, {"id": "pers_dev", "name": "Self Development", "accent": "#2B7FD4"}, {"id": "pers_done", "name": "Done", "accent": "#3DAA4C", "isDone": true}], "tasks": {"t_47neavznia": {"id": "t_47neavznia", "title": "Finish Archie website", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_qqjbhke8ho": {"id": "t_qqjbhke8ho", "title": "Start Archie onboarding", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_qbigxxl320": {"id": "t_qbigxxl320", "title": "Create Archie flyers", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_zb3kpiwqik": {"id": "t_zb3kpiwqik", "title": "Sort Harry ad account access", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_8te009mcsz": {"id": "t_8te009mcsz", "title": "Send Harvey full requirements list", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_8gr2mvllrt": {"id": "t_8gr2mvllrt", "title": "Prepare for Leon meeting", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_8yfqxarzuy": {"id": "t_8yfqxarzuy", "title": "Message Secure Drive prospects", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_today", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_xwdons1zcp": {"id": "t_xwdons1zcp", "title": "Prepare Archie ads/promo", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_3ix1vom557": {"id": "t_3ix1vom557", "title": "Complete FB ads course", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_16sqhslvat": {"id": "t_16sqhslvat", "title": "Launch Harry ads", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_0jholim5e0": {"id": "t_0jholim5e0", "title": "Finish Minerva software setup once reply received", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_nyxj16n94j": {"id": "t_nyxj16n94j", "title": "Get Leon on software", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_936eraaddn": {"id": "t_936eraaddn", "title": "Invite Leon to Skool", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_t0tmbqjubs": {"id": "t_t0tmbqjubs", "title": "Get Tom Day onto software", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_5x4db7ay26": {"id": "t_5x4db7ay26", "title": "Business Card Templates", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_zniailgm27": {"id": "t_zniailgm27", "title": "Send leaflets to Haqani", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_esvxt314c6": {"id": "t_esvxt314c6", "title": "Send leaflets to Curtis Group", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "g_tomorrow", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_e4nkae73mm": {"id": "t_e4nkae73mm", "title": "Archie website", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_asap", "bizId": "slp", "subtasks": [{"id": "t_kr9nn0fktn", "title": "Finalise homepage", "done": false, "scheduledTo": null}, {"id": "t_mhd29262el", "title": "Add chatbot", "done": false, "scheduledTo": null}, {"id": "t_lg2qgxgumd", "title": "Add forms", "done": false, "scheduledTo": null}, {"id": "t_p9yhjsg4nq", "title": "Add service sections", "done": false, "scheduledTo": null}, {"id": "t_in2mhbrxh8", "title": "Add case studies", "done": false, "scheduledTo": null}, {"id": "t_d6wg85pxwl", "title": "Add gallery/photos", "done": false, "scheduledTo": null}, {"id": "t_z9z5gvsewh", "title": "Mobile optimisation", "done": false, "scheduledTo": null}, {"id": "t_63zc4wo6xz", "title": "Final review", "done": false, "scheduledTo": null}, {"id": "t_tz55xvrfyh", "title": "Connect domain", "done": false, "scheduledTo": null}, {"id": "t_fjj6o7ixtd", "title": "Testing", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_qj046i6l7m": {"id": "t_qj046i6l7m", "title": "Archie onboarding", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_asap", "bizId": "slp", "subtasks": [{"id": "t_1xfuqqcqfr", "title": "Import past clients", "done": false, "scheduledTo": null}, {"id": "t_fm0llft9wk", "title": "Import reviews", "done": false, "scheduledTo": null}, {"id": "t_pkoc2mye3s", "title": "Setup CRM", "done": false, "scheduledTo": null}, {"id": "t_8krhtob7sy", "title": "Setup pipelines", "done": false, "scheduledTo": null}, {"id": "t_k3fqhfa123", "title": "Setup missed call text back", "done": false, "scheduledTo": null}, {"id": "t_r8hplpp0d2", "title": "Setup automations", "done": false, "scheduledTo": null}, {"id": "t_so4rv95dte", "title": "Setup calendars", "done": false, "scheduledTo": null}, {"id": "t_oyrkxhnzht", "title": "Setup invoicing", "done": false, "scheduledTo": null}, {"id": "t_didbfejgpm", "title": "Setup AI chat", "done": false, "scheduledTo": null}, {"id": "t_8fknexjin0", "title": "Connect socials", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_por9wtfswx": {"id": "t_por9wtfswx", "title": "Archie socials", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_asap", "bizId": "slp", "subtasks": [{"id": "t_xb74bkreur", "title": "Optimise Instagram", "done": false, "scheduledTo": null}, {"id": "t_s0l5zouzqo", "title": "Optimise Facebook", "done": false, "scheduledTo": null}, {"id": "t_zojl8k2ub4", "title": "Setup LinkedIn", "done": false, "scheduledTo": null}, {"id": "t_pxebagpjhh", "title": "Create highlight covers", "done": false, "scheduledTo": null}, {"id": "t_xa1x1hi449", "title": "Create services post", "done": false, "scheduledTo": null}, {"id": "t_9dw4ert8o8", "title": "Create review template", "done": false, "scheduledTo": null}, {"id": "t_k3dnz1l51r", "title": "Behind the scenes content", "done": false, "scheduledTo": null}, {"id": "t_ddhs4c02vx", "title": "Setup GMB posting", "done": false, "scheduledTo": null}, {"id": "t_prii07madx", "title": "Connect socials to GHL", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_r261isiax9": {"id": "t_r261isiax9", "title": "Twilio / LC Phone Migration", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [{"id": "t_rfw7mtjt77", "title": "Fix rejected numbers", "done": false, "scheduledTo": null}, {"id": "t_tkhr6bksh5", "title": "Rebill setup", "done": false, "scheduledTo": null}, {"id": "t_9df1bk8x28", "title": "Check client usage", "done": false, "scheduledTo": null}, {"id": "t_qy9p36jopb", "title": "Move numbers to LC", "done": false, "scheduledTo": null}, {"id": "t_99s94k888u", "title": "Test workflows", "done": false, "scheduledTo": null}, {"id": "t_tlwx8ovxto", "title": "Confirm bundles", "done": false, "scheduledTo": null}, {"id": "t_7zlci923sl", "title": "Check costs", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_xwknxa451l": {"id": "t_xwknxa451l", "title": "Build Onboarding Automation System", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [{"id": "t_e9zttktxld", "title": "Build master onboarding flow", "done": false, "scheduledTo": null}, {"id": "t_i0c4v22fpg", "title": "Auto-send contracts", "done": false, "scheduledTo": null}, {"id": "t_nt4p6vl5zh", "title": "Auto-create tasks", "done": false, "scheduledTo": null}, {"id": "t_mazdnvj9a9", "title": "Auto-send welcome emails", "done": false, "scheduledTo": null}, {"id": "t_9uptcfao6r", "title": "Auto-generate onboarding pipeline", "done": false, "scheduledTo": null}, {"id": "t_28zff5cv0i", "title": "Auto-assign services", "done": false, "scheduledTo": null}, {"id": "t_2oafis0yob", "title": "Connect forms to workflows", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_koinmbiij7": {"id": "t_koinmbiij7", "title": "New Onboarding Form", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [{"id": "t_u3d9iy42mx", "title": "Dynamic pricing", "done": false, "scheduledTo": null}, {"id": "t_65cpupmo10", "title": "Clothing options", "done": false, "scheduledTo": null}, {"id": "t_na7z39k38s", "title": "Videography options", "done": false, "scheduledTo": null}, {"id": "t_sbiuqvnzby", "title": "Ads options", "done": false, "scheduledTo": null}, {"id": "t_biuff8syfb", "title": "CRM options", "done": false, "scheduledTo": null}, {"id": "t_0tu3e0xazw", "title": "Conditional logic", "done": false, "scheduledTo": null}, {"id": "t_id2yqtgat8", "title": "Auto-total pricing", "done": false, "scheduledTo": null}, {"id": "t_e8i8t2ujla", "title": "Auto-email outputs", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_y5o0ta3cpf": {"id": "t_y5o0ta3cpf", "title": "SLP Pricing Structure", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [{"id": "t_co4imaxnt0", "title": "Finalise setup fees", "done": false, "scheduledTo": null}, {"id": "t_wogg3loo6k", "title": "Monthly pricing", "done": false, "scheduledTo": null}, {"id": "t_jlzbl8cu5s", "title": "Ads pricing", "done": false, "scheduledTo": null}, {"id": "t_5cq74j6pdn", "title": "Commission pricing", "done": false, "scheduledTo": null}, {"id": "t_5cyj78ijcv", "title": "Upsells", "done": false, "scheduledTo": null}, {"id": "t_sd3wn71yxk", "title": "Packaging structure", "done": false, "scheduledTo": null}, {"id": "t_q6erzpe668", "title": "Website pricing", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_reiiec8x1n": {"id": "t_reiiec8x1n", "title": "Finish SLP website improvements", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_rs6uu6g07y": {"id": "t_rs6uu6g07y", "title": "Create launch video structure", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_2ly8ygvtwp": {"id": "t_2ly8ygvtwp", "title": "Write launch video script", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_1hpumjg82i": {"id": "t_1hpumjg82i", "title": "Film launch footage", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_xjg2ovu6wq": {"id": "t_xjg2ovu6wq", "title": "Edit launch video", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_vhfn0osusk": {"id": "t_vhfn0osusk", "title": "Create website launch video template prompt", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_7b8va3ws6b": {"id": "t_7b8va3ws6b", "title": "Create AI-generated ad creative workflow", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_jvuvgbhnjr": {"id": "t_jvuvgbhnjr", "title": "Post 3-5 IG mockups", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_2uhx2q22q1": {"id": "t_2uhx2q22q1", "title": "Build IG highlights", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_6wt1w0ttj2": {"id": "t_6wt1w0ttj2", "title": "Daily story posting habit", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_content", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_alxf2hhizs": {"id": "t_alxf2hhizs", "title": "Build Claude prompt library", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_obxm289wz9": {"id": "t_obxm289wz9", "title": "Build website copy generation workflow", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_m4959h9444": {"id": "t_m4959h9444", "title": "Build ad copy generation workflow", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_7sdoe8d36k": {"id": "t_7sdoe8d36k", "title": "Create reusable snapshots", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_yahw22pzfk": {"id": "t_yahw22pzfk", "title": "Create client support bot knowledge base", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_xxz6rx3ga6": {"id": "t_xxz6rx3ga6", "title": "Google My Business", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_mjqpv1e7wq": {"id": "t_mjqpv1e7wq", "title": "Build Lead Gen PDFs", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_8u1rr0jkgy": {"id": "t_8u1rr0jkgy", "title": "VA Hiring Plan", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_8u49bkjxs0": {"id": "t_8u49bkjxs0", "title": "AI Caller Research", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_f8vev60s64": {"id": "t_f8vev60s64", "title": "Signage Supplier Research", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_ftyk1uo4nr": {"id": "t_ftyk1uo4nr", "title": "Client SOPs", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_dh520ovyiw": {"id": "t_dh520ovyiw", "title": "Skool Improvements", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_week", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_s2x24z0x9o": {"id": "t_s2x24z0x9o", "title": "Client Review System", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_nqy5iv9cw8": {"id": "t_nqy5iv9cw8", "title": "Email Deliverability Fixes", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "slp_systems", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_eauwp4k2nr": {"id": "t_eauwp4k2nr", "title": "AI Website Generation", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_9fww93svc0": {"id": "t_9fww93svc0", "title": "Automated Client Delivery", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_lttwuc4lzm": {"id": "t_lttwuc4lzm", "title": "SLP Mobile App", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_so16gykfmt": {"id": "t_so16gykfmt", "title": "Client Portal", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_avlgvvyuq2": {"id": "t_avlgvvyuq2", "title": "White Label Expansion", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_dst7bw7jao": {"id": "t_dst7bw7jao", "title": "AI Sales Agents", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_9nzc9usia4": {"id": "t_9nzc9usia4", "title": "Nationwide Scaling", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_sxb3yqj7mq": {"id": "t_sxb3yqj7mq", "title": "Full Team Structure", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "slp_growth", "bizId": "slp", "subtasks": [], "added": "2025-05-16"}, "t_mjqw4kgs0p": {"id": "t_mjqw4kgs0p", "title": "Outreach Automation System", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_out", "bizId": "cb", "subtasks": [{"id": "t_h4onq6zfav", "title": "Instagram outreach", "done": false, "scheduledTo": null}, {"id": "t_ebe7jnlgad", "title": "LinkedIn outreach", "done": false, "scheduledTo": null}, {"id": "t_lh29i08swv", "title": "Email outreach", "done": false, "scheduledTo": null}, {"id": "t_i0pxv8inwj", "title": "SMS testing", "done": false, "scheduledTo": null}, {"id": "t_qedq73z38s", "title": "Follow-up logic", "done": false, "scheduledTo": null}, {"id": "t_nxzg5qi0k4", "title": "Automation testing", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_1rmwnk8jcs": {"id": "t_1rmwnk8jcs", "title": "Find More Lenders", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [{"id": "t_01xk58jfoh", "title": "Research lenders", "done": false, "scheduledTo": null}, {"id": "t_je7tc7pmj9", "title": "Compare offers", "done": false, "scheduledTo": null}, {"id": "t_03i3tw1u6s", "title": "Build contacts", "done": false, "scheduledTo": null}, {"id": "t_1a3k9s8iny", "title": "Create lender database", "done": false, "scheduledTo": null}, {"id": "t_er9dq1h3ci", "title": "Relationship building", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_x5iaahfqs5": {"id": "t_x5iaahfqs5", "title": "Capital Bros Socials", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_content", "bizId": "cb", "subtasks": [{"id": "t_rmzkgm3h0i", "title": "Case study posts", "done": false, "scheduledTo": null}, {"id": "t_isx97whbrl", "title": "Educational posts", "done": false, "scheduledTo": null}, {"id": "t_rt6shx5rb3", "title": "Funding structure content", "done": false, "scheduledTo": null}, {"id": "t_3q9x83j2dv", "title": "Developer pain points", "done": false, "scheduledTo": null}, {"id": "t_fsb40c5q2z", "title": "Reels ideas", "done": false, "scheduledTo": null}, {"id": "t_whhb1e4sb7", "title": "LinkedIn posts", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_x7q20o7s84": {"id": "t_x7q20o7s84", "title": "Contracts / Legal", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [{"id": "t_p47g51wg9y", "title": "Introducer agreement", "done": false, "scheduledTo": null}, {"id": "t_ve417pbql3", "title": "Referral agreements", "done": false, "scheduledTo": null}, {"id": "t_su7afv03tr", "title": "Terms wording", "done": false, "scheduledTo": null}, {"id": "t_145gqqfjv7", "title": "Compliance research", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_3bjujsdwyt": {"id": "t_3bjujsdwyt", "title": "Build outreach system", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_out", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_c2j53fx2rh": {"id": "t_c2j53fx2rh", "title": "Automate messaging flow", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_out", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_y6l8quoq8f": {"id": "t_y6l8quoq8f", "title": "Update website", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_kc1yuh736d": {"id": "t_kc1yuh736d", "title": "Update Instagram", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_content", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_kjmexw7p0d": {"id": "t_kjmexw7p0d", "title": "Build CRM pipeline", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_8tiuycrcyf": {"id": "t_8tiuycrcyf", "title": "Reach out to lenders", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_x15081383z": {"id": "t_x15081383z", "title": "Build lender contact database", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "cb_pri", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_apma5h0nan": {"id": "t_apma5h0nan", "title": "Build developer lead sourcing workflow", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_out", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_jy5c4xqcn8": {"id": "t_jy5c4xqcn8", "title": "Cold calling structure", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "cb_out", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_2q98w4ihdz": {"id": "t_2q98w4ihdz", "title": "LinkedIn automation", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_ffdh5uxmfq": {"id": "t_ffdh5uxmfq", "title": "Email sequencing", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_2gduuiw6q8": {"id": "t_2gduuiw6q8", "title": "Investor newsletter", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_9moitav3af": {"id": "t_9moitav3af", "title": "AI outreach assistant", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_ndcp7as17p": {"id": "t_ndcp7as17p", "title": "Team Expansion", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_cydlqc6ko6": {"id": "t_cydlqc6ko6", "title": "Paid Ads", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_m090pw9tnn": {"id": "t_m090pw9tnn", "title": "Events / Networking", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_ud3652tygd": {"id": "t_ud3652tygd", "title": "Developer Community", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_q4b9zjcw8u": {"id": "t_q4b9zjcw8u", "title": "Investor Network", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "cb_future", "bizId": "cb", "subtasks": [], "added": "2025-05-16"}, "t_85svyscj8g": {"id": "t_85svyscj8g", "title": "Finish House Renovation", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "h2h_pri", "bizId": "h2h", "subtasks": [{"id": "t_g9ruj8v3v0", "title": "Remaining jobs", "done": false, "scheduledTo": null}, {"id": "t_h73fbhd7zr", "title": "Snagging", "done": false, "scheduledTo": null}, {"id": "t_ek92c97c6w", "title": "Final finishes", "done": false, "scheduledTo": null}, {"id": "t_7bvaogl14e", "title": "Cleaning", "done": false, "scheduledTo": null}, {"id": "t_wwkma1s290", "title": "Photos/videos", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_ne7p1nb7hm": {"id": "t_ne7p1nb7hm", "title": "Houses 2 Homes Socials", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "h2h_content", "bizId": "h2h", "subtasks": [{"id": "t_6sb9huipok", "title": "Edit renovation videos", "done": false, "scheduledTo": null}, {"id": "t_uuxs1adv0v", "title": "Create reels", "done": false, "scheduledTo": null}, {"id": "t_j74i2h17sk", "title": "Before/after posts", "done": false, "scheduledTo": null}, {"id": "t_5hkexst0fw", "title": "Branding", "done": false, "scheduledTo": null}, {"id": "t_e3o8d7zmli", "title": "Instagram setup", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_gowofxk1sv": {"id": "t_gowofxk1sv", "title": "Houses 2 Homes Website", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "h2h_plan", "bizId": "h2h", "subtasks": [{"id": "t_y89bjnmem0", "title": "Homepage", "done": false, "scheduledTo": null}, {"id": "t_2qhlfwe85t", "title": "Portfolio", "done": false, "scheduledTo": null}, {"id": "t_2txp0fk8jb", "title": "Services", "done": false, "scheduledTo": null}, {"id": "t_qhgkwwwv1e", "title": "Vision section", "done": false, "scheduledTo": null}, {"id": "t_cyn30s8gz8", "title": "Contact forms", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_3ifoe34lix": {"id": "t_3ifoe34lix", "title": "Full Business Plan", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "h2h_plan", "bizId": "h2h", "subtasks": [{"id": "t_lbapxq1tny", "title": "Vision planning", "done": false, "scheduledTo": null}, {"id": "t_ma388qdsa1", "title": "Service structure", "done": false, "scheduledTo": null}, {"id": "t_k6zx96eibn", "title": "Profit structure", "done": false, "scheduledTo": null}, {"id": "t_zzhfb1xpm7", "title": "Growth strategy", "done": false, "scheduledTo": null}, {"id": "t_hefbk25p6g", "title": "Long-term goals", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_oem17mlqwi": {"id": "t_oem17mlqwi", "title": "Define roles with Jack + Archie", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "h2h_plan", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_34syxhlwcv": {"id": "t_34syxhlwcv", "title": "Sit down strategy meeting", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "h2h_plan", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_5wen6p1dua": {"id": "t_5wen6p1dua", "title": "Connect CRM", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "h2h_plan", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_4nzwrs9ih7": {"id": "t_4nzwrs9ih7", "title": "Build Instagram properly", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "h2h_content", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_5sehzuxrdu": {"id": "t_5sehzuxrdu", "title": "Create clothing branding", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "h2h_content", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_le18v9dnh0": {"id": "t_le18v9dnh0", "title": "Full Renovation Team", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_7bbkrdar7p": {"id": "t_7bbkrdar7p", "title": "Property Flips", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_qb4yjchi3k": {"id": "t_qb4yjchi3k", "title": "Development Projects", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_37alsjmosq": {"id": "t_37alsjmosq", "title": "Estate Builds", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_flgmjvspk9": {"id": "t_flgmjvspk9", "title": "Nationwide Brand", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_h9ltkswoow": {"id": "t_h9ltkswoow", "title": "Apprentices", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_krnybr1ueo": {"id": "t_krnybr1ueo", "title": "Luxury Renovations", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "h2h_vision", "bizId": "h2h", "subtasks": [], "added": "2025-05-16"}, "t_cn6borat4a": {"id": "t_cn6borat4a", "title": "Submit UNITE claim", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [{"id": "t_qtm4aq9ccz", "title": "Attach evidence/screenshots", "done": false, "scheduledTo": null}, {"id": "t_5wgv2xgmei", "title": "Write summary of events", "done": false, "scheduledTo": null}, {"id": "t_8twt4lm4ls", "title": "Pay court fee", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_ml1jv0i2k8": {"id": "t_ml1jv0i2k8", "title": "Chase JACA payment", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_r61kkefn5x": {"id": "t_r61kkefn5x", "title": "Organise self assessment", "priority": "high", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [{"id": "t_gz6e5oo4cm", "title": "Organise invoices/receipts", "done": false, "scheduledTo": null}, {"id": "t_r3h4pgi4c4", "title": "Build subcontractor spreadsheet", "done": false, "scheduledTo": null}, {"id": "t_f07xawheqi", "title": "Add Charlie payments", "done": false, "scheduledTo": null}, {"id": "t_hwnjhtrz0h", "title": "Add Abs payments", "done": false, "scheduledTo": null}, {"id": "t_8g2po2afvt", "title": "Add subcontractor records", "done": false, "scheduledTo": null}], "added": "2025-05-16"}, "t_9rvev5vmaq": {"id": "t_9rvev5vmaq", "title": "Update CV", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_g25ayliikq": {"id": "t_g25ayliikq", "title": "Update portfolio", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_zwakb8qwjv": {"id": "t_zwakb8qwjv", "title": "Apply for remote sales jobs", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_ifvavj45kd": {"id": "t_ifvavj45kd", "title": "Create monthly budget sheet", "priority": "medium", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_r6ng4iq564": {"id": "t_r6ng4iq564", "title": "Buy lamp", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_ioyt0kppye": {"id": "t_ioyt0kppye", "title": "Buy t-shirts", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}, "t_0fco3h15rf": {"id": "t_0fco3h15rf", "title": "Skincare", "priority": "low", "due": "", "note": "", "pinned": false, "colId": "pers_admin", "bizId": null, "subtasks": [], "added": "2025-05-16"}}};
 
 // Seed tasks on first load if task store is empty
-(function seedIfEmpty(){
-  let ts = S.tasks2;
-  let existing = Object.keys(ts.tasks||{}).length;
-  if(existing === 0){
-    // Fresh install — merge seed tasks
-    S.tasks2 = SEED_TASKS;
-    // Convert any Python True/False booleans (already handled in JSON)
-    ss('tasks2');
-    console.log('Seeded', Object.keys(SEED_TASKS.tasks).length, 'tasks');
-  } else {
-    // Already has tasks — just ensure column structure is up to date
-    // but DON'T overwrite existing tasks
-    console.log('Existing tasks found:', existing, '— skipping seed');
-  }
-})();
-
 renderAll();
 fetchPrayerTimes();
 loadFromCloud();
