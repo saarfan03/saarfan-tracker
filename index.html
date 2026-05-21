@@ -550,6 +550,17 @@ input[type=file]{display:none}
     <input type="file" id="import-file" accept=".json" onchange="importData(this)">
     <div id="import-status" style="font-size:13px;color:var(--green);margin-top:8px;display:none">✓ Data restored</div>
   </div>
+  <div class="card">
+    <div class="ct">Cloud sync</div>
+    <div id="sync-status" style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+      <input type="text" id="sb-url-input" placeholder="Supabase project URL" style="font-size:12px">
+      <input type="text" id="sb-key-input" placeholder="Supabase anon/public key" style="font-size:12px">
+    </div>
+    <button class="sb" onclick="saveSBKeys()" style="margin-bottom:8px">Save & connect</button>
+    <button class="sb ghost" id="manual-sync-btn" onclick="manualSync()">↑↓ Sync now</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Supabase is free. Go to supabase.com → New project → Settings → API to get your URL and key.</p>
+  </div>
   <div class="card"><div class="ct">Install as app</div><p style="font-size:13px;color:var(--text2);line-height:1.7"><strong>iPhone:</strong> Open in Safari → Share → Add to Home Screen</p><p style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:8px"><strong>Android:</strong> Chrome → 3-dot menu → Add to Home screen</p></div>
   <div class="card"><div class="ct">Danger zone</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px">Export first before clearing.</p><button class="sb" style="background:#444" onclick="clearAllData()">Clear all data</button></div>
 </div>
@@ -619,8 +630,13 @@ async function loadFromCloud(){
     let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value',{headers:getSBH()});
     let rows=await r.json();if(!rows||!rows.length)return;
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
-    rows.forEach(row=>{try{let v=JSON.parse(row.value);localStorage.setItem(row.key,row.value);if(rm[row.key])S[rm[row.key]]=v;}catch(e){}});
-    renderAll();fetchPrayerTimes();
+    rows.forEach(row=>{try{
+      let v=JSON.parse(row.value);
+      localStorage.setItem(row.key,row.value);
+      if(rm[row.key]) S[rm[row.key]]=v;
+      if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
+    }catch(e){}});
+    renderAll();renderTasks();fetchPrayerTimes();
   }catch(e){}
 }
 
@@ -650,7 +666,12 @@ let S={
   mood:lsGet('mood3',{}),reviews:lsGet('rev3',{}),food:lsGet('food3',{}),favs:lsGet('favs3',[])
 };
 const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
-function ss(k){let v=S[k];lsSet(KEY_MAP[k],v);sbSet(KEY_MAP[k],v);flashSaved();}
+function ss(k){
+  let v=S[k]; lsSet(KEY_MAP[k],v);
+  const url=lsGet('_sb_url',''); const key=lsGet('_sb_key','');
+  if(url&&key){ sbSet(KEY_MAP[k],v).catch(()=>{}); }
+  flashSaved();
+}
 let _sf;
 function flashSaved(){let el=document.getElementById('save-indicator');if(!el)return;el.classList.add('show');clearTimeout(_sf);_sf=setTimeout(()=>el.classList.remove('show'),1500);}
 
@@ -907,7 +928,12 @@ function migrateOldTasks(raw){
   return {tasks, trash:{}, order:{}};
 }
 
-function saveTasks(){ lsSet('tasks_v4', T); try{sbSet('tasks_v4', T);}catch(e){} flashSaved(); }
+function saveTasks(){
+  lsSet('tasks_v4', T);
+  const url=lsGet('_sb_url',''); const key=lsGet('_sb_key','');
+  if(url&&key){ sbSet('tasks_v4', T).catch(()=>{}); }
+  flashSaved();
+}
 function newTaskId(){ return 't_'+Math.random().toString(36).slice(2,11)+Date.now().toString(36).slice(-3); }
 
 // T is the live task store
