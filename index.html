@@ -272,7 +272,7 @@ input[type=file]{display:none}
 <div class="nav">
   <button class="nb active" onclick="showPage('dashboard',this)">Dashboard</button>
   <button class="nb" onclick="showPage('habits',this)">Habits</button>
-  <button class="nb" onclick="showPage('prayers',this)">Prayers</button>
+  <button class="nb" id="nav-prayers" onclick="showPage('prayers',this)">Prayers</button>
   <button class="nb" onclick="showPage('calories',this)">Calories</button>
   <button class="nb" onclick="showPage('business',this)">Business</button>
   <button class="nb" onclick="showPage('weekly',this)">Weekly</button>
@@ -494,6 +494,7 @@ input[type=file]{display:none}
 </div>
 
 <!-- TASKS -->
+<canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none"></canvas>
 <div id="todo" class="page">
 
   <!-- Mobile section jump -->
@@ -1374,6 +1375,22 @@ function activateMobSection(){
 }
 
 
+
+async function manualSync(){
+  const btn=document.getElementById('manual-sync-btn');
+  if(btn){btn.textContent='Syncing...';btn.disabled=true;}
+  try{
+    const url=lsGet('_sb_url','');const key=lsGet('_sb_key','');
+    if(!url||!key){alert('No Supabase keys saved. Add them in Settings → Cloud sync.');if(btn){btn.textContent='↑↓ Sync now';btn.disabled=false;}return;}
+    const allKeys=Object.keys(KEY_MAP);
+    await Promise.all(allKeys.map(k=>sbSet(KEY_MAP[k],S[k]).catch(()=>{})));
+    await sbSet('tasks_v4',T).catch(()=>{});
+    if(btn){btn.textContent='✓ Synced!';btn.style.color='#3daa4c';}
+    setTimeout(()=>{if(btn){btn.textContent='↑↓ Sync now';btn.style.color='';btn.disabled=false;}},2500);
+  }catch(e){
+    if(btn){btn.textContent='Sync failed';btn.disabled=false;}
+  }
+}
 
 // ── Init ──
 function renderQuote(){let el=document.getElementById('quote-display');if(!el)return;let q=QUOTES[new Date().getDay()%QUOTES.length];el.innerHTML=`<div class="qt">"${q.t}"</div><div class="qa">${q.a}</div>`;}
