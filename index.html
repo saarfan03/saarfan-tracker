@@ -353,7 +353,9 @@ input[type=file]{display:none}
       <!-- 75 dots -->
       <div id="sevfive-dots" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px"></div>
       <!-- Today's checklist -->
-      <div id="sevfive-checklist" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div id="sevfive-checklist" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">This week</div>
+      <div id="sevfive-weekly" style="margin-bottom:10px"></div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div id="sevfive-streak" style="font-size:11px;color:var(--text3)"></div>
         <div style="display:flex;gap:6px;align-items:center">
@@ -1718,7 +1720,7 @@ function renderWeekly(){
   ['boxing','run'].forEach(type=>{
     el=document.getElementById('weekly-'+type+'-block');if(!el)return;
     let wk=S.weekly[type]||{};let hits=weekDates.filter(d=>wk[d]).length;let target=type==='boxing'?2:1;
-    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span style="font-size:14px;font-weight:500;color:var(--text)">${type==='boxing'?'Boxing sessions':'Run'}</span><span class="spl ${pillCls(hits,target,1)}">${hits}/${target}</span></div><div class="wdc">${weekDates.map((ds,i)=>{hit=!!wk[ds];isPast=ds<=today;return `<div class="wdd"><button class="wdc-circle ${!isPast?'future':hit?'hit':'miss'}" onclick="${isPast?`toggleWeekly('${type}','${ds}')`:''}">${hit?'✓':'·'}</button><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span style="font-size:14px;font-weight:500;color:var(--text)">${type==='boxing'?'🥊 Boxing (2x/week)':'🏃 5k Run (1x/week)'}</span><span class="spl ${pillCls(hits,target,1)}">${hits}/${target}</span></div><div class="wdc">${weekDates.map((ds,i)=>{hit=!!wk[ds];isPast=ds<=today;return `<div class="wdd"><button class="wdc-circle ${!isPast?'future':hit?'hit':'miss'}" onclick="${isPast?`toggleWeekly('${type}','${ds}')`:''}">${hit?'✓':'·'}</button><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;
   });
   let sumEl=document.getElementById('weekly-summary');if(!sumEl)return;
   // Weekly business total
@@ -2479,6 +2481,28 @@ function render75Hard(){
     }).join('');
   }
 
+  // Weekly boxing + run progress
+  const weeklyEl = document.getElementById('sevfive-weekly');
+  if(weeklyEl){
+    const wkDates = getWeekDates();
+    const boxingHits = wkDates.filter(d=>!!(S.weekly.boxing||{})[d]).length;
+    const runHits    = wkDates.filter(d=>!!(S.weekly.run||{})[d]).length;
+    const boxOk = boxingHits>=2, runOk = runHits>=1;
+    weeklyEl.innerHTML =
+      `<div style="display:flex;gap:6px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:${boxOk?'rgba(61,170,76,.15)':'var(--bg4)'};border:1px solid ${boxOk?'rgba(61,170,76,.3)':'var(--border)'}">
+          <span style="font-size:13px">🥊</span>
+          <span style="font-size:11px;font-weight:600;color:${boxOk?'var(--green)':'var(--text3)'}">Boxing ${boxingHits}/2</span>
+          ${boxOk?'<span style="font-size:10px;color:var(--green)">✓</span>':''}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:${runOk?'rgba(61,170,76,.15)':'var(--bg4)'};border:1px solid ${runOk?'rgba(61,170,76,.3)':'var(--border)'}">
+          <span style="font-size:13px">🏃</span>
+          <span style="font-size:11px;font-weight:600;color:${runOk?'var(--green)':'var(--text3)'}">5k Run ${runHits}/1</span>
+          ${runOk?'<span style="font-size:10px;color:var(--green)">✓</span>':''}
+        </div>
+      </div>`;
+  }
+
   // Streak info
   const streakEl = document.getElementById('sevfive-streak');
   if(streakEl){
@@ -2842,8 +2866,8 @@ function renderTrackerWeekly(){
   const today = td();
 
   const items = [
-    {label:'Boxing',  type:'boxing',  target:2, fn: d => !!(S.weekly.boxing||{})[d]},
-    {label:'Running', type:'run',     target:1, fn: d => !!(S.weekly.run||{})[d]},
+    {label:'🥊 Boxing', type:'boxing', target:2, fn: d => !!(S.weekly.boxing||{})[d]},
+    {label:'🏃 5k Run', type:'run',    target:1, fn: d => !!(S.weekly.run||{})[d]},
     {label:'Gym sessions', type:'gym', target:4, fn: d => !!(migrateWorkouts(S.workouts[d]||[]).length)},
   ];
 
