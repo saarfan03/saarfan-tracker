@@ -606,7 +606,7 @@ input[type=file]{display:none}
   </div>
 
   <!-- Task import modal -->
-  <div id="task-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;padding:16px;overflow-y:auto">
+  <div id="task-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
     <div style="max-width:520px;margin:0 auto;background:var(--bg2);border-radius:14px;padding:20px;border:1.5px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <span style="font-size:16px;font-weight:800;color:var(--text)">📋 Paste Tasks</span>
@@ -2920,6 +2920,37 @@ function renderReflectStats(){
 }
 
 // ── Settings ──
+// ── Task import via paste ──
+let _importParsed = [];
+const TASK_IMPORT_COL_MAP = {
+  'today':'today','tomorrow':'tomorrow','overdue':'overdue','brain dump':'brain_dump','brain':'brain_dump',
+  'slp asap':'slp_asap','slp_asap':'slp_asap','asap':'slp_asap',
+  'slp week':'slp_week','slp_week':'slp_week','this week':'slp_week',
+  'slp content':'slp_content','slp_content':'slp_content',
+  'slp systems':'slp_systems','slp_systems':'slp_systems','systems':'slp_systems',
+  'slp growth':'slp_growth','slp_growth':'slp_growth',
+  'slp prog':'slp_prog','slp_prog':'slp_prog',
+  'slp waiting':'slp_waiting','slp_waiting':'slp_waiting',
+  'cb priority':'cb_priority','cb_priority':'cb_priority',
+  'cb outreach':'cb_outreach','cb_outreach':'cb_outreach','outreach':'cb_outreach',
+  'cb content':'cb_content','cb_content':'cb_content',
+  'cb future':'cb_future','cb_future':'cb_future',
+  'cb prog':'cb_prog','cb_prog':'cb_prog',
+  'h2h priority':'h2h_priority','h2h_priority':'h2h_priority',
+  'h2h content':'h2h_content','h2h_content':'h2h_content',
+  'h2h plan':'h2h_plan','h2h_plan':'h2h_plan',
+  'h2h vision':'h2h_vision','h2h_vision':'h2h_vision',
+  'h2h prog':'h2h_prog','h2h_prog':'h2h_prog',
+  'personal admin':'personal_admin','personal_admin':'personal_admin','admin':'personal_admin','life admin':'personal_admin',
+  'personal health':'personal_health','personal_health':'personal_health',
+  'personal dev':'personal_dev','personal_dev':'personal_dev',
+};
+function openTaskImport(){const m=document.getElementById('task-import-modal');if(m){m.style.display='block';setTimeout(()=>{const ta=document.getElementById('task-import-text');if(ta)ta.focus();},100);}}
+function closeTaskImport(){const m=document.getElementById('task-import-modal');if(m)m.style.display='none';const ta=document.getElementById('task-import-text');if(ta)ta.value='';const pv=document.getElementById('task-import-preview');if(pv)pv.innerHTML='';const btn=document.getElementById('task-import-confirm');if(btn)btn.style.display='none';_importParsed=[];}
+function parseTaskLine(line){line=line.trim();if(!line||line.startsWith('#'))return null;const ci=line.indexOf(':');if(ci===-1)return null;const colRaw=line.slice(0,ci).trim().toLowerCase();const rest=line.slice(ci+1).trim();if(!rest)return null;const parts=rest.split('|').map(p=>p.trim());const title=parts[0];if(!title)return null;const priority=['high','medium','low'].includes((parts[1]||'').toLowerCase())?parts[1].toLowerCase():'medium';const due=(parts[2]||'').match(/^\d{4}-\d{2}-\d{2}$/)?parts[2]:'';const colId=TASK_IMPORT_COL_MAP[colRaw];if(!colId)return{error:'Unknown column: "'+colRaw+'"',title};return{title,colId,priority,due,note:''};}
+function previewTaskImport(){const text=document.getElementById('task-import-text')?.value||'';_importParsed=[];let ok=0,errors=0;let html='<div style="font-size:12px;max-height:220px;overflow-y:auto;margin-top:6px">';text.split('\n').filter(l=>l.trim()).forEach(line=>{const p=parseTaskLine(line);if(!p)return;if(p.error){errors++;html+=`<div style="color:var(--red);padding:3px 0;border-bottom:1px solid var(--border)">✗ ${p.error}</div>`;}else{ok++;_importParsed.push(p);const pr=PRI[p.priority]||PRI.medium;const col=ALL_COLS.find(c=>c.id===p.colId);html+=`<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--green);font-size:11px">✓</span><span style="flex:1;font-size:13px;color:var(--text)">${p.title}</span><span style="font-size:9px;font-weight:700;color:${pr.color};background:${pr.bg};padding:1px 5px;border-radius:4px;flex-shrink:0">${pr.label}</span><span style="font-size:10px;color:var(--text3);flex-shrink:0">${col?col.label:p.colId}</span></div>`;}});html+=`<div style="margin-top:8px;color:var(--text3)">${ok} task${ok!==1?'s':''} ready${errors?' · '+errors+' error'+(errors!==1?'s':''):''}.</div></div>`;const pv=document.getElementById('task-import-preview');if(pv)pv.innerHTML=html;const btn=document.getElementById('task-import-confirm');if(btn)btn.style.display=ok>0?'block':'none';}
+function confirmTaskImport(){if(!_importParsed.length)return;_importParsed.forEach(t=>{const id=newTaskId();T.tasks[id]={id,title:t.title,priority:t.priority,due:t.due,note:'',pinned:false,colId:t.colId,subtasks:[],added:td(),doneAt:null};});saveTasks();renderTasks();renderDashboard();closeTaskImport();flashSaved();}
+
 function saveTargets(){c=parseFloat(document.getElementById('cal-goal-input')?.value)||1600;p=parseFloat(document.getElementById('prot-goal-input')?.value)||160;S.targets={cal:c,prot:p};ss('targets');renderCalories();renderDashboard();}
 function saveSBKeys(){
   url=(document.getElementById('sb-url-input')?.value||'').trim();
