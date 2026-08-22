@@ -494,6 +494,7 @@ input[type=file]{display:none}
 <!-- WEEKLY -->
 <div id="weekly" class="page">
   <div class="card" style="border-color:var(--red-b)"><div class="ct">Weekly targets</div><div id="weekly-boxing-block"></div><div style="border-top:1.5px solid var(--border);margin:12px 0"></div><div id="weekly-run-block"></div></div>
+  <div class="card"><div class="ct">Business hours this week</div><div id="weekly-biz-hours"></div></div>
   <div class="card"><div class="ct">Habit consistency</div><div id="weekly-summary"></div></div>
 </div>
 
@@ -664,6 +665,15 @@ input[type=file]{display:none}
       <div class="ct">Weekly Habits</div>
       <div id="tracker-weekly"></div>
     </div>
+    <div class="card" id="sf-table-card" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="ct" style="margin:0">🔥 75 Hard — Full Progress</span>
+        <span id="sf-table-overall" style="font-size:13px;font-weight:800"></span>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <div id="sf-progress-table"></div>
+      </div>
+    </div>
   </div>
   <!-- Habits tab -->
   <div id="rt-habits" class="rt-panel" style="display:none">
@@ -776,11 +786,16 @@ const SB_URL=lsGet('_sb_url','https://vkndekaptscaxkbhrsrd.supabase.co');
 const SB_KEY=lsGet('_sb_key','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbmRla2FwdHNjYXhrYmhyc3JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzIxMDUsImV4cCI6MjA5MzgwODEwNX0.Ws-N53pateZqmObxOXl5UpE2RDkzf93th9rGfkBioW4');
 const getSBH=()=>({'apikey':lsGet('_sb_key',''),'Authorization':'Bearer '+lsGet('_sb_key',''),'Content-Type':'application/json'});
 async function sbSet(k,v){
-  var url=lsGet('_sb_url','');var key=lsGet('_sb_key','');if(!url||!key)return;
-  try{await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:{...getSBH(),'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})});}catch(e){}
+  var url=(lsGet('_sb_url','')||SB_URL);var key=(lsGet('_sb_key','')||SB_KEY);if(!url||!key)return;
+  try{
+    const res=await fetch(url+'/rest/v1/tracker_data',{method:'POST',
+      headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})});
+    if(!res.ok)console.warn('Supabase error:',k,res.status);
+  }catch(e){console.warn('Supabase failed:',k,e);}
 }
 async function loadFromCloud(){
-  var _url=lsGet('_sb_url','');var _key=lsGet('_sb_key','');if(!_url||!_key)return;
+  var _url=lsGet('_sb_url','')||SB_URL;var _key=lsGet('_sb_key','')||SB_KEY;if(!_url||!_key)return;
   try{
     let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value',{headers:getSBH()});
     let rows=await r.json();if(!rows||!rows.length)return;
@@ -822,11 +837,11 @@ let S={
 };
 const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
 function ss(k){
-  v=S[k]; lsSet(KEY_MAP[k],v);
-  // Skip Supabase for logos (too large) and workouts (verbose)
-  if(k!=='logos' && k!=='workouts'){
-    const url=lsGet('_sb_url',''); const key=lsGet('_sb_key','');
-    if(url&&key){ sbSet(KEY_MAP[k],v).catch(()=>{}); }
+  const v=S[k]; lsSet(KEY_MAP[k],v);
+  if(k!=='logos'&&k!=='workouts'){
+    const _url=lsGet('_sb_url','')||SB_URL;
+    const _key=lsGet('_sb_key','')||SB_KEY;
+    if(_url&&_key){ sbSet(KEY_MAP[k],v).catch(e=>console.warn('Sync failed:',k,e)); }
   }
   flashSaved();
 }
@@ -1589,8 +1604,8 @@ async function manualSync(){
   const btn=document.getElementById('manual-sync-btn');
   if(btn){btn.textContent='Syncing...';btn.disabled=true;}
   try{
-    const url=lsGet('_sb_url','');const key=lsGet('_sb_key','');
-    if(!url||!key){alert('No Supabase keys saved. Add them in Settings → Cloud sync.');if(btn){btn.textContent='↑↓ Sync now';btn.disabled=false;}return;}
+    const url=lsGet('_sb_url','')||SB_URL;const key=lsGet('_sb_key','')||SB_KEY;
+    if(!url||!key){alert('No Supabase keys found.');if(btn){btn.textContent='↑↓ Sync now';btn.disabled=false;}return;}
     const allKeys=Object.keys(KEY_MAP);
     await Promise.all(allKeys.map(k=>sbSet(KEY_MAP[k],S[k]).catch(()=>{})));
     await sbSet('tasks_v4',T).catch(()=>{});
@@ -2366,15 +2381,34 @@ function isGymRequired(dateStr){
 }
 
 const SF_HABITS = [
-  {key:'prayers', label:'5 Prayers', fn: d=>PRAYERS.filter(p=>getP(d)[p]).length>=5, icon:'🕌', core:true},
-  {key:'gym',     label:'Gym',       fn: d=>!isGymRequired(d)||!!getH(d).gym,         icon:'🏋️', core:true, gymOnly:true},
-  {key:'diet',    label:'Diet',      fn: d=>!!getH(d).diet,                            icon:'🥗', core:true},
-  {key:'pushups', label:'Push-ups',  fn: d=>!!getH(d).pushups,                        icon:'💪', core:true},
-  {key:'reading', label:'5pg read',  fn: d=>!!getH(d).reading,                        icon:'📖', core:true},
-  {key:'biz',     label:'2h work',   fn: d=>getBizH(d)>=2,                            icon:'💼', core:true},
-  // Tracked but don't affect perfect day
-  {key:'sugar',   label:'No sugar',  fn: d=>!!getH(d).sugar,  icon:'🚫', core:false},
+  {key:'prayers', label:'5 Prayers', fn: d=>PRAYERS.filter(p=>getP(d)[p]).length>=5, icon:'🕌', core:true,  toggle:'prayers'},
+  {key:'gym',     label:'Gym',       fn: d=>!isGymRequired(d)||!!getH(d).gym,         icon:'🏋️', core:true, gymOnly:true, toggle:'habit'},
+  {key:'diet',    label:'Diet',      fn: d=>!!getH(d).diet,                            icon:'🥗', core:true,  toggle:'habit'},
+  {key:'pushups', label:'Push-ups',  fn: d=>!!getH(d).pushups,                        icon:'💪', core:true,  toggle:'habit'},
+  {key:'reading', label:'5pg read',  fn: d=>!!getH(d).reading,                        icon:'📖', core:true,  toggle:'habit'},
+  {key:'biz',     label:'2h work',   fn: d=>getBizH(d)>=2,                            icon:'💼', core:true,  toggle:'biz'},
+  {key:'sugar',   label:'No sugar',  fn: d=>!!getH(d).sugar,  icon:'🚫', core:false,  toggle:'habit'},
 ];
+
+function toggleSFHabit(key, type){
+  const d = td();
+  if(type==='habit'){
+    if(!S.habits[d]) S.habits[d]={};
+    S.habits[d][key]=!S.habits[d][key];
+    ss('habits');
+  } else if(type==='prayers'){
+    // Show which prayers are done + quick toggle all
+    const allDone = PRAYERS.every(p=>getP(d)[p]);
+    if(!S.prayers[d]) S.prayers[d]={};
+    PRAYERS.forEach(p=>{ S.prayers[d][p]=!allDone; });
+    ss('prayers');
+  } else if(type==='biz'){
+    showPage('business', document.querySelector('.nb[onclick*=business]'));
+    return;
+  }
+  render75Hard();
+  renderHabits();
+}
 
 function sf_coreHabits(){ return SF_HABITS.filter(h=>h.core); }
 
@@ -2396,7 +2430,7 @@ function start75Hard(){
 }
 
 function reset75Hard(){
-  if(!confirm('Reset 75 Hard back to Day 1 from today?')) return;
+  if(!confirm('Are you sure you want to restart 75 Hard?\n\nYour start date will reset to today. All your habit history stays intact.')) return;
   lsSet('_75hard_start', td());
   renderDashboard();
 }
@@ -2471,11 +2505,13 @@ function render75Hard(){
       const isRestDay = h.gymOnly && !isGymRequired(today);
       const bg = isRestDay?'var(--bg3)':done?'rgba(61,170,76,.15)':'var(--bg4)';
       const border = isRestDay?'var(--border)':done?'rgba(61,170,76,.3)':'var(--border)';
-      const label_color = isRestDay?'var(--text3)':done?'var(--green)':'var(--text3)';
-      const suffix = isRestDay?'<span style="font-size:9px;color:var(--text3)">rest</span>':done?'<span style="font-size:10px;color:var(--green)">✓</span>':'';
-      return `<div style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:8px;background:${bg};border:1px solid ${border}">
+      const lc = isRestDay?'var(--text3)':done?'var(--green)':'var(--text3)';
+      const suffix = isRestDay?'<span style="font-size:9px;color:var(--text3)">rest</span>':done?'<span style="font-size:10px;color:var(--green)">✓</span>':'<span style="font-size:10px;color:var(--red)">✗</span>';
+      const clickable = h.toggle && !isRestDay;
+      return `<div onclick="${clickable?`toggleSFHabit('${h.key}','${h.toggle}')`:''}"
+        style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:8px;background:${bg};border:1px solid ${border};${clickable?'cursor:pointer;':''};transition:opacity .1s">
         <span style="font-size:13px">${h.icon}</span>
-        <span style="font-size:11px;font-weight:600;color:${label_color}">${h.label}</span>
+        <span style="font-size:11px;font-weight:600;color:${lc}">${h.label}</span>
         ${suffix}
       </div>`;
     }).join('');
@@ -2756,6 +2792,102 @@ function renderBizCharts(){
 }
 
 
+
+// ── 75 Hard Progress Table ──
+function renderSF75Table(){
+  const card = document.getElementById('sf-table-card');
+  const startDate = get75HardStart();
+  if(!card) return;
+  if(!startDate){ card.style.display='none'; return; }
+  card.style.display='block';
+
+  const start = new Date(startDate+'T00:00:00');
+  const today = td();
+  const cols = sf_coreHabits(); // only core habits
+
+  // Build column headers - short labels
+  const colLabels = {
+    prayers:'Prayers', gym:'Gym', diet:'Diet', pushups:'Push-ups',
+    reading:'5pg', biz:'2h work'
+  };
+
+  // Build all 75 day rows
+  let totalPossible = 0, totalDone = 0;
+  const colTotals = {}; cols.forEach(h=>{ colTotals[h.key]={done:0,poss:0}; });
+  const rows = [];
+
+  for(let i=0;i<75;i++){
+    const d = new Date(start); d.setDate(d.getDate()+i);
+    const dStr = localDate(d);
+    const isFuture = dStr > today;
+    const dateLabel = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+    const score = isFuture ? 'future' : getDayScore75(dStr);
+    const rowColor = score==='green'?'rgba(61,170,76,.08)':score==='amber'?'rgba(212,133,26,.08)':score==='red'?'rgba(224,40,46,.06)':'transparent';
+    const rowBorder = score==='green'?'rgba(61,170,76,.2)':score==='amber'?'rgba(212,133,26,.2)':score==='red'?'rgba(224,40,46,.2)':'var(--border)';
+
+    const cells = cols.map(h=>{
+      if(isFuture) return {val:'—', color:'var(--text3)'};
+      const done = h.fn(dStr);
+      const isRestDay = h.gymOnly && !isGymRequired(dStr);
+      if(isRestDay) return {val:'rest', color:'var(--text3)'};
+      colTotals[h.key].poss++;
+      if(done){ colTotals[h.key].done++; totalDone++; }
+      totalPossible++;
+      return {val:done?'✓':'✗', color:done?'var(--green)':'var(--red)'};
+    });
+
+    let dayDone = 0, dayPoss = 0;
+    cells.forEach((c,ci)=>{ if(c.val==='✓'){dayDone++;dayPoss++;} else if(c.val==='✗'){dayPoss++;} });
+    const dayPct = dayPoss>0?Math.round((dayDone/dayPoss)*100):null;
+
+    rows.push({i, dStr, dateLabel, isFuture, score, rowColor, rowBorder, cells, dayPct});
+  }
+
+  const overallPct = totalPossible>0?Math.round((totalDone/totalPossible)*100):0;
+  const overallColor = overallPct>=80?'var(--green)':overallPct>=50?'var(--amber)':'var(--red)';
+  const overallEl = document.getElementById('sf-table-overall');
+  if(overallEl){ overallEl.textContent=overallPct+'% complete'; overallEl.style.color=overallColor; }
+
+  // Render table
+  const cellStyle = 'min-width:52px;text-align:center;padding:5px 4px;font-size:11px;font-weight:700;border-bottom:1px solid var(--border)';
+  const hdStyle = 'min-width:52px;text-align:center;padding:5px 4px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text3);border-bottom:2px solid var(--border)';
+
+  let html = `<table style="border-collapse:collapse;width:100%;font-size:11px">
+    <thead><tr>
+      <td style="${hdStyle};min-width:28px;text-align:left">#</td>
+      <td style="${hdStyle};min-width:90px;text-align:left">Date</td>
+      ${cols.map(h=>`<td style="${hdStyle}">${colLabels[h.key]||h.key}</td>`).join('')}
+      <td style="${hdStyle}">Score</td>
+    </tr></thead><tbody>`;
+
+  rows.forEach(row=>{
+    const scoreDisplay = row.isFuture ? '<span style="color:var(--text3)">—</span>'
+      : row.dayPct===null ? '<span style="color:var(--text3)">—</span>'
+      : `<span style="color:${row.dayPct>=80?'var(--green)':row.dayPct>=50?'var(--amber)':'var(--red)'};font-weight:800">${row.dayPct}%</span>`;
+
+    html+=`<tr style="background:${row.rowColor};border-left:3px solid ${row.rowBorder}">
+      <td style="padding:5px 4px;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border);min-width:28px">${row.i+1}</td>
+      <td style="padding:5px 4px;font-size:10px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;min-width:90px">${row.dateLabel}</td>
+      ${row.cells.map(c=>`<td style="${cellStyle};color:${c.color}">${c.val}</td>`).join('')}
+      <td style="${cellStyle}">${scoreDisplay}</td>
+    </tr>`;
+  });
+
+  // Footer totals row
+  html+=`<tfoot><tr style="background:var(--bg4)">
+    <td colspan="2" style="padding:6px 4px;font-size:10px;font-weight:800;color:var(--text3);border-top:2px solid var(--border)">TOTAL</td>
+    ${cols.map(h=>{
+      const pct = colTotals[h.key].poss>0?Math.round((colTotals[h.key].done/colTotals[h.key].poss)*100):0;
+      const c = pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+      return `<td style="padding:6px 4px;text-align:center;font-size:10px;font-weight:800;color:${c};border-top:2px solid var(--border)">${pct}%</td>`;
+    }).join('')}
+    <td style="padding:6px 4px;text-align:center;font-size:11px;font-weight:800;color:${overallColor};border-top:2px solid var(--border)">${overallPct}%</td>
+  </tr></tfoot></table>`;
+
+  const tableEl = document.getElementById('sf-progress-table');
+  if(tableEl) tableEl.innerHTML = html;
+}
+
 function renderTrackerTab(){
   const el = document.getElementById('tracker-grid'); if(!el) return;
 
@@ -2858,6 +2990,7 @@ function renderTrackerTab(){
 
   // Weekly habits section
   renderTrackerWeekly();
+  renderSF75Table();
 }
 
 function renderTrackerWeekly(){
@@ -2957,7 +3090,7 @@ function saveSBKeys(){
   let key=(document.getElementById('sb-key-input')?.value||'').trim();
   if(!url||!key){alert('Please enter both the URL and key.');return;}
   lsSet('_sb_url',url);lsSet('_sb_key',key);
-  let st=document.getElementById('sb-save-status');if(st){st.style.display='block';setTimeout(()=>st.style.display='none',3000);}
+  flashSaved();
   loadFromCloud();
 }
 function renderSettings(){
@@ -3032,11 +3165,9 @@ function renderAll(){
 
 
 // Seed tasks on first load if task store is empty
-// Bootstrap Supabase keys into localStorage from hardcoded constants
-if(!lsGet('_sb_url','') && typeof SB_URL !== 'undefined' && SB_URL)
-  lsSet('_sb_url', SB_URL);
-if(!lsGet('_sb_key','') && typeof SB_KEY !== 'undefined' && SB_KEY)
-  lsSet('_sb_key', SB_KEY);
+// Always ensure hardcoded Supabase keys are in localStorage
+if(typeof SB_URL!=='undefined'&&SB_URL) lsSet('_sb_url',SB_URL);
+if(typeof SB_KEY!=='undefined'&&SB_KEY) lsSet('_sb_key',SB_KEY);
 
 renderAll();
 fetchPrayerTimes();
