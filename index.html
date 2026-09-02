@@ -805,6 +805,7 @@ async function loadFromCloud(){
       localStorage.setItem(row.key,row.value);
       if(rm[row.key]) S[rm[row.key]]=v;
       if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
+      if(row.key==='75hard_start'&&v){ lsSet('_75hard_start',v); }
     }catch(e){}});
     renderAll();renderTasks();fetchPrayerTimes();
   }catch(e){}
@@ -1609,6 +1610,8 @@ async function manualSync(){
     const allKeys=Object.keys(KEY_MAP);
     await Promise.all(allKeys.map(k=>sbSet(KEY_MAP[k],S[k]).catch(()=>{})));
     await sbSet('tasks_v4',T).catch(()=>{});
+    const sf=lsGet('_75hard_start',null);
+    if(sf) await sbSet('75hard_start',sf).catch(()=>{});
     if(btn){btn.textContent='✓ Synced!';btn.style.color='#3daa4c';}
     setTimeout(()=>{if(btn){btn.textContent='↑↓ Sync now';btn.style.color='';btn.disabled=false;}},2500);
   }catch(e){
@@ -2425,13 +2428,21 @@ function getDayScore75(d){
 function get75HardStart(){ return lsGet('_75hard_start', null); }
 
 function start75Hard(){
-  lsSet('_75hard_start', td());
+  const d = td();
+  lsSet('_75hard_start', d);
+  const url=lsGet('_sb_url','')||SB_URL;
+  const key=lsGet('_sb_key','')||SB_KEY;
+  if(url&&key) sbSet('75hard_start', d).catch(()=>{});
   renderDashboard();
 }
 
 function reset75Hard(){
   if(!confirm('Are you sure you want to restart 75 Hard?\n\nYour start date will reset to today. All your habit history stays intact.')) return;
-  lsSet('_75hard_start', td());
+  const d = td();
+  lsSet('_75hard_start', d);
+  const url=lsGet('_sb_url','')||SB_URL;
+  const key=lsGet('_sb_key','')||SB_KEY;
+  if(url&&key) sbSet('75hard_start', d).catch(()=>{});
   renderDashboard();
 }
 function edit75HardStart(){
@@ -2439,6 +2450,9 @@ function edit75HardStart(){
   const newDate = prompt('Start date (YYYY-MM-DD):', current);
   if(!newDate||!newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
   lsSet('_75hard_start', newDate);
+  const url=lsGet('_sb_url','')||SB_URL;
+  const key=lsGet('_sb_key','')||SB_KEY;
+  if(url&&key) sbSet('75hard_start', newDate).catch(()=>{});
   renderDashboard();
 }
 
