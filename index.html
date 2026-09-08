@@ -487,7 +487,6 @@ input[type=file]{display:none}
     <div class="mg"><div class="met"><div class="mv" style="font-size:15px;color:var(--slp)">1,500h</div><div class="ml">Swift Leads Pro</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--cb)">~50h</div><div class="ml">Capital Bros</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--h2h)">~3,500h</div><div class="ml">Houses 2 Homes</div></div></div>
   </div>
   <div id="biz-cards"></div>
-  <div id="biz-input-cards"></div>
   <div class="card"><div class="ct">All-time totals</div><div id="biz-totals"></div></div>
   <div class="card">
     <div class="ct">Daily hours — last 30 days</div>
@@ -1886,15 +1885,7 @@ function handleLogoUpload(id,input){file=input.files[0];if(!file)return;let r=ne
 function removeLogo(id){delete S.logos[id];ss('logos');renderBusiness();}
 function setBizDay(d){
   _bizDay = d;
-  // Re-render just the biz input cards so inputs show hours for that day
-  renderBizInputCards();
-  // Update banner label
-  const lbl = document.getElementById('biz-day-label-text');
-  if(lbl){
-    const isToday = d===td();
-    const dt = new Date(d+'T12:00:00');
-    lbl.textContent = isToday ? 'Today' : dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
-  }
+  renderBusiness(); // reload inputs with this day's logged hours
 }
 
 function initBizDayPicker(){
@@ -1905,29 +1896,7 @@ function initBizDayPicker(){
   el.min = localDate(minD);
 }
 
-function renderBizInputCards(){
-  // Re-render just the hours/notes inputs for the selected day
-  const saveDay = _bizDay||td();
-  const el = document.getElementById('biz-input-cards'); if(!el) return;
-  el.innerHTML = BIZ_CFG.map(b=>{
-    const entry = S.biz[b.id]||{};
-    const tod = entry[saveDay]||{hours:0,notes:''};
-    return `<div class="card" style="border-left:3px solid ${b.color}">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        ${b.img?`<img src="${b.img}" style="width:28px;height:28px;border-radius:6px;object-fit:cover">`:
-          `<div style="width:28px;height:28px;border-radius:6px;background:${b.color}20;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${b.color}">${b.name[0]}</div>`}
-        <span style="font-size:15px;font-weight:800;color:var(--text)">${b.name}</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <input type="number" id="biz-h-${b.id}" placeholder="Hours" min="0" max="24" step="0.5" value="${tod.hours||''}"
-          style="flex:1;padding:8px 10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:9px;color:var(--text);font-size:16px;font-weight:700;font-family:inherit;outline:none;text-align:center">
-        <input type="text" id="biz-n-${b.id}" placeholder="Notes (optional)" value="${(tod.notes||'').replace(/"/g,'&quot;')}"
-          style="flex:2;padding:8px 10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
-      </div>
-      <button id="biz-save-${b.id}" onclick="saveBizHours('${b.id}')" style="width:100%;padding:9px;background:var(--red);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">Save hours</button>
-    </div>`;
-  }).join('');
-}
+
 
 function renderBusiness(){
   initBizDayPicker();
@@ -1949,24 +1918,28 @@ function renderBusiness(){
         <div style="flex:1"><div style="font-size:15px;font-weight:600;color:${b.color}">${b.name}</div><div style="font-size:11px;color:var(--text3)">${total.toFixed(1)}h total</div>${logo?`<button onclick="removeLogo('${b.id}')" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">Remove</button>`:'<div style="font-size:11px;color:var(--text3);margin-top:2px">Tap to upload logo</div>'}</div>
       </div>
       <div class="mg4"><div class="met"><div class="mv" style="font-size:14px">${(parseFloat(tod.hours)||0).toFixed(1)}h</div><div class="ml">${saveDay2===td()?'Today':'Selected'}</div></div><div class="met"><div class="mv" style="font-size:14px">${weekly.toFixed(1)}h</div><div class="ml">Week</div></div><div class="met"><div class="mv" style="font-size:14px">${monthly.toFixed(1)}h</div><div class="ml">Month</div></div><div class="met"><div class="mv" style="font-size:14px">${total.toFixed(1)}h</div><div class="ml">Total</div></div></div>
+      <div class="ir" style="margin-top:10px;margin-bottom:5px"><label style="min-width:52px;font-size:12px">Hours</label><input type="number" id="biz-h-${b.id}" value="${tod.hours||''}" placeholder="0" min="0" step="0.5" style="width:78px"><input type="text" id="biz-n-${b.id}" value="${tod.notes||''}" placeholder="What did you work on?" style="flex:1"></div>
+      <button class="sb ghost" onclick="saveBizHours('${b.id}')" id="biz-save-${b.id}">Save hours</button>
       <div style="margin-top:11px">${MS.map(m=>{pct=Math.min(100,Math.round((total/m)*100));return `<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>${m}h</span><span>${Math.min(total,m).toFixed(0)}/${m}h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:${pct}%;background:${b.color}"></div></div></div>`;}).join('')}</div>
       <div class="ms-row">${MS.map(m=>`<div class="ms ${total>=m?'hit':''}">${m}h</div>`).join('')}</div>
     </div>`;
   }).join('');
   totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
-  renderBizInputCards();
 }
 function saveBizHours(id){
   const h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
   const n=document.getElementById('biz-n-'+id)?.value||'';
-  const saveDay=_bizDay||td(); // use dedicated variable - never reads DOM
+  // Read date from picker element directly at save time - most reliable
+  const picker=document.getElementById('biz-day-picker');
+  const saveDay=(picker&&picker.value)?picker.value:(_bizDay||td());
   if(!S.biz[id])S.biz[id]={};
   S.biz[id][saveDay]={hours:h,notes:n};
   ss('biz');
   renderHabits();renderDashboard();render75Hard();
-  // Flash the save button
+  // Flash button with confirmation of which day was saved
   const btn=document.getElementById('biz-save-'+id);
-  if(btn){btn.textContent='✓ Saved for '+new Date(saveDay+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});btn.style.background='var(--green)';setTimeout(()=>{btn.textContent='Save hours';btn.style.background='';},2000);}
+  const dayLabel=saveDay===td()?'today':new Date(saveDay+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  if(btn){btn.textContent='✓ Saved for '+dayLabel;btn.style.background='var(--green)';setTimeout(()=>{btn.textContent='Save hours';btn.style.background='';},2500);}
 }
 
 // ── Gym ──
