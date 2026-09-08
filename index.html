@@ -723,8 +723,9 @@ input[type=file]{display:none}
       <input type="text" id="sb-key-input" placeholder="Supabase anon/public key" style="font-size:12px">
     </div>
     <button class="sb" onclick="saveSBKeys()" style="margin-bottom:8px">Save & connect</button>
-    <button class="sb ghost" id="manual-sync-btn" onclick="manualSync()">↑↓ Sync now</button>
-    <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Supabase is free. Go to supabase.com → New project → Settings → API to get your URL and key.</p>
+    <button class="sb ghost" id="manual-sync-btn" onclick="manualSync()" style="margin-bottom:8px">↑↓ Sync now</button>
+    <button class="sb ghost" onclick="testSupabase()" style="margin-bottom:8px;border-color:rgba(43,127,212,.4);color:var(--blue)">🔍 Test connection</button>
+    <div id="sync-test-result" style="display:none;font-size:12px;border-radius:9px;padding:10px 12px;margin-top:4px;line-height:1.7"></div>
   </div>
   <div class="card"><div class="ct">Install as app</div><p style="font-size:13px;color:var(--text2);line-height:1.7"><strong>iPhone:</strong> Open in Safari → Share → Add to Home Screen</p><p style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:8px"><strong>Android:</strong> Chrome → 3-dot menu → Add to Home screen</p></div>
   <div class="card"><div class="ct">Danger zone</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px">Export first before clearing.</p><button class="sb" style="background:#444" onclick="clearAllData()">Clear all data</button></div>
@@ -1601,21 +1602,102 @@ function activateMobSection(){
 
 
 
+
+async function testSupabase(){
+  const el = document.getElementById('sync-test-result');
+  if(!el) return;
+  el.style.display='block';
+  el.style.background='var(--bg3)';
+  el.style.border='1px solid var(--border)';
+  el.style.color='var(--text2)';
+  el.innerHTML='🔄 Testing connection...';
+
+  const url = lsGet('_sb_url','')||SB_URL;
+  const key = lsGet('_sb_key','')||SB_KEY;
+
+  if(!url||!key){
+    el.innerHTML='<span style="color:var(--red)">✗ No Supabase URL or key found.</span>';
+    return;
+  }
+
+  try {
+    // Step 1: Test write
+    const writeRes = await fetch(url+'/rest/v1/tracker_data', {
+      method:'POST',
+      headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({key:'_test_ping',value:'"pong"',updated_at:new Date().toISOString()})
+    });
+
+    if(!writeRes.ok){
+      const err = await writeRes.text();
+      let msg = '';
+      if(writeRes.status===404) msg='Table "tracker_data" does not exist. Run the SQL below.';
+      else if(writeRes.status===401) msg='Invalid API key.';
+      else if(writeRes.status===403) msg='Permission denied — Row Level Security is blocking writes. Run the SQL below.';
+      else msg='Error '+writeRes.status+': '+err.slice(0,100);
+      el.innerHTML=`<span style="color:var(--red)">✗ Write failed: ${msg}</span><br><br>
+        <strong style="color:var(--text)">Run this SQL in your Supabase SQL Editor:</strong><br>
+        <code style="font-size:10px;color:var(--gold);background:var(--bg4);padding:8px;border-radius:6px;display:block;margin-top:6px;white-space:pre-wrap">CREATE TABLE IF NOT EXISTS tracker_data (
+  key text PRIMARY KEY,
+  value text,
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE tracker_data DISABLE ROW LEVEL SECURITY;</code>`;
+      return;
+    }
+
+    // Step 2: Test read
+    const readRes = await fetch(url+'/rest/v1/tracker_data?key=eq._test_ping&select=key,value', {
+      headers:{'apikey':key,'Authorization':'Bearer '+key}
+    });
+
+    if(!readRes.ok){
+      el.innerHTML='<span style="color:var(--amber)">⚠ Write worked but read failed (status '+readRes.status+'). Check RLS policies.</span>';
+      return;
+    }
+
+    const data = await readRes.json();
+    if(!data||!data.length){
+      el.innerHTML='<span style="color:var(--amber)">⚠ Write worked but could not read back. RLS may be blocking reads.</span>';
+      return;
+    }
+
+    el.style.background='rgba(61,170,76,.1)';
+    el.style.border='1px solid rgba(61,170,76,.3)';
+    el.innerHTML='<span style="color:var(--green)">✓ Connection working perfectly — reads and writes both successful.</span><br><span style="font-size:11px;color:var(--text3)">Supabase URL: '+url.replace('https://','').slice(0,30)+'...</span>';
+
+    // Clean up test row
+    fetch(url+'/rest/v1/tracker_data?key=eq._test_ping',{method:'DELETE',headers:{'apikey':key,'Authorization':'Bearer '+key}});
+
+  } catch(e) {
+    el.innerHTML='<span style="color:var(--red)">✗ Network error: '+e.message+'</span><br><span style="font-size:11px;color:var(--text3)">Check your internet connection and Supabase URL.</span>';
+  }
+}
+
 async function manualSync(){
   const btn=document.getElementById('manual-sync-btn');
   if(btn){btn.textContent='Syncing...';btn.disabled=true;}
+  const url=lsGet('_sb_url','')||SB_URL;
+  const key=lsGet('_sb_key','')||SB_KEY;
+  if(!url||!key){
+    alert('No Supabase keys found.');
+    if(btn){btn.textContent='↑↓ Sync now';btn.disabled=false;}
+    return;
+  }
   try{
-    const url=lsGet('_sb_url','')||SB_URL;const key=lsGet('_sb_key','')||SB_KEY;
-    if(!url||!key){alert('No Supabase keys found.');if(btn){btn.textContent='↑↓ Sync now';btn.disabled=false;}return;}
-    const allKeys=Object.keys(KEY_MAP);
-    await Promise.all(allKeys.map(k=>sbSet(KEY_MAP[k],S[k]).catch(()=>{})));
-    await sbSet('tasks_v4',T).catch(()=>{});
+    // Push all data keys
+    const pushes=Object.keys(KEY_MAP).map(k=>sbSet(KEY_MAP[k],S[k]).catch(e=>console.warn('Sync fail:',k,e)));
+    pushes.push(sbSet('tasks_v4',T).catch(e=>console.warn('Sync fail: tasks',e)));
     const sf=lsGet('_75hard_start',null);
-    if(sf) await sbSet('75hard_start',sf).catch(()=>{});
-    if(btn){btn.textContent='✓ Synced!';btn.style.color='#3daa4c';}
+    if(sf) pushes.push(sbSet('75hard_start',sf).catch(e=>console.warn('Sync fail: 75hard',e)));
+    await Promise.all(pushes);
+    if(btn){btn.textContent='✓ Synced!';btn.style.color='var(--green)';}
     setTimeout(()=>{if(btn){btn.textContent='↑↓ Sync now';btn.style.color='';btn.disabled=false;}},2500);
+    renderSettings();
   }catch(e){
-    if(btn){btn.textContent='Sync failed';btn.disabled=false;}
+    console.error('manualSync error:',e);
+    if(btn){btn.textContent='✗ Failed — check connection';btn.disabled=false;btn.style.color='var(--red)';}
+    setTimeout(()=>{if(btn){btn.textContent='↑↓ Sync now';btn.style.color='';btn.disabled=false;}},3000);
   }
 }
 
