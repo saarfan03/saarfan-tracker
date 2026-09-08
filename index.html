@@ -478,7 +478,8 @@ input[type=file]{display:none}
   <div class="card" style="padding:10px 14px;margin-bottom:0">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">📅 Logging for:</span>
-      <select id="biz-day-picker" onchange="setBizDay(this.value)" style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none"></select>
+      <input type="date" id="biz-day-picker" onchange="setBizDay(this.value)"
+        style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color-scheme:dark">
     </div>
   </div>
   <div class="card" style="border-left:3px solid var(--red);background:var(--red-l)">
@@ -1891,14 +1892,13 @@ function setBizDay(d){
 function initBizDayPicker(){
   const el = document.getElementById('biz-day-picker'); if(!el) return;
   const today = td();
-  const days = [];
-  for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-i);days.push(localDate(d));}
   const cur = _editDay||today;
-  el.innerHTML = days.map(d=>{
-    const dt=new Date(d+'T12:00:00');
-    const lbl=d===today?'Today — '+dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'}):dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
-    return `<option value="${d}"${d===cur?' selected':''}>${lbl}</option>`;
-  }).join('');
+  el.value = cur;
+  // Set max to today so can't pick future
+  el.max = today;
+  // Set min to 90 days ago
+  const minD = new Date(); minD.setDate(minD.getDate()-90);
+  el.min = localDate(minD);
 }
 
 function renderBusiness(){
