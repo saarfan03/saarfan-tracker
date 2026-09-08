@@ -475,8 +475,11 @@ input[type=file]{display:none}
 
 <!-- BUSINESS -->
 <div id="business" class="page">
-  <div id="biz-edit-day-banner" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:9px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--gold);font-weight:600;display:none;text-align:center">
-    📅 Logging hours for: <span id="biz-edit-day-label">Today</span> — <button onclick="goToToday()" style="background:transparent;border:none;color:var(--gold);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Back to today</button>
+  <div class="card" style="padding:10px 14px;margin-bottom:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">📅 Logging for:</span>
+      <select id="biz-day-picker" onchange="setBizDay(this.value)" style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none"></select>
+    </div>
   </div>
   <div class="card" style="border-left:3px solid var(--red);background:var(--red-l)">
     <div class="ct" style="color:#FF6B6B">Pre-tracker estimates</div>
@@ -1878,17 +1881,35 @@ function renderPastReviews(){el=document.getElementById('past-reviews-block');if
 function triggerLogoUpload(id){document.getElementById('logo-file-'+id)?.click();}
 function handleLogoUpload(id,input){file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{S.logos[id]=e.target.result;ss('logos');renderBusiness();};r.readAsDataURL(file);}
 function removeLogo(id){delete S.logos[id];ss('logos');renderBusiness();}
+function setBizDay(d){
+  _editDay = d;
+  renderBusiness();
+  renderHabits();
+  renderDashboard();
+}
+
+function initBizDayPicker(){
+  const el = document.getElementById('biz-day-picker'); if(!el) return;
+  const today = td();
+  const days = [];
+  for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-i);days.push(localDate(d));}
+  const cur = _editDay||today;
+  el.innerHTML = days.map(d=>{
+    const dt=new Date(d+'T12:00:00');
+    const lbl=d===today?'Today — '+dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'}):dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+    return `<option value="${d}"${d===cur?' selected':''}>${lbl}</option>`;
+  }).join('');
+}
+
 function renderBusiness(){
-  // Show edit day banner
-  let today2=td();let isToday=(_editDay||today2)===today2;
-  let bizBanner=document.getElementById('biz-edit-day-banner');
-  let bizLabel=document.getElementById('biz-edit-day-label');
-  if(bizBanner)bizBanner.style.display=isToday?'none':'block';
-  if(bizLabel&&!isToday){let dt=new Date((_editDay||today2)+'T12:00:00');bizLabel.textContent=dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});}
+  initBizDayPicker();
+  // Sync _editDay from picker
+  const picker = document.getElementById('biz-day-picker');
+  if(picker&&picker.value) _editDay=picker.value;
   el=document.getElementById('biz-cards');if(!el)return;
   today=td(),weekStart=localDate(getMonday()),now=new Date(),monthStart=localDate(new Date(now.getFullYear(),now.getMonth(),1));
   el.innerHTML=BIZ_CFG.map(b=>{
-    entry=S.biz[b.id]||{};let saveDay=_editDay||today;let tod=entry[saveDay]||{hours:0,notes:''};
+    entry=S.biz[b.id]||{};const picker2=document.getElementById('biz-day-picker');let saveDay2=picker2?.value||_editDay||today;let tod=entry[saveDay2]||{hours:0,notes:''};
     let total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);
     let weekly=Object.entries(entry).filter(([d])=>d>=weekStart).reduce((s,[,v])=>s+(parseFloat(v.hours)||0),0);
     let monthly=Object.entries(entry).filter(([d])=>d>=monthStart).reduce((s,[,v])=>s+(parseFloat(v.hours)||0),0);
@@ -1911,10 +1932,16 @@ function renderBusiness(){
 function saveBizHours(id){
   let h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
   let n=document.getElementById('biz-n-'+id)?.value||'';
-  let saveDay=_editDay||td();
+  // Always read day from the picker directly
+  const picker=document.getElementById('biz-day-picker');
+  let saveDay=picker?.value||_editDay||td();
   if(!S.biz[id])S.biz[id]={};
   S.biz[id][saveDay]={hours:h,notes:n};
-  ss('biz');renderBusiness();renderHabits();renderDashboard();
+  ss('biz');
+  renderBusiness();renderHabits();renderDashboard();
+  // Flash confirmation
+  const btn=document.querySelector(`button[onclick="saveBizHours('${id}')"]`);
+  if(btn){const orig=btn.textContent;btn.textContent='Saved ✓';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent=orig;btn.style.color='';},1500);}
 }
 
 // ── Gym ──
