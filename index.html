@@ -488,9 +488,7 @@ input[type=file]{display:none}
     <div class="mg"><div class="met"><div class="mv" style="font-size:15px;color:var(--slp)">1,500h</div><div class="ml">Swift Leads Pro</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--cb)">~50h</div><div class="ml">Capital Bros</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--h2h)">~3,500h</div><div class="ml">Houses 2 Homes</div></div></div>
   </div>
 
-  <div id="biz-slp-wrap"></div>
-  <div id="biz-cb-wrap"></div>
-  <div id="biz-h2h-wrap"></div>
+  <div id="biz-cards"></div>
   <div class="card"><div class="ct">All-time totals</div><div id="biz-totals"></div></div>
   <div class="card">
     <div class="ct">Daily hours — last 30 days</div>
@@ -1919,93 +1917,54 @@ function renderBusiness(){
   // Sync _editDay from picker
   const picker = document.getElementById('biz-day-picker');
   if(picker&&picker.value) _editDay=picker.value;
-  const today=td(),weekStart=localDate(getMonday()),now=new Date(),monthStart=localDate(new Date(now.getFullYear(),now.getMonth(),1));
+  el=document.getElementById('biz-cards');if(!el)return;
+  today=td();weekStart=localDate(getMonday());now=new Date();monthStart=localDate(new Date(now.getFullYear(),now.getMonth(),1));
+  el.innerHTML='';
   BIZ_CFG.forEach(function(b){
-    const wrap = document.getElementById('biz-'+b.id+'-wrap'); if(!wrap) return;
-    const entry = S.biz[b.id]||{};
-    const saveDay2 = _bizDay||today;
-    const tod = entry[saveDay2]||{hours:'',notes:''};
-    const total = Object.values(entry).reduce(function(s,v){return s+(parseFloat(v.hours)||0);},0);
-    const weekly = Object.entries(entry).filter(function(e){return e[0]>=weekStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
-    const monthly = Object.entries(entry).filter(function(e){return e[0]>=monthStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
-    const logo = S.logos[b.id];
-
-    const card = document.createElement('div');
-    card.className = 'biz-card';
-    card.style.borderLeft = '3px solid '+b.color;
-
-    // Logo + name
-    const logoFile = document.createElement('input');
-    logoFile.type='file'; logoFile.id='logo-file-'+b.id; logoFile.accept='image/*';
-    logoFile.onchange = function(){ handleLogoUpload(b.id, this); };
-    card.appendChild(logoFile);
-
-    const topRow = document.createElement('div');
-    topRow.style.cssText = 'display:flex;align-items:center;gap:11px;margin-bottom:11px';
-    const logoArea = document.createElement('div');
-    logoArea.className = 'logo-area';
-    logoArea.onclick = function(){ triggerLogoUpload(b.id); };
-    if(logo){ const img=document.createElement('img'); img.src=logo; img.alt=b.name; logoArea.appendChild(img); }
-    else { logoArea.innerHTML='<div class="logo-ph">+logo</div>'; }
-    const nameDiv = document.createElement('div');
-    nameDiv.style.flex='1';
-    nameDiv.innerHTML = '<div style="font-size:15px;font-weight:600;color:'+b.color+'">'+b.name+'</div>'
-      +'<div style="font-size:11px;color:var(--text3)">'+total.toFixed(1)+'h total</div>'
-      +(logo?'<button onclick="removeLogo(\"'+b.id+'\")">Remove</button>':'<div style="font-size:11px;color:var(--text3);margin-top:2px">Tap to upload logo</div>');
-    topRow.appendChild(logoArea); topRow.appendChild(nameDiv);
-    card.appendChild(topRow);
-
-    // Stats
-    const stats = document.createElement('div');
-    stats.className = 'mg4';
-    stats.innerHTML = '<div class="met"><div class="mv" style="font-size:14px">'+(parseFloat(tod.hours)||0).toFixed(1)+'h</div><div class="ml">'+(saveDay2===today?'Today':'Selected')+'</div></div>'
-      +'<div class="met"><div class="mv" style="font-size:14px">'+weekly.toFixed(1)+'h</div><div class="ml">Week</div></div>'
-      +'<div class="met"><div class="mv" style="font-size:14px">'+monthly.toFixed(1)+'h</div><div class="ml">Month</div></div>'
-      +'<div class="met"><div class="mv" style="font-size:14px">'+total.toFixed(1)+'h</div><div class="ml">Total</div></div>';
-    card.appendChild(stats);
-
-    // Hours input row
-    const ir = document.createElement('div');
-    ir.className = 'ir';
-    ir.style.cssText = 'margin:10px 0 6px';
-    const lbl = document.createElement('label');
-    lbl.style.cssText = 'min-width:52px;font-size:12px';
-    lbl.textContent = 'Hours';
-    const hInp = document.createElement('input');
-    hInp.type='number'; hInp.id='biz-h-'+b.id; hInp.placeholder='0'; hInp.min='0'; hInp.step='0.5';
-    hInp.value = tod.hours||'';
-    hInp.style.cssText = 'width:90px';
-    const nInp = document.createElement('input');
-    nInp.type='text'; nInp.id='biz-n-'+b.id; nInp.placeholder='What did you work on?';
-    nInp.value = tod.notes||'';
-    nInp.style.cssText = 'flex:1';
-    ir.appendChild(lbl); ir.appendChild(hInp); ir.appendChild(nInp);
-    card.appendChild(ir);
-
-    // Save button
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'sb ghost'; saveBtn.id = 'biz-save-'+b.id;
-    saveBtn.textContent = 'Save hours';
-    saveBtn.onclick = function(){ saveBizHours(b.id); };
-    card.appendChild(saveBtn);
-
-    // Milestones
-    const ms = document.createElement('div');
-    ms.style.marginTop='11px';
-    ms.innerHTML = MS.map(function(m){
-      const pct = Math.min(100,Math.round((total/m)*100));
-      return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>'+m+'h</span><span>'+Math.min(total,m).toFixed(0)+'/'+m+'h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:'+pct+'%;background:'+b.color+'"></div></div></div>';
-    }).join('');
-    card.appendChild(ms);
-
-    const msRow = document.createElement('div');
-    msRow.className = 'ms-row';
-    msRow.innerHTML = MS.map(function(m){ return '<div class="ms '+(total>=m?'hit':'')+'">'+m+'h</div>'; }).join('');
+    var entry=S.biz[b.id]||{};
+    var saveDay2=_bizDay||today;
+    var tod=entry[saveDay2]||{hours:'',notes:''};
+    var total=Object.values(entry).reduce(function(s,v){return s+(parseFloat(v.hours)||0);},0);
+    var weekly=Object.entries(entry).filter(function(e){return e[0]>=weekStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
+    var monthly=Object.entries(entry).filter(function(e){return e[0]>=monthStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
+    var logo=S.logos[b.id];
+    var card=document.createElement('div');
+    card.className='biz-card card';
+    card.setAttribute('style','border-left:3px solid '+b.color+';margin-bottom:12px');
+    var logoHtml=logo?('<img src="'+logo+'" alt="'+b.name+'" style="width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:pointer" data-biz="'+b.id+'" onclick="triggerLogoUpload(this.dataset.biz)">')
+      :('<div class="logo-ph" style="cursor:pointer" data-biz="'+b.id+'" onclick="triggerLogoUpload(this.dataset.biz)">+logo</div>');
+    var removeHtml=logo?('<button style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;display:block" data-biz="'+b.id+'" onclick="removeLogo(this.dataset.biz)">Remove</button>')
+      :('<div style="font-size:11px;color:var(--text3);margin-top:2px">Tap to upload logo</div>');
+    card.innerHTML='<input type="file" id="logo-file-'+b.id+'" accept="image/*" onchange="handleLogoUpload(this.dataset.biz,this)">'
+      +'<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">'
+        +'<div class="logo-area">'+logoHtml+'</div>'
+        +'<div style="flex:1"><div style="font-size:15px;font-weight:600;color:'+b.color+'">'+b.name+'</div>'
+        +'<div style="font-size:11px;color:var(--text3)">'+total.toFixed(1)+'h total</div>'+removeHtml+'</div>'
+      +'</div>'
+      +'<div class="mg4">'
+        +'<div class="met"><div class="mv" style="font-size:14px">'+(parseFloat(tod.hours)||0).toFixed(1)+'h</div><div class="ml">'+(saveDay2===today?'Today':'Selected')+'</div></div>'
+        +'<div class="met"><div class="mv" style="font-size:14px">'+weekly.toFixed(1)+'h</div><div class="ml">Week</div></div>'
+        +'<div class="met"><div class="mv" style="font-size:14px">'+monthly.toFixed(1)+'h</div><div class="ml">Month</div></div>'
+        +'<div class="met"><div class="mv" style="font-size:14px">'+total.toFixed(1)+'h</div><div class="ml">Total</div></div>'
+      +'</div>'
+      +'<div class="ir" style="margin:10px 0 6px">'
+        +'<label style="min-width:52px;font-size:12px">Hours</label>'
+        +'<input type="number" id="biz-h-'+b.id+'" value="'+(tod.hours||'')+'" placeholder="0" min="0" step="0.5" style="width:90px">'
+        +'<input type="text" id="biz-n-'+b.id+'" value="" placeholder="What did you work on?" style="flex:1">'
+      +'</div>'
+      +'<button class="sb ghost" id="biz-save-'+b.id+'" data-biz="'+b.id+'" onclick="saveBizHours(this.dataset.biz)">Save hours</button>';
+    var notesInp=card.querySelector('#biz-n-'+b.id);
+    if(notesInp) notesInp.value=tod.notes||'';
+    var msDiv=document.createElement('div');
+    msDiv.style.marginTop='11px';
+    msDiv.innerHTML=MS.map(function(m){var pct=Math.min(100,Math.round((total/m)*100));return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>'+m+'h</span><span>'+Math.min(total,m).toFixed(0)+'/'+m+'h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:'+pct+'%;background:'+b.color+'"></div></div></div>';}).join('');
+    card.appendChild(msDiv);
+    var msRow=document.createElement('div');
+    msRow.className='ms-row';
+    msRow.innerHTML=MS.map(function(m){return '<div class="ms '+(total>=m?'hit':'')+'">'+m+'h</div>';}).join('');
     card.appendChild(msRow);
-
-    wrap.innerHTML = '';
-    wrap.appendChild(card);
-  });
+    el.appendChild(card);
+  })
   fillBizInputs();
   totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
 }
