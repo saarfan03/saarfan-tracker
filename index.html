@@ -482,13 +482,7 @@ input[type=file]{display:none}
       <select id="biz-day-select" onchange="setBizDay(this.value)" style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;font-family:inherit;outline:none"></select>
     </div>
   </div>
-  <div class="card" style="padding:10px 14px;margin-bottom:0">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">📅 Logging for:</span>
-      <input type="date" id="biz-day-picker" onchange="setBizDay(this.value)"
-        style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color-scheme:dark">
-    </div>
-  </div>
+
   <div class="card" style="border-left:3px solid var(--red);background:var(--red-l)">
     <div class="ct" style="color:#FF6B6B">Pre-tracker estimates</div>
     <div class="mg"><div class="met"><div class="mv" style="font-size:15px;color:var(--slp)">1,500h</div><div class="ml">Swift Leads Pro</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--cb)">~50h</div><div class="ml">Capital Bros</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--h2h)">~3,500h</div><div class="ml">Houses 2 Homes</div></div></div>
@@ -2475,12 +2469,18 @@ function renderBusiness(){
         <div style="flex:1"><div style="font-size:15px;font-weight:600;color:${b.color}">${b.name}</div><div style="font-size:11px;color:var(--text3)">${total.toFixed(1)}h total</div>${logo?`<button onclick="removeLogo('${b.id}')" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">Remove</button>`:'<div style="font-size:11px;color:var(--text3);margin-top:2px">Tap to upload logo</div>'}</div>
       </div>
       <div class="mg4"><div class="met"><div class="mv" style="font-size:14px">${(parseFloat(tod.hours)||0).toFixed(1)}h</div><div class="ml">Today</div></div><div class="met"><div class="mv" style="font-size:14px">${weekly.toFixed(1)}h</div><div class="ml">Week</div></div><div class="met"><div class="mv" style="font-size:14px">${monthly.toFixed(1)}h</div><div class="ml">Month</div></div><div class="met"><div class="mv" style="font-size:14px">${total.toFixed(1)}h</div><div class="ml">Total</div></div></div>
-      
+      <div class="ir" style="margin:10px 0 6px">
+        <label style="min-width:52px;font-size:12px">Hours</label>
+        <input type="number" id="biz-h-${b.id}" value="${tod.hours||''}" placeholder="0" min="0" step="0.5" style="width:90px">
+        <input type="text" id="biz-n-${b.id}" placeholder="What did you work on?" style="flex:1">
+      </div>
+      <button class="sb ghost" id="biz-save-${b.id}" data-biz="${b.id}" onclick="saveBizHours(this.dataset.biz)">Save hours</button>
       <div style="margin-top:11px">${MS.map(m=>{pct=Math.min(100,Math.round((total/m)*100));return `<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>${m}h</span><span>${Math.min(total,m).toFixed(0)}/${m}h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:${pct}%;background:${b.color}"></div></div></div>`;}).join('')}</div>
       <div class="ms-row">${MS.map(m=>`<div class="ms ${total>=m?'hit':''}">${m}h</div>`).join('')}</div>
     </div>`;
   }).join('');
   totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
+  fillBizInputs();
 }
 function saveBizHours(id){
   var h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
