@@ -809,9 +809,25 @@ async function loadFromCloud(){
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
     rows.forEach(row=>{try{
       let v=JSON.parse(row.value);
-      localStorage.setItem(row.key,row.value);
-      if(rm[row.key]) S[rm[row.key]]=v;
-      if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
+      // Don't overwrite local data with cloud if local has more/equal content
+      let localRaw=localStorage.getItem(row.key);
+      let localVal=localRaw?JSON.parse(localRaw):null;
+      let shouldOverwrite=false;
+      if(!localVal||localVal===null){
+        shouldOverwrite=true; // nothing local, use cloud
+      } else if(typeof v==='object'&&v!==null&&typeof localVal==='object'&&localVal!==null){
+        // For objects: use cloud only if it has strictly more keys
+        let cloudKeys=Object.keys(v).length;
+        let localKeys=Object.keys(localVal).length;
+        shouldOverwrite=cloudKeys>localKeys;
+      } else if(row.key==='75hard_start'||row.key==='tasks_v4'){
+        shouldOverwrite=true; // always sync these
+      }
+      if(shouldOverwrite){
+        localStorage.setItem(row.key,row.value);
+        if(rm[row.key]) S[rm[row.key]]=v;
+        if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
+      }
       if(row.key==='75hard_start'&&v){ lsSet('_75hard_start',v); }
     }catch(e){}});
     renderAll();renderTasks();fetchPrayerTimes();
@@ -1712,6 +1728,8 @@ async function manualSync(){
     if(sf) pushes.push(sbSet('75hard_start',sf).catch(e=>console.warn('Sync fail: 75hard',e)));
     await Promise.all(pushes);
     if(btn){btn.textContent='✓ Synced!';btn.style.color='var(--green)';}
+    // After pushing, refresh from cloud for any keys we don't have locally
+    setTimeout(loadFromCloud, 500);
     setTimeout(()=>{if(btn){btn.textContent='↑↓ Sync now';btn.style.color='';btn.disabled=false;}},2500);
     renderSettings();
   }catch(e){
