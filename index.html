@@ -1796,7 +1796,7 @@ function renderCalories(){
   set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v;};
   set('cal-eaten',tots.cal);set('cal-goal-disp',goal);
   let lE=document.getElementById('cal-left');if(lE){lE.textContent=Math.abs(calLeft);lE.style.color=calLeft<0?'var(--red)':'var(--green)';}
-  let fE=document.getElementById('cal-fill');if(fE){fE.style.width=calPct+'%';fE.style.background=calPct>109?'var(--red)':calPct>=100?'var(--amber)':calPct>=90?'var(--green)':'var(--amber)';}
+  let fE=document.getElementById('cal-fill');if(fE){fE.style.width=calPct+'%';fE.style.background=calPct>112?'var(--red)':calPct>106?'var(--amber)':calPct>=94?'var(--green)':calPct>=88?'var(--amber)':'var(--red)';}
   set('prot-eaten-disp',tots.prot+'g');set('prot-goal-disp2',pgoal+'g');
   let plE=document.getElementById('prot-left-disp');if(plE){plE.textContent=Math.abs(protLeft)+'g';plE.style.color=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
   let pfE=document.getElementById('prot-fill');if(pfE){pfE.style.width=protPct+'%';pfE.style.background=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
@@ -1815,7 +1815,7 @@ function renderCalories(){
           t=getDayTotals(dd);
           let pct=S.targets.cal?Math.min(100,Math.round((t.cal/S.targets.cal)*100)):0;
           isPast=dd<=today;let isToday=dd===today;
-          let barColor=!isPast?'var(--border)':pct>109?'var(--red)':pct>=100?'var(--amber)':pct>=80?'var(--green)':'var(--amber)';
+          let barColor=!isPast?'var(--border)':pct>112?'var(--red)':pct>106?'var(--amber)':pct>=94?'var(--green)':pct>=88?'var(--amber)':'var(--red)';
           let heightPct=isPast&&pct>0?Math.max(8,pct):4;
           return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:${isPast?'pointer':'default'}" onclick="${isPast?`openDayModal('${dd}')`:''}" title="${isPast?t.cal+'kcal — tap to edit':''}">
             <div style="width:100%;border-radius:4px 4px 0 0;background:${barColor};height:${heightPct}%;min-height:${isPast?4:2}px;transition:height .3s;${isToday?'box-shadow:0 0 6px rgba(224,40,46,0.4)':''}"></div>
@@ -2359,7 +2359,7 @@ function renderCalories(){
   set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v;};
   set('cal-eaten',tots.cal);set('cal-goal-disp',goal);
   lE=document.getElementById('cal-left');if(lE){lE.textContent=Math.abs(calLeft);lE.style.color=calLeft<0?'var(--red)':'var(--green)';}
-  fE=document.getElementById('cal-fill');if(fE){fE.style.width=calPct+'%';fE.style.background=calPct>109?'var(--red)':calPct>=100?'var(--amber)':calPct>=90?'var(--green)':'var(--amber)';}
+  fE=document.getElementById('cal-fill');if(fE){fE.style.width=calPct+'%';fE.style.background=calPct>112?'var(--red)':calPct>106?'var(--amber)':calPct>=94?'var(--green)':calPct>=88?'var(--amber)':'var(--red)';}
   set('prot-eaten-disp',tots.prot+'g');set('prot-goal-disp2',pgoal+'g');
   plE=document.getElementById('prot-left-disp');if(plE){plE.textContent=Math.abs(protLeft)+'g';plE.style.color=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
   pfE=document.getElementById('prot-fill');if(pfE){pfE.style.width=protPct+'%';pfE.style.background=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
@@ -2378,7 +2378,7 @@ function renderCalories(){
           t=getDayTotals(dd);
           pct=S.targets.cal?Math.min(100,Math.round((t.cal/S.targets.cal)*100)):0;
           isPast=dd<=today;let isToday=dd===today;
-          barColor=!isPast?'var(--border)':pct>109?'var(--red)':pct>=100?'var(--amber)':pct>=80?'var(--green)':'var(--amber)';
+          barColor=!isPast?'var(--border)':pct>112?'var(--red)':pct>106?'var(--amber)':pct>=94?'var(--green)':pct>=88?'var(--amber)':'var(--red)';
           heightPct=isPast&&pct>0?Math.max(8,pct):4;
           return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:${isPast?'pointer':'default'}" onclick="${isPast?`openDayModal('${dd}')`:''}" title="${isPast?t.cal+'kcal — tap to edit':''}">
             <div style="width:100%;border-radius:4px 4px 0 0;background:${barColor};height:${heightPct}%;min-height:${isPast?4:2}px;transition:height .3s;${isToday?'box-shadow:0 0 6px rgba(224,40,46,0.4)':''}"></div>
@@ -2774,7 +2774,7 @@ function renderDashboard(){
   tots=getDayTotals(td());goal=S.targets.cal||1600;pgoal=S.targets.prot||160;calLeft=goal-tots.cal;let protLeft=pgoal-tots.prot;let calPct=Math.min(100,Math.round((tots.cal/goal)*100));
   let crEl=document.getElementById('d-cal-remain');if(crEl){crEl.textContent=Math.abs(calLeft);crEl.style.color=calLeft<-150?'var(--red)':calLeft<0?'var(--amber)':'var(--text)';}
   let prEl=document.getElementById('d-prot-remain');if(prEl){prEl.textContent=Math.abs(protLeft)+'g';prEl.style.color=protLeft<0?'var(--green)':'var(--text)';}
-  let dcb=document.getElementById('d-cal-bar');if(dcb){dcb.style.width=calPct+'%';dcb.style.background=calPct>109?'var(--red)':calPct>=100?'var(--amber)':calPct>=85?'var(--green)':'var(--amber)';}
+  let dcb=document.getElementById('d-cal-bar');if(dcb){dcb.style.width=calPct+'%';dcb.style.background=calPct>112?'var(--red)':calPct>106?'var(--amber)':calPct>=94?'var(--green)':calPct>=88?'var(--amber)':'var(--red)';}
   bbd=document.getElementById('d-biz-breakdown');if(bbd){lines=BIZ_CFG.map(b=>{e=S.biz[b.id]?.[td()];let h=parseFloat(e?.hours)||0;if(!h)return null;let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px">${logo?`<img src="${logo}" style="width:18px;height:18px;object-fit:contain;border-radius:4px">`:`<div style="width:18px;height:18px;border-radius:4px;background:var(--bg4)"></div>`}<span style="color:${b.color};flex:1">${b.name}</span><span style="color:var(--text)">${h}h${e?.notes?' — '+e.notes:''}</span></div>`;}).filter(Boolean);bbd.innerHTML=lines.length?lines.join(''):'<span style="color:var(--text3);font-size:14px">No hours logged today</span>';}
   m=S.mood[td()]||{};let mEl=document.getElementById('d-mood-display');if(mEl)mEl.textContent=m.mood?['','😔','😐','🙂','😄','🔥'][m.mood]:'—';
   // Today's tasks from new system
