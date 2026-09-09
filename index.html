@@ -911,10 +911,6 @@ function initBizDaySelect(){
   }).join('');
 }
 
-function setBizDay(d){
-  _bizDay=d;
-  renderBusiness();
-}
 function renderDayPicker(){
   el=document.getElementById('habit-day-picker');if(!el)return;
   let anchor=new Date();anchor.setDate(anchor.getDate()+(_editWeekOffset*7));
@@ -1730,178 +1726,17 @@ function renderQuote(){el=document.getElementById('quote-display');if(!el)return
 function setDate(){el=document.getElementById('today-date');if(!el)return;el.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
 
 // ── Confetti ──
-function spawnConfetti(big){
-  let canvas=document.getElementById('confetti-canvas');if(!canvas)return;
-  canvas.style.display='block';let ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  let count=big?200:60;let pieces=[];let colors=['#E0282E','#7B6FD4','#3DAA4C','#D4851A','#2B7FD4','#FFD700','#FF6B6B'];
-  for(i=0;i<count;i++)pieces.push({x:Math.random()*canvas.width,y:-10,r:Math.random()*6+3,c:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-0.5)*4,vy:Math.random()*4+2,spin:Math.random()*0.2-0.1,op:1});
-  let frame=0,max=big?180:90;
-  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.08;p.spin+=0.05;if(frame>max*0.6)p.op=Math.max(0,p.op-0.03);ctx.save();ctx.globalAlpha=p.op;ctx.fillStyle=p.c;ctx.translate(p.x,p.y);ctx.rotate(p.spin*frame);ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);ctx.restore();});frame++;if(frame<max)requestAnimationFrame(draw);else{ctx.clearRect(0,0,canvas.width,canvas.height);canvas.style.display='none';}}
-  draw();
-}
 
 // ── Food / Calories ──
 let _ingMode=false;
-function getCalDay(){el=document.getElementById('cal-day-picker');return el&&el.value?el.value:td();}
-function initDayPicker(){
-  el=document.getElementById('cal-day-picker');if(!el)return;
-  // Last 30 days
-  let days30=[]; for(let i=29;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days30.push(localDate(d));}
-  let today=td(); let cur=getCalDay();
-  // Sync with _editDay if it was changed from habits page
-  if(_editDay&&_editDay!==today) cur=_editDay;
-  el.innerHTML=days30.map(d=>{
-    dt=new Date(d+'T12:00:00');
-    lbl=d===today?'Today':dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-    return `<option value="${d}"${d===cur?' selected':''}>${lbl}</option>`;
-  }).reverse().join('');
-  // Show/hide edit banner
-  let banner=document.getElementById('cal-edit-day-banner');
-  let label=document.getElementById('cal-edit-day-label');
-  let isToday=cur===today;
-  if(banner)banner.style.display=isToday?'none':'block';
-  if(label)label.textContent=isToday?'Today':new Date(cur+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
-}
-function toggleIngredientMode(){_ingMode=!_ingMode;let tog=document.getElementById('ingredient-toggle'),knob=document.getElementById('ingredient-knob');if(tog)tog.style.background=_ingMode?'var(--green)':'var(--border2)';if(knob)knob.style.left=_ingMode?'22px':'2px';}
-function getDayTotals(d){items=S.food[d]||[];return{cal:items.reduce((s,i)=>s+i.cal,0),prot:items.reduce((s,i)=>s+i.prot,0)};}
-function logFood(){
-  let name=document.getElementById('food-name')?.value.trim();let cal=parseFloat(document.getElementById('food-cal')?.value)||0;let prot=parseFloat(document.getElementById('food-prot')?.value)||0;let meal=document.getElementById('food-meal')?.value||'snack';
-  if(!name||!cal)return;d=getCalDay();if(!S.food[d])S.food[d]=[];
-  S.food[d].push({name,cal,prot,meal,ingredient:_ingMode,id:Date.now()});ss('food');
-  ['food-name','food-cal','food-prot'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});
-  renderCalories();renderDashboard();
-}
-function deleteFood(id,d){d=d||getCalDay();S.food[d]=(S.food[d]||[]).filter(i=>i.id!==id);ss('food');if(document.getElementById('day-modal').classList.contains('open'))renderFoodLog(_modalDay,'modal-food-log',true);else{renderCalories();renderDashboard();}}
-function saveFavourite(){name=document.getElementById('food-name')?.value.trim();cal=parseFloat(document.getElementById('food-cal')?.value)||0;let prot=parseFloat(document.getElementById('food-prot')?.value)||0;if(!name||!cal)return;if(S.favs.find(f=>f.name===name))return;S.favs.push({name,cal,prot,id:Date.now()});ss('favs');renderFavChips();}
-function addFavToLog(id){fav=S.favs.find(f=>f.id===id);if(!fav)return;meal=document.getElementById('food-meal')?.value||'snack';let d=getCalDay();if(!S.food[d])S.food[d]=[];S.food[d].push({...fav,meal,ingredient:_ingMode,id:Date.now()});ss('food');renderCalories();renderDashboard();}
-function deleteFav(id){S.favs=S.favs.filter(f=>f.id!==id);ss('favs');renderFavChips();renderSettings();}
-function renderFavChips(){el=document.getElementById('fav-chips');if(!el)return;el.innerHTML=S.favs.length?S.favs.map(f=>`<button class="fav-chip" onclick="addFavToLog(${f.id})">⭐ ${f.name} <span style="color:var(--text3)">${f.cal}kcal</span></button>`).join(''):'<div style="font-size:13px;color:var(--text3)">No favourites yet — add a food and tap ★</div>';}
-function renderFoodLog(d,elId,showDel){
-  el=document.getElementById(elId);if(!el)return;
-  items=S.food[d]||[];if(!items.length){el.innerHTML='<div style="font-size:14px;color:var(--text3)">Nothing logged</div>';return;}
-  let byMeal={};items.forEach(i=>{if(!byMeal[i.meal])byMeal[i.meal]=[];byMeal[i.meal].push(i);});
-  order=['breakfast','pre-workout','lunch','post-workout','dinner','snack'];let html='';
-  order.filter(m=>byMeal[m]).forEach(m=>{
-    let mItems=byMeal[m];let mCal=mItems.reduce((s,i)=>s+i.cal,0);let mProt=mItems.reduce((s,i)=>s+i.prot,0);
-    html+=`<div class="meal-group"><div class="meal-header"><span>${MEAL_LABELS[m]||m}</span><span>${mCal}kcal · ${mProt}g</span></div>`;
-    mItems.forEach(i=>{let del=showDel?`<button onclick="deleteFood(${i.id},'${d}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;font-family:inherit;padding:0;flex-shrink:0">×</button>`:'';if(i.ingredient){html+=`<div class="food-item" style="padding-left:12px;border-left:2px solid var(--border2);margin-left:4px"><div class="food-name" style="color:var(--text2)">↳ ${i.name}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="food-macros">${i.cal}kcal·${i.prot}g</span>${del}</div></div>`;}else{html+=`<div class="food-item"><div class="food-name">${i.name}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="food-macros">${i.cal}kcal·${i.prot}g</span>${del}</div></div>`;}});
-    html+='</div>';
-  });
-  el.innerHTML=html;
-}
-function renderCalories(){
-  initDayPicker();
-  d=getCalDay();let tots=getDayTotals(d);let goal=S.targets.cal||1600;let pgoal=S.targets.prot||160;
-  let calLeft=goal-tots.cal;let protLeft=pgoal-tots.prot;let calPct=Math.min(100,Math.round((tots.cal/goal)*100));let protPct=Math.min(100,Math.round((tots.prot/pgoal)*100));
-  set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v;};
-  set('cal-eaten',tots.cal);set('cal-goal-disp',goal);
-  let lE=document.getElementById('cal-left');if(lE){lE.textContent=Math.abs(calLeft);lE.style.color=calLeft<0?'var(--red)':'var(--green)';}
-  let fE=document.getElementById('cal-fill');if(fE){fE.style.width=calPct+'%';fE.style.background=calPct>112?'var(--red)':calPct>106?'var(--amber)':calPct>=94?'var(--green)':calPct>=88?'var(--amber)':'var(--red)';}
-  set('prot-eaten-disp',tots.prot+'g');set('prot-goal-disp2',pgoal+'g');
-  let plE=document.getElementById('prot-left-disp');if(plE){plE.textContent=Math.abs(protLeft)+'g';plE.style.color=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
-  let pfE=document.getElementById('prot-fill');if(pfE){pfE.style.width=protPct+'%';pfE.style.background=protLeft<0?'var(--green)':protLeft<=10?'var(--green)':protLeft<=30?'var(--amber)':'var(--red)';}
-  let weekDates=getWeekDates();let wkE=weekDates.reduce((s,d)=>s+getDayTotals(d).cal,0);let wkB=(S.targets.cal||1600)*7;let wkR=wkB-wkE;let wkP=Math.min(100,Math.round((wkE/wkB)*100));
-  set('wk-eaten',wkE);set('wk-budget',wkB);
-  let wrE=document.getElementById('wk-remain');if(wrE){wrE.textContent=Math.abs(wkR);wrE.style.color=wkR<0?'var(--red)':'var(--green)';}
-  let wfE=document.getElementById('wk-fill');if(wfE)wfE.style.width=wkP+'%';
-  let dbEl=document.getElementById('wk-day-bars');let today=td();
-  if(dbEl){
-    dbEl.innerHTML=`<div style="margin-top:8px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        ${weekDates.map((dd,i)=>{let isToday=dd===today;return `<div style="flex:1;text-align:center;font-size:10px;font-weight:${isToday?700:500};color:${isToday?'var(--red)':'var(--text3)'}">${DAYS_SHORT[i]}</div>`;}).join('')}
-      </div>
-      <div style="display:flex;gap:4px;align-items:flex-end;height:48px;margin-bottom:6px">
-        ${weekDates.map((dd,i)=>{
-          t=getDayTotals(dd);
-          let pct=S.targets.cal?Math.min(100,Math.round((t.cal/S.targets.cal)*100)):0;
-          isPast=dd<=today;let isToday=dd===today;
-          let barColor=!isPast?'var(--border)':pct>112?'var(--red)':pct>106?'var(--amber)':pct>=94?'var(--green)':pct>=88?'var(--amber)':'var(--red)';
-          let heightPct=isPast&&pct>0?Math.max(8,pct):4;
-          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:${isPast?'pointer':'default'}" onclick="${isPast?`openDayModal('${dd}')`:''}" title="${isPast?t.cal+'kcal — tap to edit':''}">
-            <div style="width:100%;border-radius:4px 4px 0 0;background:${barColor};height:${heightPct}%;min-height:${isPast?4:2}px;transition:height .3s;${isToday?'box-shadow:0 0 6px rgba(224,40,46,0.4)':''}"></div>
-          </div>`;
-        }).join('')}
-      </div>
-      <div style="display:flex;justify-content:space-between">
-        ${weekDates.map((dd,i)=>{
-          t=getDayTotals(dd);isPast=dd<=today;
-          return `<div style="flex:1;text-align:center;font-size:9px;color:${isPast?'var(--text2)':'var(--text3)'}">${isPast&&t.cal>0?t.cal:'—'}</div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
-  renderFoodLog(d,'food-log-today',true);renderFavChips();
-}
 let _modalDay=null;
-function openDayModal(d){_modalDay=d;dt=new Date(d+'T12:00:00');let te=document.getElementById('modal-title-date');if(te)te.textContent=dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});renderFoodLog(d,'modal-food-log',true);document.getElementById('day-modal').classList.add('open');}
-function logFoodForDate(){name=document.getElementById('modal-food-name')?.value.trim();cal=parseFloat(document.getElementById('modal-food-cal')?.value)||0;prot=parseFloat(document.getElementById('modal-food-prot')?.value)||0;let meal=document.getElementById('modal-food-meal')?.value||'snack';if(!name||!cal)return;if(!S.food[_modalDay])S.food[_modalDay]=[];S.food[_modalDay].push({name,cal,prot,meal,ingredient:false,id:Date.now()});ss('food');['modal-food-name','modal-food-cal','modal-food-prot'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});renderFoodLog(_modalDay,'modal-food-log',true);renderCalories();renderDashboard();}
-function closeModal(){document.getElementById('day-modal').classList.remove('open');}
 document.getElementById('day-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
 // ── Weekly ──
-function renderWeekly(){
-  weekDates=getWeekDates();let today=td();
-  ['boxing','run'].forEach(type=>{
-    el=document.getElementById('weekly-'+type+'-block');if(!el)return;
-    let wk=S.weekly[type]||{};let hits=weekDates.filter(d=>wk[d]).length;let target=type==='boxing'?2:1;
-    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span style="font-size:14px;font-weight:500;color:var(--text)">${type==='boxing'?'🥊 Boxing (2x/week)':'🏃 5k Run (1x/week)'}</span><span class="spl ${pillCls(hits,target,1)}">${hits}/${target}</span></div><div class="wdc">${weekDates.map((ds,i)=>{hit=!!wk[ds];isPast=ds<=today;return `<div class="wdd"><button class="wdc-circle ${!isPast?'future':hit?'hit':'miss'}" onclick="${isPast?`toggleWeekly('${type}','${ds}')`:''}">${hit?'✓':'·'}</button><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;
-  });
-  let sumEl=document.getElementById('weekly-summary');if(!sumEl)return;
-  // Weekly business total
-  let weekBizEl=document.getElementById('weekly-biz-hours');
-  if(weekBizEl){
-    let totalBizH=weekDates.filter(d=>d<=today).reduce((s,d)=>s+BIZ_CFG.reduce((a,b)=>a+(parseFloat(S.biz[b.id]?.[d]?.hours)||0),0),0);
-    let bizPct=Math.min(100,Math.round((totalBizH/20)*100));
-    let bizColour=totalBizH>=20?'var(--green)':totalBizH>=10?'var(--amber)':'var(--red)';
-    weekBizEl.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-      <span style="font-size:14px;font-weight:500;color:var(--text)">Business hours</span>
-      <span class="spl" style="color:${bizColour};border-color:${bizColour}30;background:${bizColour}15">${totalBizH.toFixed(1)}h / 20h</span>
-    </div>
-    <div class="pb"><div class="pf" style="width:${bizPct}%;background:${bizColour}"></div></div>
-    <div style="font-size:11px;color:var(--text3);margin-top:6px">Weekdays: 2h/day · Sat+Sun: 5h/day</div>`;
-  }
-  days=weekDates.filter(d=>d<=today);
-  rows=[
-    {label:'All 5 prayers',fn:d=>PRAYERS.filter(p=>getP(d)[p]).length>=5},
-    {label:'Gym',fn:d=>!!getH(d).gym,target:4},
-    {label:'100 push-ups',fn:d=>!!getH(d).pushups},
-    {label:'Diet',fn:d=>!!getH(d).diet},
-    {label:'No excess sugar',fn:d=>!!getH(d).sugar},
-    {label:'5 pages read',fn:d=>!!getH(d).reading},
-    {label:'2h+ business',fn:d=>getBizH(d)>=2}
-  ].map(r=>{hits=days.filter(d=>r.fn(d)).length;cap=r.target||days.length;let pct=cap?Math.min(100,Math.round((hits/cap)*100)):0;return{...r,hits,total:r.target||days.length,pct};});
-  sumEl.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1.5px solid var(--border)"><span style="font-size:13px;color:var(--text);min-width:110px">${r.label}</span><div style="flex:1"><div class="pb" style="margin:0"><div class="pf" style="width:${r.pct}%;background:${r.pct>=80?'var(--green)':r.pct>=50?'var(--amber)':'var(--red)'}"></div></div></div><span style="font-size:12px;color:var(--text3);min-width:36px;text-align:right">${r.hits}/${r.total}</span></div>`).join('');
-}
-function toggleWeekly(type,ds){if(!S.weekly[type])S.weekly[type]={};S.weekly[type][ds]=!S.weekly[type][ds];ss('weekly');renderWeekly();}
 
 // ── Weekly Review ──
-function renderWeeklyReview(){
-  el=document.getElementById('review-content');if(!el)return;
-  weekDates=getWeekDates();let today=td();let pastDays=weekDates.filter(d=>d<=today);
-  let avgScore=pastDays.length?Math.round(pastDays.reduce((s,d)=>s+habScore(d),0)/pastDays.length):0;
-  let gymSessions=pastDays.filter(d=>!!getH(d).gym).length;let prayerDays=pastDays.filter(d=>PRAYERS.filter(p=>getP(d)[p]).length>=5).length;
-  let totalBizH=BIZ_CFG.reduce((acc,b)=>{let entry=S.biz[b.id]||{};return acc+weekDates.reduce((s,d)=>s+(parseFloat(entry[d]?.hours)||0),0);},0);
-  let wkCal=weekDates.reduce((s,d)=>s+getDayTotals(d).cal,0);let wkBudget=(S.targets.cal||1600)*7;
-  let savedReview=S.reviews[weekDates[0]]||{};
-  let monStr=new Date(weekDates[0]+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  let sunStr=new Date(weekDates[6]+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  el.innerHTML=`<div class="card" style="border-color:var(--red-b)"><div class="ct">Week of ${monStr} — ${sunStr}</div><div class="mg4"><div class="met"><div class="mv">${avgScore}%</div><div class="ml">Avg score</div></div><div class="met"><div class="mv">${gymSessions}/4</div><div class="ml">Gym</div></div><div class="met"><div class="mv">${prayerDays}/7</div><div class="ml">Full salah</div></div><div class="met"><div class="mv">${totalBizH.toFixed(1)}h</div><div class="ml">Biz work</div></div></div><div class="mg2" style="margin-bottom:0"><div class="met"><div class="mv" style="font-size:16px">${wkCal}</div><div class="ml">kcal this week</div></div><div class="met"><div class="mv" style="font-size:16px;color:${wkCal>wkBudget?'var(--red)':'var(--green)'}">${Math.abs(wkBudget-wkCal)}</div><div class="ml">${wkCal>wkBudget?'over':'under'}</div></div></div></div>
-  <div class="card"><div class="ct">Business hours</div>${BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};h=weekDates.reduce((s,d)=>s+(parseFloat(entry[d]?.hours)||0),0);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:24px;height:24px;object-fit:contain;border-radius:4px">`:`<div style="width:24px;height:24px;border-radius:4px;background:var(--bg4)"></div>`}<span style="font-size:13px;color:${b.color};flex:1">${b.name}</span><span style="font-size:14px;font-weight:500;color:var(--text)">${h.toFixed(1)}h</span></div>`;}).join('')}</div>
-  <div class="card" style="border-color:var(--red-b)"><div class="ct">Weekly review</div>
-  <div style="margin-bottom:12px"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:500">What went well?</div><textarea id="wr-wins" placeholder="Wins, progress, gratitude...">${savedReview.wins||''}</textarea></div>
-  <div style="margin-bottom:12px"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:500">One thing to fix next week</div><textarea id="wr-fix" placeholder="Be specific...">${savedReview.fix||''}</textarea></div>
-  <div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:500">Next week's focus</div><textarea id="wr-focus" placeholder="Business / training / personal...">${savedReview.focus||''}</textarea></div>
-  <button class="sb" onclick="saveWeeklyReview('${weekDates[0]}')">Save review</button></div>
-  <div id="past-reviews-block"></div>`;
-  renderPastReviews();
-}
-function saveWeeklyReview(ws){S.reviews[ws]={wins:document.getElementById('wr-wins')?.value||'',fix:document.getElementById('wr-fix')?.value||'',focus:document.getElementById('wr-focus')?.value||''};ss('reviews');let btn=document.querySelector('#review-content .sb');if(btn){btn.textContent='Saved ✓';btn.style.background='var(--green)';setTimeout(()=>{btn.textContent='Save review';btn.style.background='';},2000);}}
-function renderPastReviews(){el=document.getElementById('past-reviews-block');if(!el)return;entries=Object.entries(S.reviews).sort((a,b)=>b[0].localeCompare(a[0])).slice(1,5);if(!entries.length)return;el.innerHTML=`<div class="card"><div class="ct">Past reviews</div>${entries.map(([ws,r])=>{let lbl=new Date(ws+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});return `<div style="padding:9px 0;border-bottom:1.5px solid var(--border)"><div style="font-size:12px;color:var(--text3);margin-bottom:5px;font-weight:500">Week of ${lbl}</div>${r.wins?`<div style="font-size:13px;color:var(--text2);margin-bottom:3px"><span style="color:var(--text3)">Wins: </span>${r.wins}</div>`:''}${r.fix?`<div style="font-size:13px;color:var(--text2);margin-bottom:3px"><span style="color:var(--text3)">Fix: </span>${r.fix}</div>`:''}${r.focus?`<div style="font-size:13px;color:var(--text2)"><span style="color:var(--text3)">Focus: </span>${r.focus}</div>`:''}</div>`;}).join('')}</div>`;}
 
 // ── Business ──
-function triggerLogoUpload(id){document.getElementById('logo-file-'+id)?.click();}
-function handleLogoUpload(id,input){file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{S.logos[id]=e.target.result;ss('logos');renderBusiness();};r.readAsDataURL(file);}
-function removeLogo(id){delete S.logos[id];ss('logos');renderBusiness();}
 
 function fillBizInputs(){
   const d = _bizDay||td();
@@ -1929,155 +1764,14 @@ function initBizDayPicker(){
 
 
 
-function renderBusiness(){
-  initBizDayPicker();
-  // Sync _editDay from picker
-  const picker = document.getElementById('biz-day-picker');
-  if(picker&&picker.value) _editDay=picker.value;
-  el=document.getElementById('biz-cards');if(!el)return;
-  today=td();weekStart=localDate(getMonday());now=new Date();monthStart=localDate(new Date(now.getFullYear(),now.getMonth(),1));
-  el.innerHTML='';
-  BIZ_CFG.forEach(function(b){
-    var entry=S.biz[b.id]||{};
-    var saveDay2=_bizDay||today;
-    var tod=entry[saveDay2]||{hours:'',notes:''};
-    var total=Object.values(entry).reduce(function(s,v){return s+(parseFloat(v.hours)||0);},0);
-    var weekly=Object.entries(entry).filter(function(e){return e[0]>=weekStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
-    var monthly=Object.entries(entry).filter(function(e){return e[0]>=monthStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
-    var logo=S.logos[b.id];
-
-    /* --- Card wrapper --- */
-    var card=document.createElement('div');
-    card.className='biz-card card';
-    card.style.cssText='border-left:3px solid '+b.color+';margin-bottom:12px';
-
-    /* --- File input (hidden) --- */
-    var fi=document.createElement('input');
-    fi.type='file';fi.id='logo-file-'+b.id;fi.accept='image/*';
-    fi.dataset.biz=b.id;
-    fi.onchange=function(){handleLogoUpload(this.dataset.biz,this);};
-    card.appendChild(fi);
-
-    /* --- Top row: logo + name --- */
-    var topRow=document.createElement('div');
-    topRow.style.cssText='display:flex;align-items:center;gap:11px;margin-bottom:11px';
-    var la=document.createElement('div');la.className='logo-area';
-    la.dataset.biz=b.id;la.onclick=function(){triggerLogoUpload(this.dataset.biz);};
-    if(logo){var img=document.createElement('img');img.src=logo;img.alt=b.name;la.appendChild(img);}
-    else{la.innerHTML='<div class="logo-ph">+logo</div>';}
-    var nd=document.createElement('div');nd.style.flex='1';
-    var nm=document.createElement('div');nm.style.cssText='font-size:15px;font-weight:600;color:'+b.color;nm.textContent=b.name;
-    var tt=document.createElement('div');tt.style.cssText='font-size:11px;color:var(--text3)';tt.textContent=total.toFixed(1)+'h total';
-    nd.appendChild(nm);nd.appendChild(tt);
-    if(logo){var rb2=document.createElement('button');rb2.style.cssText='font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;display:block';rb2.textContent='Remove';rb2.dataset.biz=b.id;rb2.onclick=function(){removeLogo(this.dataset.biz);};nd.appendChild(rb2);}
-    else{var tp=document.createElement('div');tp.style.cssText='font-size:11px;color:var(--text3);margin-top:2px';tp.textContent='Tap to upload logo';nd.appendChild(tp);}
-    topRow.appendChild(la);topRow.appendChild(nd);
-    card.appendChild(topRow);
-
-    /* --- Stats grid --- */
-    var sg=document.createElement('div');sg.className='mg4';
-    var stats=[[(parseFloat(tod.hours)||0).toFixed(1)+'h',saveDay2===today?'Today':'Selected'],[weekly.toFixed(1)+'h','Week'],[monthly.toFixed(1)+'h','Month'],[total.toFixed(1)+'h','Total']];
-    sg.innerHTML=stats.map(function(s){return '<div class="met"><div class="mv" style="font-size:14px">'+s[0]+'</div><div class="ml">'+s[1]+'</div></div>';}).join('');
-    card.appendChild(sg);
-
-    /* --- Hours input row (always added via createElement) --- */
-    var ir=document.createElement('div');ir.className='ir';ir.style.cssText='margin:10px 0 6px';
-    var lbl=document.createElement('label');lbl.style.cssText='min-width:52px;font-size:12px';lbl.textContent='Hours';
-    var hi=document.createElement('input');hi.type='number';hi.id='biz-h-'+b.id;hi.placeholder='0';hi.min='0';hi.step='0.5';hi.value=tod.hours||'';hi.style.cssText='width:90px';
-    var ni=document.createElement('input');ni.type='text';ni.id='biz-n-'+b.id;ni.placeholder='What did you work on?';ni.value=tod.notes||'';ni.style.flex='1';
-    ir.appendChild(lbl);ir.appendChild(hi);ir.appendChild(ni);
-    card.appendChild(ir);
-
-    /* --- Save button --- */
-    var sb2=document.createElement('button');sb2.className='sb ghost';sb2.id='biz-save-'+b.id;sb2.textContent='Save hours';sb2.dataset.biz=b.id;
-    sb2.onclick=function(){saveBizHours(this.dataset.biz);};
-    card.appendChild(sb2);
-
-    /* --- Milestones --- */
-    var ms=document.createElement('div');ms.style.marginTop='11px';
-    ms.innerHTML=MS.map(function(m){var pct=Math.min(100,Math.round((total/m)*100));return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>'+m+'h</span><span>'+Math.min(total,m).toFixed(0)+'/'+m+'h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:'+pct+'%;background:'+b.color+'"></div></div></div>';}).join('');
-    card.appendChild(ms);
-    var mr=document.createElement('div');mr.className='ms-row';
-    mr.innerHTML=MS.map(function(m){return '<div class="ms '+(total>=m?'hit':'')+'">'+m+'h</div>';}).join('');
-    card.appendChild(mr);
-
-    el.appendChild(card);
-  })
-  fillBizInputs();
-  totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
-}
-function saveBizHours(id){
-  const h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
-  const n=document.getElementById('biz-n-'+id)?.value||'';
-  // Read date from picker element directly at save time - most reliable
-  const picker=document.getElementById('biz-day-picker');
-  const saveDay=(picker&&picker.value)?picker.value:(_bizDay||td());
-  if(!S.biz[id])S.biz[id]={};
-  S.biz[id][saveDay]={hours:h,notes:n};
-  ss('biz');
-  renderHabits();renderDashboard();render75Hard();
-  // Flash button with confirmation of which day was saved
-  const btn=document.getElementById('biz-save-'+id);
-  const dayLabel=saveDay===td()?'today':new Date(saveDay+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-  if(btn){btn.textContent='✓ Saved for '+dayLabel;btn.style.background='var(--green)';setTimeout(()=>{btn.textContent='Save hours';btn.style.background='';},2500);}
-}
 
 // ── Gym ──
-function renderGymWeek(){el=document.getElementById('gym-week-dots'),cnt=document.getElementById('gym-week-count');if(!el)return;weekDates=getWeekDates();today=td();let sessions=weekDates.filter(d=>d<=today&&(S.workouts[d]||[]).length>0).length;if(cnt){cnt.textContent=sessions+' session'+(sessions!==1?'s':'');cnt.className='spl '+pillCls(sessions,4,2);}el.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{let hw=(S.workouts[ds]||[]).length>0;let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hw?'hit':'miss'}">${hw?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;}
 ;
-const GYM_DAYS_SHORT = {mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
 
-function getGymPlan(){ return lsGet('_gym_plan', GYM_PLAN_DEFAULT); }
 
-function renderGymPlan(){
-  const plan = getGymPlan();
-  const todayKey = ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
-  const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
-  const view = document.getElementById('gym-plan-view'); if(!view) return;
-  view.innerHTML = dayKeys.map(d => {
-    const isToday = d === todayKey;
-    const val = plan[d] || '—';
-    const isRest = val.toLowerCase().startsWith('rest');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:11px;font-weight:700;color:${isToday?'var(--gold)':'var(--text3)'};width:32px;flex-shrink:0">${GYM_DAYS_SHORT[d].toUpperCase()}</span>
-      <span style="flex:1;font-size:13px;color:${isToday?'var(--text)':isRest?'var(--text3)':'var(--text2)'};font-weight:${isToday?700:400}">${val}</span>
-      ${isToday?'<span style="font-size:10px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.12);border-radius:5px;padding:2px 7px">TODAY</span>':''}
-    </div>`;
-  }).join('');
-}
 
-function toggleGymPlanEdit(){
-  const view = document.getElementById('gym-plan-view');
-  const edit = document.getElementById('gym-plan-edit');
-  const btn  = document.getElementById('gym-plan-edit-btn');
-  const isEditing = edit.style.display !== 'none';
-  if(isEditing){ view.style.display=''; edit.style.display='none'; btn.textContent='Edit'; }
-  else {
-    const plan = getGymPlan();
-    ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => { const inp=document.getElementById('gp-'+d); if(inp) inp.value=plan[d]||''; });
-    view.style.display='none'; edit.style.display=''; btn.textContent='Cancel';
-  }
-}
 
-function saveGymPlan(){
-  const plan = {};
-  ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => { const inp=document.getElementById('gp-'+d); plan[d]=inp?inp.value.trim():''; });
-  lsSet('_gym_plan', plan);
-  toggleGymPlanEdit(); renderGymPlan();
-}
 
-function renderGymWeek(){
-  const el=document.getElementById('gym-week-dots'), cnt=document.getElementById('gym-week-count');
-  if(!el) return;
-  const weekDates=getWeekDates(), today=td();
-  const sessions=weekDates.filter(d=>d<=today&&migrateWorkouts(S.workouts[d]||[]).length>0).length;
-  if(cnt){ cnt.textContent=sessions+' session'+(sessions!==1?'s':''); cnt.className='spl '+pillCls(sessions,4,2); }
-  el.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{
-    const hw=migrateWorkouts(S.workouts[ds]||[]).length>0;
-    const isPast=ds<=today;
-    return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hw?'hit':'miss'}">${hw?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;
-  }).join('')}</div>`;
-}
 
 // ── Migrate old flat workout format to new set-by-set format ──
 function migrateWorkouts(exercises){
@@ -2298,12 +1992,6 @@ function toggleExDetail(name){
   el.style.display=_exDetailOpen[name]?'block':'none';
 }
 
-function renderWorkout(){
-  renderGymPlan();
-  renderGymWeek();
-  renderGymTodaySession();
-  renderExHistory();
-}
 
 
 // ── Confetti ──
@@ -2497,10 +2185,17 @@ function saveBizHours(id){
 }
 
 // ── Gym ──
-function renderGymWeek(){el=document.getElementById('gym-week-dots'),cnt=document.getElementById('gym-week-count');if(!el)return;weekDates=getWeekDates();today=td();sessions=weekDates.filter(d=>d<=today&&(S.workouts[d]||[]).length>0).length;if(cnt){cnt.textContent=sessions+' session'+(sessions!==1?'s':'');cnt.className='spl '+pillCls(sessions,4,2);}el.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{let hw=(S.workouts[ds]||[]).length>0;let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hw?'hit':'miss'}">${hw?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;}
-function logExercise(){name=document.getElementById('ex-name')?.value.trim();sets=parseInt(document.getElementById('ex-sets')?.value)||0;let reps=parseInt(document.getElementById('ex-reps')?.value)||0;let weight=parseFloat(document.getElementById('ex-weight')?.value)||0;if(!name||!sets||!reps)return;let d=td();if(!S.workouts[d])S.workouts[d]=[];S.workouts[d].push({name,sets,reps,weight,time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})});ss('workouts');['ex-name','ex-sets','ex-reps','ex-weight'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});renderWorkout();}
+function renderWorkout(){
+  renderGymPlan();
+  renderGymWeek();
+  renderGymTodaySession();
+  renderExHistory();
+}
 
-// ── Gym plan ──
+function renderGymWeek(){el=document.getElementById('gym-week-dots'),cnt=document.getElementById('gym-week-count');if(!el)return;weekDates=getWeekDates();today=td();sessions=weekDates.filter(d=>d<=today&&(S.workouts[d]||[]).length>0).length;if(cnt){cnt.textContent=sessions+' session'+(sessions!==1?'s':'');cnt.className='spl '+pillCls(sessions,4,2);}el.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{let hw=(S.workouts[ds]||[]).length>0;let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hw?'hit':'miss'}">${hw?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;}
+;
+const GYM_DAYS = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
+
 const GYM_PLAN_DEFAULT = {
   mon:'Chest, Triceps & Shoulders + Boxing 🥊',
   tue:'Back, Biceps & Abs',
@@ -2510,7 +2205,7 @@ const GYM_PLAN_DEFAULT = {
   sat:'Rest',
   sun:'Rest'
 };
-const GYM_DAYS = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
+const GYM_DAYS_SHORT = {mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
 
 function getGymPlan(){ return lsGet('_gym_plan', GYM_PLAN_DEFAULT); }
 
@@ -2563,12 +2258,6 @@ function saveGymPlan(){
   renderGymPlan();
 }
 
-function renderWorkout(){
-  renderGymPlan();
-  renderGymWeek();
-  tw=document.getElementById('todays-workout');if(tw){let entries=S.workouts[td()]||[];tw.innerHTML=entries.length?entries.map(e=>`<div style="background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:7px"><div style="font-size:14px;font-weight:500;margin-bottom:5px;color:var(--text)">${e.name}</div><div style="display:flex;gap:5px;flex-wrap:wrap"><span style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--text2)">${e.sets}×${e.reps}</span>${e.weight?`<span style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--text2)">${e.weight}kg</span>`:''}<span style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--text3)">${e.time}</span></div></div>`).join(''):'<span style="color:var(--text3)">Nothing logged yet</span>';}
-  let he=document.getElementById('exercise-history');if(he){let all={};Object.entries(S.workouts).forEach(([date,entries])=>{entries.forEach(e=>{if(!all[e.name])all[e.name]=[];all[e.name].push({...e,date});});});let names=Object.keys(all);he.innerHTML=names.length?names.map(name=>{let es=all[name].sort((a,b)=>a.date.localeCompare(b.date));let last=es[es.length-1];let improved=es.length>1&&(last.weight>es[0].weight||last.reps>es[0].reps);return `<div style="padding:8px 0;border-bottom:1.5px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:500;color:var(--text)">${name}</span>${es.length>1?`<span class="spl ${improved?'g':'a'}" style="font-size:11px">${improved?'Improving':'Steady'}</span>`:''}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Best: ${last.sets}×${last.reps}${last.weight?' @ '+last.weight+'kg':''} · ${es.length} session${es.length!==1?'s':''}</div></div>`;}).join(''):'<span style="color:var(--text3)">Log exercises to see progression</span>';}
-}
 
 // ── Goals ──
 function addGoal(type){let inp=document.getElementById(type+'-goal-input');if(!inp||!inp.value.trim())return;if(!S.goals[type])S.goals[type]=[];S.goals[type].push({text:inp.value.trim(),done:false,id:Date.now()});inp.value='';ss('goals');renderGoals();}
