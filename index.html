@@ -479,6 +479,12 @@ input[type=file]{display:none}
   <div class="card" style="padding:10px 14px;margin-bottom:0">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">📅 Logging for:</span>
+      <select id="biz-day-select" onchange="setBizDay(this.value)" style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;font-family:inherit;outline:none"></select>
+    </div>
+  </div>
+  <div class="card" style="padding:10px 14px;margin-bottom:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">📅 Logging for:</span>
       <input type="date" id="biz-day-picker" onchange="setBizDay(this.value)"
         style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color-scheme:dark">
     </div>
@@ -897,7 +903,24 @@ function pillCls(v,g,a){return v>=g?'g':v>=a?'a':'r';}
 // ── Past day editing ──
 let _editDay=td();
 let _editWeekOffset=0; // 0=this week, -1=last week etc
-let _bizDay=td(); // dedicated business log day
+let _bizDay=td(); // business log day
+
+function initBizDaySelect(){
+  var sel=document.getElementById('biz-day-select'); if(!sel) return;
+  var today=td(); var days30=[];
+  for(var i=0;i<30;i++){var d=new Date();d.setDate(d.getDate()-i);days30.push(localDate(d));}
+  var cur=_bizDay||today;
+  sel.innerHTML=days30.map(function(d){
+    var dt=new Date(d+'T12:00:00');
+    var lbl=d===today?'Today — '+dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'}):dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+    return '<option value="'+d+'"'+(d===cur?' selected':'')+'>'+lbl+'</option>';
+  }).join('');
+}
+
+function setBizDay(d){
+  _bizDay=d;
+  renderBusiness();
+}
 function renderDayPicker(){
   el=document.getElementById('habit-day-picker');if(!el)return;
   let anchor=new Date();anchor.setDate(anchor.getDate()+(_editWeekOffset*7));
@@ -1928,41 +1951,62 @@ function renderBusiness(){
     var weekly=Object.entries(entry).filter(function(e){return e[0]>=weekStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
     var monthly=Object.entries(entry).filter(function(e){return e[0]>=monthStart;}).reduce(function(s,e){return s+(parseFloat(e[1].hours)||0);},0);
     var logo=S.logos[b.id];
+
+    /* --- Card wrapper --- */
     var card=document.createElement('div');
     card.className='biz-card card';
-    card.setAttribute('style','border-left:3px solid '+b.color+';margin-bottom:12px');
-    var logoHtml=logo?('<img src="'+logo+'" alt="'+b.name+'" style="width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:pointer" data-biz="'+b.id+'" onclick="triggerLogoUpload(this.dataset.biz)">')
-      :('<div class="logo-ph" style="cursor:pointer" data-biz="'+b.id+'" onclick="triggerLogoUpload(this.dataset.biz)">+logo</div>');
-    var removeHtml=logo?('<button style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;display:block" data-biz="'+b.id+'" onclick="removeLogo(this.dataset.biz)">Remove</button>')
-      :('<div style="font-size:11px;color:var(--text3);margin-top:2px">Tap to upload logo</div>');
-    card.innerHTML='<input type="file" id="logo-file-'+b.id+'" accept="image/*" onchange="handleLogoUpload(this.dataset.biz,this)">'
-      +'<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">'
-        +'<div class="logo-area">'+logoHtml+'</div>'
-        +'<div style="flex:1"><div style="font-size:15px;font-weight:600;color:'+b.color+'">'+b.name+'</div>'
-        +'<div style="font-size:11px;color:var(--text3)">'+total.toFixed(1)+'h total</div>'+removeHtml+'</div>'
-      +'</div>'
-      +'<div class="mg4">'
-        +'<div class="met"><div class="mv" style="font-size:14px">'+(parseFloat(tod.hours)||0).toFixed(1)+'h</div><div class="ml">'+(saveDay2===today?'Today':'Selected')+'</div></div>'
-        +'<div class="met"><div class="mv" style="font-size:14px">'+weekly.toFixed(1)+'h</div><div class="ml">Week</div></div>'
-        +'<div class="met"><div class="mv" style="font-size:14px">'+monthly.toFixed(1)+'h</div><div class="ml">Month</div></div>'
-        +'<div class="met"><div class="mv" style="font-size:14px">'+total.toFixed(1)+'h</div><div class="ml">Total</div></div>'
-      +'</div>'
-      +'<div class="ir" style="margin:10px 0 6px">'
-        +'<label style="min-width:52px;font-size:12px">Hours</label>'
-        +'<input type="number" id="biz-h-'+b.id+'" value="'+(tod.hours||'')+'" placeholder="0" min="0" step="0.5" style="width:90px">'
-        +'<input type="text" id="biz-n-'+b.id+'" value="" placeholder="What did you work on?" style="flex:1">'
-      +'</div>'
-      +'<button class="sb ghost" id="biz-save-'+b.id+'" data-biz="'+b.id+'" onclick="saveBizHours(this.dataset.biz)">Save hours</button>';
-    var notesInp=card.querySelector('#biz-n-'+b.id);
-    if(notesInp) notesInp.value=tod.notes||'';
-    var msDiv=document.createElement('div');
-    msDiv.style.marginTop='11px';
-    msDiv.innerHTML=MS.map(function(m){var pct=Math.min(100,Math.round((total/m)*100));return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>'+m+'h</span><span>'+Math.min(total,m).toFixed(0)+'/'+m+'h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:'+pct+'%;background:'+b.color+'"></div></div></div>';}).join('');
-    card.appendChild(msDiv);
-    var msRow=document.createElement('div');
-    msRow.className='ms-row';
-    msRow.innerHTML=MS.map(function(m){return '<div class="ms '+(total>=m?'hit':'')+'">'+m+'h</div>';}).join('');
-    card.appendChild(msRow);
+    card.style.cssText='border-left:3px solid '+b.color+';margin-bottom:12px';
+
+    /* --- File input (hidden) --- */
+    var fi=document.createElement('input');
+    fi.type='file';fi.id='logo-file-'+b.id;fi.accept='image/*';
+    fi.dataset.biz=b.id;
+    fi.onchange=function(){handleLogoUpload(this.dataset.biz,this);};
+    card.appendChild(fi);
+
+    /* --- Top row: logo + name --- */
+    var topRow=document.createElement('div');
+    topRow.style.cssText='display:flex;align-items:center;gap:11px;margin-bottom:11px';
+    var la=document.createElement('div');la.className='logo-area';
+    la.dataset.biz=b.id;la.onclick=function(){triggerLogoUpload(this.dataset.biz);};
+    if(logo){var img=document.createElement('img');img.src=logo;img.alt=b.name;la.appendChild(img);}
+    else{la.innerHTML='<div class="logo-ph">+logo</div>';}
+    var nd=document.createElement('div');nd.style.flex='1';
+    var nm=document.createElement('div');nm.style.cssText='font-size:15px;font-weight:600;color:'+b.color;nm.textContent=b.name;
+    var tt=document.createElement('div');tt.style.cssText='font-size:11px;color:var(--text3)';tt.textContent=total.toFixed(1)+'h total';
+    nd.appendChild(nm);nd.appendChild(tt);
+    if(logo){var rb2=document.createElement('button');rb2.style.cssText='font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;display:block';rb2.textContent='Remove';rb2.dataset.biz=b.id;rb2.onclick=function(){removeLogo(this.dataset.biz);};nd.appendChild(rb2);}
+    else{var tp=document.createElement('div');tp.style.cssText='font-size:11px;color:var(--text3);margin-top:2px';tp.textContent='Tap to upload logo';nd.appendChild(tp);}
+    topRow.appendChild(la);topRow.appendChild(nd);
+    card.appendChild(topRow);
+
+    /* --- Stats grid --- */
+    var sg=document.createElement('div');sg.className='mg4';
+    var stats=[[(parseFloat(tod.hours)||0).toFixed(1)+'h',saveDay2===today?'Today':'Selected'],[weekly.toFixed(1)+'h','Week'],[monthly.toFixed(1)+'h','Month'],[total.toFixed(1)+'h','Total']];
+    sg.innerHTML=stats.map(function(s){return '<div class="met"><div class="mv" style="font-size:14px">'+s[0]+'</div><div class="ml">'+s[1]+'</div></div>';}).join('');
+    card.appendChild(sg);
+
+    /* --- Hours input row (always added via createElement) --- */
+    var ir=document.createElement('div');ir.className='ir';ir.style.cssText='margin:10px 0 6px';
+    var lbl=document.createElement('label');lbl.style.cssText='min-width:52px;font-size:12px';lbl.textContent='Hours';
+    var hi=document.createElement('input');hi.type='number';hi.id='biz-h-'+b.id;hi.placeholder='0';hi.min='0';hi.step='0.5';hi.value=tod.hours||'';hi.style.cssText='width:90px';
+    var ni=document.createElement('input');ni.type='text';ni.id='biz-n-'+b.id;ni.placeholder='What did you work on?';ni.value=tod.notes||'';ni.style.flex='1';
+    ir.appendChild(lbl);ir.appendChild(hi);ir.appendChild(ni);
+    card.appendChild(ir);
+
+    /* --- Save button --- */
+    var sb2=document.createElement('button');sb2.className='sb ghost';sb2.id='biz-save-'+b.id;sb2.textContent='Save hours';sb2.dataset.biz=b.id;
+    sb2.onclick=function(){saveBizHours(this.dataset.biz);};
+    card.appendChild(sb2);
+
+    /* --- Milestones --- */
+    var ms=document.createElement('div');ms.style.marginTop='11px';
+    ms.innerHTML=MS.map(function(m){var pct=Math.min(100,Math.round((total/m)*100));return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px"><span>'+m+'h</span><span>'+Math.min(total,m).toFixed(0)+'/'+m+'h</span></div><div class="pb" style="margin:0"><div class="pf" style="width:'+pct+'%;background:'+b.color+'"></div></div></div>';}).join('');
+    card.appendChild(ms);
+    var mr=document.createElement('div');mr.className='ms-row';
+    mr.innerHTML=MS.map(function(m){return '<div class="ms '+(total>=m?'hit':'')+'">'+m+'h</div>';}).join('');
+    card.appendChild(mr);
+
     el.appendChild(card);
   })
   fillBizInputs();
@@ -2415,10 +2459,11 @@ function triggerLogoUpload(id){document.getElementById('logo-file-'+id)?.click()
 function handleLogoUpload(id,input){file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{S.logos[id]=e.target.result;ss('logos');renderBusiness();};r.readAsDataURL(file);}
 function removeLogo(id){delete S.logos[id];ss('logos');renderBusiness();}
 function renderBusiness(){
+  initBizDaySelect();
   let el=document.getElementById('biz-cards');if(!el)return;
   today=td(),weekStart=localDate(getMonday()),now=new Date(),monthStart=localDate(new Date(now.getFullYear(),now.getMonth(),1));
   el.innerHTML=BIZ_CFG.map(b=>{
-    entry=S.biz[b.id]||{};let tod=entry[today]||{hours:0,notes:''};
+    entry=S.biz[b.id]||{};let saveDay=_bizDay||today;let tod=entry[saveDay]||{hours:0,notes:''};
     total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);
     weekly=Object.entries(entry).filter(([d])=>d>=weekStart).reduce((s,[,v])=>s+(parseFloat(v.hours)||0),0);
     monthly=Object.entries(entry).filter(([d])=>d>=monthStart).reduce((s,[,v])=>s+(parseFloat(v.hours)||0),0);
@@ -2437,7 +2482,19 @@ function renderBusiness(){
   }).join('');
   totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
 }
-function saveBizHours(id){h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;n=document.getElementById('biz-n-'+id)?.value||'';if(!S.biz[id])S.biz[id]={};S.biz[id][td()]={hours:h,notes:n};ss('biz');renderBusiness();renderHabits();renderDashboard();}
+function saveBizHours(id){
+  var h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
+  var n=document.getElementById('biz-n-'+id)?.value||'';
+  var sel=document.getElementById('biz-day-select');
+  var saveDay=sel&&sel.value?sel.value:(_bizDay||td());
+  if(!S.biz[id])S.biz[id]={};
+  S.biz[id][saveDay]={hours:h,notes:n};
+  ss('biz');
+  renderBusiness();renderHabits();renderDashboard();render75Hard();
+  // Confirm which day was saved
+  var btn=document.getElementById('biz-save-'+id);
+  if(btn){var dl=saveDay===td()?'today':new Date(saveDay+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});btn.textContent='✓ Saved for '+dl;btn.style.background='var(--green)';setTimeout(function(){btn.textContent='Save hours';btn.style.background='';},2500);}
+}
 
 // ── Gym ──
 function renderGymWeek(){el=document.getElementById('gym-week-dots'),cnt=document.getElementById('gym-week-count');if(!el)return;weekDates=getWeekDates();today=td();sessions=weekDates.filter(d=>d<=today&&(S.workouts[d]||[]).length>0).length;if(cnt){cnt.textContent=sessions+' session'+(sessions!==1?'s':'');cnt.className='spl '+pillCls(sessions,4,2);}el.innerHTML=`<div class="wdc">${weekDates.map((ds,i)=>{let hw=(S.workouts[ds]||[]).length>0;let isPast=ds<=today;return `<div class="wdd"><div class="wdc-circle ${!isPast?'future':hw?'hit':'miss'}">${hw?'✓':'·'}</div><div class="wdc-label">${DAYS_SHORT[i]}</div></div>`;}).join('')}</div>`;}
@@ -3327,6 +3384,55 @@ function renderAll(){
 
 
 // Seed tasks on first load if task store is empty
+
+// ── One-time history seed ──
+(function seedHistory(){
+  if(lsGet('_seed_v2')) return;
+
+  const days = ['2026-09-07','2026-09-08','2026-09-09'];
+
+  // 75 Hard start
+  lsSet('_75hard_start','2026-09-07');
+  const _url=lsGet('_sb_url','')||SB_URL;
+  const _key=lsGet('_sb_key','')||SB_KEY;
+  if(_url&&_key) sbSet('75hard_start','2026-09-07').catch(()=>{});
+
+  // All prayers ticked
+  days.forEach(d=>{
+    if(!S.prayers[d])S.prayers[d]={};
+    ['fajr','dhuhr','asr','maghrib','isha'].forEach(p=>S.prayers[d][p]=true);
+  });
+  lsSet('pr3',S.prayers);
+
+  // All core habits ticked (no tahajjud)
+  days.forEach(d=>{
+    if(!S.habits[d])S.habits[d]={};
+    ['gym','pushups','diet','reading','sugar'].forEach(h=>S.habits[d][h]=true);
+  });
+  lsSet('h3',S.habits);
+
+  // 2h business on SLP each day
+  if(!S.biz.slp)S.biz.slp={};
+  days.forEach(d=>{ S.biz.slp[d]={hours:2,notes:'Work session'}; });
+  lsSet('bz3',S.biz);
+
+  // Perfect calories each day (1700kcal / 150g protein)
+  days.forEach(d=>{
+    S.food[d]=[{name:'Daily meals',cal:1700,prot:150,meal:'dinner',ingredient:false,id:Date.now()+Math.floor(Math.random()*9999)}];
+  });
+  lsSet('food3',S.food);
+
+  // Sync to Supabase
+  if(_url&&_key){
+    sbSet('pr3',S.prayers).catch(()=>{});
+    sbSet('h3',S.habits).catch(()=>{});
+    sbSet('bz3',S.biz).catch(()=>{});
+    sbSet('food3',S.food).catch(()=>{});
+  }
+
+  lsSet('_seed_v2',true);
+})();
+
 // Always ensure hardcoded Supabase keys are in localStorage
 if(typeof SB_URL!=='undefined'&&SB_URL) lsSet('_sb_url',SB_URL);
 if(typeof SB_KEY!=='undefined'&&SB_KEY) lsSet('_sb_key',SB_KEY);
