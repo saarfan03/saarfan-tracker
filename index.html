@@ -3146,6 +3146,12 @@ if(typeof SB_KEY!=='undefined'&&SB_KEY) lsSet('_sb_key',SB_KEY);
 renderAll();
 fetchPrayerTimes();
 loadFromCloud();
+// Pull fresh data whenever app comes back into focus (switching from phone to app etc)
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden){
+    loadFromCloud().then(()=>{ renderAll(); renderTasks(); });
+  }
+});
 </script>
 </body>
 </html>
