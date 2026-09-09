@@ -809,22 +809,15 @@ async function loadFromCloud(){
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
     rows.forEach(row=>{try{
       let v=JSON.parse(row.value);
-      // Don't overwrite local data with cloud if local has more/equal content
+      let cloudTs=row.updated_at?new Date(row.updated_at).getTime():0;
+      let localTs=lsGet('_ts_'+row.key,0)||0;
       let localRaw=localStorage.getItem(row.key);
-      let localVal=localRaw?JSON.parse(localRaw):null;
-      let shouldOverwrite=false;
-      if(!localVal||localVal===null){
-        shouldOverwrite=true; // nothing local, use cloud
-      } else if(typeof v==='object'&&v!==null&&typeof localVal==='object'&&localVal!==null){
-        // For objects: use cloud only if it has strictly more keys
-        let cloudKeys=Object.keys(v).length;
-        let localKeys=Object.keys(localVal).length;
-        shouldOverwrite=cloudKeys>localKeys;
-      } else if(row.key==='75hard_start'||row.key==='tasks_v4'){
-        shouldOverwrite=true; // always sync these
-      }
+      let hasLocal=localRaw!==null&&localRaw!==undefined&&localRaw!=='null';
+      // Use cloud if: no local data, OR cloud is newer than our last local save
+      let shouldOverwrite=!hasLocal||(cloudTs>localTs);
       if(shouldOverwrite){
         localStorage.setItem(row.key,row.value);
+        lsSet('_ts_'+row.key, cloudTs||Date.now());
         if(rm[row.key]) S[rm[row.key]]=v;
         if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
       }
@@ -861,7 +854,10 @@ let S={
 };
 const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
 function ss(k){
-  const v=S[k]; lsSet(KEY_MAP[k],v);
+  const v=S[k];
+  const ts=Date.now();
+  lsSet(KEY_MAP[k],v);
+  lsSet('_ts_'+KEY_MAP[k], ts); // timestamp this save
   if(k!=='logos'&&k!=='workouts'){
     const _url=lsGet('_sb_url','')||SB_URL;
     const _key=lsGet('_sb_key','')||SB_KEY;
@@ -1722,6 +1718,9 @@ async function manualSync(){
   }
   try{
     // Push all data keys
+    // Stamp all keys with current time before pushing
+    const now=Date.now();
+    Object.keys(KEY_MAP).forEach(k=>{ if(k!=='logos')lsSet('_ts_'+KEY_MAP[k],now); });
     const pushes=Object.keys(KEY_MAP).map(k=>sbSet(KEY_MAP[k],S[k]).catch(e=>console.warn('Sync fail:',k,e)));
     pushes.push(sbSet('tasks_v4',T).catch(e=>console.warn('Sync fail: tasks',e)));
     const sf=lsGet('_75hard_start',null);
