@@ -485,7 +485,7 @@ input[type=file]{display:none}
 
   <div class="card" style="border-left:3px solid var(--red);background:var(--red-l)">
     <div class="ct" style="color:#FF6B6B">Pre-tracker estimates</div>
-    <div class="mg"><div class="met"><div class="mv" style="font-size:15px;color:var(--slp)">1,500h</div><div class="ml">Swift Leads Pro</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--cb)">~50h</div><div class="ml">Capital Bros</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--h2h)">~3,500h</div><div class="ml">Houses 2 Homes</div></div></div>
+    <div class="mg"><div class="met"><div class="mv" style="font-size:15px;color:var(--slp)">1,750h</div><div class="ml">Swift Leads Pro</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--cb)">~50h</div><div class="ml">Capital Bros</div></div><div class="met"><div class="mv" style="font-size:15px;color:var(--h2h)">~3,500h</div><div class="ml">Houses 2 Homes</div></div></div>
   </div>
 
   <div id="biz-cards"></div>
@@ -804,23 +804,18 @@ async function sbSet(k,v){
 async function loadFromCloud(){
   var _url=lsGet('_sb_url','')||SB_URL;var _key=lsGet('_sb_key','')||SB_KEY;if(!_url||!_key)return;
   try{
-    let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value',{headers:getSBH()});
+    let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value,updated_at',{headers:{'apikey':_key,'Authorization':'Bearer '+_key}});
     let rows=await r.json();if(!rows||!rows.length)return;
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
+    const now=Date.now();
     rows.forEach(row=>{try{
       let v=JSON.parse(row.value);
-      let cloudTs=row.updated_at?new Date(row.updated_at).getTime():0;
-      let localTs=lsGet('_ts_'+row.key,0)||0;
-      let localRaw=localStorage.getItem(row.key);
-      let hasLocal=localRaw!==null&&localRaw!==undefined&&localRaw!=='null';
-      // Use cloud if: no local data, OR cloud is newer than our last local save
-      let shouldOverwrite=!hasLocal||(cloudTs>localTs);
-      if(shouldOverwrite){
-        localStorage.setItem(row.key,row.value);
-        lsSet('_ts_'+row.key, cloudTs||Date.now());
-        if(rm[row.key]) S[rm[row.key]]=v;
-        if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
-      }
+      // Skip if we saved this key locally in the last 10 seconds (just ticked, don't wipe)
+      let localSaveTs=lsGet('_ts_'+row.key,0)||0;
+      if(now-localSaveTs<10000) return; // saved <10s ago, skip
+      localStorage.setItem(row.key,row.value);
+      if(rm[row.key]) S[rm[row.key]]=v;
+      if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
       if(row.key==='75hard_start'&&v){ lsSet('_75hard_start',v); }
     }catch(e){}});
     renderAll();renderTasks();fetchPrayerTimes();
@@ -857,7 +852,7 @@ function ss(k){
   const v=S[k];
   const ts=Date.now();
   lsSet(KEY_MAP[k],v);
-  lsSet('_ts_'+KEY_MAP[k], ts); // timestamp this save
+  lsSet('_ts_'+KEY_MAP[k], ts); // guard against cloud overwrite for 10s
   if(k!=='logos'&&k!=='workouts'){
     const _url=lsGet('_sb_url','')||SB_URL;
     const _key=lsGet('_sb_key','')||SB_KEY;
@@ -3148,10 +3143,10 @@ fetchPrayerTimes();
 loadFromCloud();
 // Pull fresh data whenever app comes back into focus (switching from phone to app etc)
 document.addEventListener('visibilitychange', function(){
-  if(!document.hidden){
-    loadFromCloud().then(()=>{ renderAll(); renderTasks(); });
-  }
+  if(!document.hidden){ loadFromCloud(); }
 });
+// Poll every 15 seconds so devices stay in sync automatically
+setInterval(function(){ loadFromCloud(); }, 15000);
 </script>
 </body>
 </html>
