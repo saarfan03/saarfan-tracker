@@ -816,7 +816,10 @@ async function loadFromCloud(){
       localStorage.setItem(row.key,row.value);
       if(rm[row.key]) S[rm[row.key]]=v;
       if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
-      if(row.key==='75hard_start'&&v){ lsSet('_75hard_start',v); }
+      if(row.key==='75hard_start'&&v){
+        var sfLocalTs=lsGet('_ts_75hard',0)||0;
+        if(Date.now()-sfLocalTs>10000){ lsSet('_75hard_start',v); }
+      }
     }catch(e){}});
     renderAll();renderTasks();fetchPrayerTimes();
   }catch(e){}
@@ -856,12 +859,21 @@ function ss(k){
   if(k!=='logos'&&k!=='workouts'){
     const _url=lsGet('_sb_url','')||SB_URL;
     const _key=lsGet('_sb_key','')||SB_KEY;
-    if(_url&&_key){ sbSet(KEY_MAP[k],v).catch(e=>console.warn('Sync failed:',k,e)); }
+    if(_url&&_key){
+      sbSet(KEY_MAP[k],v)
+        .then(()=>flashSaved('☁'))
+        .catch(e=>{console.warn('Sync failed:',k,e);});
+    }
   }
   flashSaved();
 }
 let _sf;
-function flashSaved(){let el=document.getElementById('save-indicator');if(!el)return;el.classList.add('show');clearTimeout(_sf);_sf=setTimeout(()=>el.classList.remove('show'),1500);}
+function flashSaved(cloud){
+  let el=document.getElementById('save-indicator');if(!el)return;
+  el.textContent=cloud?'☁ Saved':'Saved ✓';
+  el.classList.add('show');clearTimeout(_sf);
+  _sf=setTimeout(()=>{el.classList.remove('show');el.textContent='Saved ✓';},2000);
+}
 
 // ── Nav ──
 function showPage(id,btn){
@@ -1719,7 +1731,10 @@ async function manualSync(){
     const pushes=Object.keys(KEY_MAP).map(k=>sbSet(KEY_MAP[k],S[k]).catch(e=>console.warn('Sync fail:',k,e)));
     pushes.push(sbSet('tasks_v4',T).catch(e=>console.warn('Sync fail: tasks',e)));
     const sf=lsGet('_75hard_start',null);
-    if(sf) pushes.push(sbSet('75hard_start',sf).catch(e=>console.warn('Sync fail: 75hard',e)));
+    if(sf){
+      lsSet('_ts_75hard', Date.now()); // stamp so pull doesn't immediately overwrite
+      pushes.push(sbSet('75hard_start',sf).catch(e=>console.warn('Sync fail: 75hard',e)));
+    }
     await Promise.all(pushes);
     if(btn){btn.textContent='✓ Synced!';btn.style.color='var(--green)';}
     // After pushing, refresh from cloud for any keys we don't have locally
@@ -2346,6 +2361,7 @@ function reset75Hard(){
   if(!confirm('Are you sure you want to restart 75 Hard?\n\nYour start date will reset to today. All your habit history stays intact.')) return;
   const d = td();
   lsSet('_75hard_start', d);
+  lsSet('_ts_75hard', Date.now()); // guard against cloud overwrite for 10s
   const url=lsGet('_sb_url','')||SB_URL;
   const key=lsGet('_sb_key','')||SB_KEY;
   if(url&&key) sbSet('75hard_start', d).catch(()=>{});
@@ -2356,6 +2372,7 @@ function edit75HardStart(){
   const newDate = prompt('Start date (YYYY-MM-DD):', current);
   if(!newDate||!newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
   lsSet('_75hard_start', newDate);
+  lsSet('_ts_75hard', Date.now()); // guard against cloud overwrite for 10s
   const url=lsGet('_sb_url','')||SB_URL;
   const key=lsGet('_sb_key','')||SB_KEY;
   if(url&&key) sbSet('75hard_start', newDate).catch(()=>{});
@@ -3142,11 +3159,17 @@ renderAll();
 fetchPrayerTimes();
 loadFromCloud();
 // Pull fresh data whenever app comes back into focus (switching from phone to app etc)
+// Pull from cloud when switching back to app (with 30s cooldown)
+var _lastCloudPull = 0;
 document.addEventListener('visibilitychange', function(){
-  if(!document.hidden){ loadFromCloud(); }
+  if(!document.hidden){
+    var now = Date.now();
+    if(now - _lastCloudPull > 30000){ // max once per 30s
+      _lastCloudPull = now;
+      loadFromCloud();
+    }
+  }
 });
-// Poll every 15 seconds so devices stay in sync automatically
-setInterval(function(){ loadFromCloud(); }, 15000);
 </script>
 </body>
 </html>
