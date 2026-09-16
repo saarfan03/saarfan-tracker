@@ -1679,32 +1679,30 @@ async function testDataPush(){
   var url=(lsGet('_sb_url','')||SB_URL);
   var key=(lsGet('_sb_key','')||SB_KEY);
   try{
-    var testVal={test:true,ts:Date.now()};
-    var res=await fetch(url+'/rest/v1/tracker_data',{
-      method:'POST',
-      headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:'_data_test',value:JSON.stringify(testVal)})
-    });
-    var body=await res.text();
+    var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+    // Test PATCH then POST (same as sbSet)
+    var pr=await fetch(url+'/rest/v1/tracker_data?key=eq._data_test',{method:'PATCH',headers:h,body:JSON.stringify({value:'"test"',updated_at:new Date().toISOString()})});
+    var updated=pr.ok?(await pr.json().catch(()=>[])):[];
+    var ok=pr.ok&&updated.length>0;
+    if(!ok){
+      var ir=await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:h,body:JSON.stringify({key:'_data_test',value:'"test"',updated_at:new Date().toISOString()})});
+      ok=ir.ok;
+    }
+    // Test habits
+    var pr2=await fetch(url+'/rest/v1/tracker_data?key=eq.h3',{method:'PATCH',headers:h,body:JSON.stringify({value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})});
+    var updated2=pr2.ok?(await pr2.json().catch(()=>[])):[];
+    var ok2=pr2.ok&&updated2.length>0;
+    if(!ok2&&pr2.ok){
+      var ir2=await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:h,body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})});
+      ok2=ir2.ok;
+    }
     if(el){
-      el.style.background=res.ok?'rgba(61,170,76,.1)':'rgba(224,40,46,.1)';
-      el.style.border='1px solid '+(res.ok?'rgba(61,170,76,.3)':'rgba(224,40,46,.3)');
-      el.innerHTML=res.ok?'<span style="color:var(--green)">✓ Data push works! Status: '+res.status+'</span>':
-        '<span style="color:var(--red)">✗ Push failed! Status: '+res.status+'<br>Response: '+body.slice(0,200)+'</span>';
+      el.style.background='rgba(61,170,76,.1)';el.style.border='1px solid rgba(61,170,76,.3)';
+      el.innerHTML='<span style="color:'+(ok?'var(--green)':'var(--red)')+'">'+(ok?'✓':'✗')+' Test push</span><br>'
+        +'<span style="color:'+(ok2?'var(--green)':'var(--red)')+'">'+(ok2?'✓':'✗')+' Habits push</span><br>'
+        +'<span style="color:var(--green)">☁ Last pushed: '+lsGet('_last_cloud_push','none')+'</span>';
     }
-    // Now test with actual habits data
-    if(res.ok){
-      var res2=await fetch(url+'/rest/v1/tracker_data',{
-        method:'POST',
-        headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-        body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits)})
-      });
-      var body2=await res2.text();
-      if(el)el.innerHTML+='<br><span style="color:'+(res2.ok?'var(--green)':'var(--red)')+'">Habits push: '+(res2.ok?'✓ Status '+res2.status:'✗ Status '+res2.status+' '+body2.slice(0,100))+'</span>';
-    }
-  }catch(e){
-    if(el){el.innerHTML='<span style="color:var(--red)">✗ Network error: '+e.message+'</span>';}
-  }
+  }catch(e){if(el)el.innerHTML='<span style="color:var(--red)">✗ '+e.message+'</span>';}
 }
 
 async function testSupabase(){
