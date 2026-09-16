@@ -734,6 +734,7 @@ input[type=file]{display:none}
     <button class="sb" onclick="saveSBKeys()" style="margin-bottom:8px">Save & connect</button>
     <button class="sb ghost" id="manual-sync-btn" onclick="manualSync()" style="margin-bottom:8px">↑↓ Sync now</button>
     <button class="sb ghost" onclick="testSupabase()" style="margin-bottom:8px;border-color:rgba(43,127,212,.4);color:var(--blue)">🔍 Test connection</button>
+    <button class="sb ghost" onclick="testDataPush()" style="margin-bottom:8px;border-color:rgba(201,168,76,.4);color:var(--gold)">🔍 Test data push</button>
     <div id="sync-last-push" style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center"></div>
     <div id="sync-test-result" style="display:none;font-size:12px;border-radius:9px;padding:10px 12px;margin-top:4px;line-height:1.7"></div>
   </div>
@@ -806,10 +807,14 @@ async function sbSet(k,v){
       var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
       lsSet('_last_cloud_push',t);
       var el=document.getElementById('sync-last-push');
-      if(el)el.textContent='☁ Last pushed to cloud: '+t;
+      if(el)el.textContent='☁ Last pushed: '+t;
       return true;
     } else {
-      console.warn('Supabase error:',k,res.status);
+      var errText=await res.text().catch(()=>'');
+      console.warn('Supabase error:',k,res.status,errText);
+      var el=document.getElementById('sync-last-push');
+      if(el)el.textContent='✗ Push failed: HTTP '+res.status+' — '+errText.slice(0,80);
+      lsSet('_last_push_error','HTTP '+res.status+': '+errText.slice(0,100));
       return false;
     }
   }catch(e){console.warn('Supabase failed:',k,e);return false;}
@@ -1652,6 +1657,41 @@ function activateMobSection(){
 
 
 
+
+
+async function testDataPush(){
+  var el=document.getElementById('sync-test-result');
+  if(el){el.style.display='block';el.innerHTML='Testing data push...';}
+  var url=(lsGet('_sb_url','')||SB_URL);
+  var key=(lsGet('_sb_key','')||SB_KEY);
+  try{
+    var testVal={test:true,ts:Date.now()};
+    var res=await fetch(url+'/rest/v1/tracker_data',{
+      method:'POST',
+      headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({key:'_data_test',value:JSON.stringify(testVal),updated_at:new Date().toISOString()})
+    });
+    var body=await res.text();
+    if(el){
+      el.style.background=res.ok?'rgba(61,170,76,.1)':'rgba(224,40,46,.1)';
+      el.style.border='1px solid '+(res.ok?'rgba(61,170,76,.3)':'rgba(224,40,46,.3)');
+      el.innerHTML=res.ok?'<span style="color:var(--green)">✓ Data push works! Status: '+res.status+'</span>':
+        '<span style="color:var(--red)">✗ Push failed! Status: '+res.status+'<br>Response: '+body.slice(0,200)+'</span>';
+    }
+    // Now test with actual habits data
+    if(res.ok){
+      var res2=await fetch(url+'/rest/v1/tracker_data',{
+        method:'POST',
+        headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})
+      });
+      var body2=await res2.text();
+      if(el)el.innerHTML+='<br><span style="color:'+(res2.ok?'var(--green)':'var(--red)')+'">Habits push: '+(res2.ok?'✓ Status '+res2.status:'✗ Status '+res2.status+' '+body2.slice(0,100))+'</span>';
+    }
+  }catch(e){
+    if(el){el.innerHTML='<span style="color:var(--red)">✗ Network error: '+e.message+'</span>';}
+  }
+}
 
 async function testSupabase(){
   const el = document.getElementById('sync-test-result');
@@ -3043,8 +3083,14 @@ function saveSBKeys(){
 }
 function renderSettings(){
   var lp=lsGet('_last_cloud_push',null);
+  var le=lsGet('_last_push_error',null);
   var el=document.getElementById('sync-last-push');
-  if(el)el.textContent=lp?'☁ Last pushed to cloud: '+lp:'Cloud push not yet confirmed this session';
+  if(el){
+    if(lp) el.textContent='☁ Last pushed: '+lp;
+    else if(le) el.textContent='✗ Last error: '+le;
+    else el.textContent='No push yet — tick a habit to test';
+    el.style.color=lp?'var(--green)':le?'var(--red)':'var(--text3)';
+  }
   let cg=document.getElementById('cal-goal-input'),pg=document.getElementById('prot-goal-input');if(cg)cg.value=S.targets.cal||1700;if(pg)pg.value=S.targets.prot||150;
   let sbu=document.getElementById('sb-url-input'),sbk=document.getElementById('sb-key-input');
   if(sbu)sbu.value=lsGet('_sb_url','');if(sbk)sbk.value=lsGet('_sb_key','');
