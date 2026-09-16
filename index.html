@@ -802,7 +802,7 @@ async function sbSet(k,v){
   try{
     const res=await fetch(url+'/rest/v1/tracker_data',{method:'POST',
       headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:k,value:JSON.stringify(v),updated_at:new Date().toISOString()})});
+      body:JSON.stringify({key:k,value:JSON.stringify(v)})});
     if(res.ok){
       var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
       lsSet('_last_cloud_push',t);
@@ -1212,8 +1212,7 @@ function migrateOldTasks(raw){
 
 function saveTasks(){
   lsSet('tasks_v4', T);
-  const url=lsGet('_sb_url',''); const key=lsGet('_sb_key','');
-  if(url&&key){ sbSet('tasks_v4', T).catch(()=>{}); }
+  // Tasks pushed only on manual Sync Now (too large for auto-push)
   flashSaved();
 }
 function newTaskId(){ return 't_'+Math.random().toString(36).slice(2,11)+Date.now().toString(36).slice(-3); }
@@ -1669,7 +1668,7 @@ async function testDataPush(){
     var res=await fetch(url+'/rest/v1/tracker_data',{
       method:'POST',
       headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:'_data_test',value:JSON.stringify(testVal),updated_at:new Date().toISOString()})
+      body:JSON.stringify({key:'_data_test',value:JSON.stringify(testVal)})
     });
     var body=await res.text();
     if(el){
@@ -1683,7 +1682,7 @@ async function testDataPush(){
       var res2=await fetch(url+'/rest/v1/tracker_data',{
         method:'POST',
         headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-        body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})
+        body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits)})
       });
       var body2=await res2.text();
       if(el)el.innerHTML+='<br><span style="color:'+(res2.ok?'var(--green)':'var(--red)')+'">Habits push: '+(res2.ok?'✓ Status '+res2.status:'✗ Status '+res2.status+' '+body2.slice(0,100))+'</span>';
