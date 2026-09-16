@@ -798,25 +798,40 @@ const SB_URL=lsGet('_sb_url','https://vkndekaptscaxkbhrsrd.supabase.co');
 const SB_KEY=lsGet('_sb_key','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbmRla2FwdHNjYXhrYmhyc3JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzIxMDUsImV4cCI6MjA5MzgwODEwNX0.Ws-N53pateZqmObxOXl5UpE2RDkzf93th9rGfkBioW4');
 const getSBH=()=>({'apikey':lsGet('_sb_key',''),'Authorization':'Bearer '+lsGet('_sb_key',''),'Content-Type':'application/json'});
 async function sbSet(k,v){
-  var url=(lsGet('_sb_url','')||SB_URL);var key=(lsGet('_sb_key','')||SB_KEY);if(!url||!key)return;
+  var url=(lsGet('_sb_url','')||SB_URL);var key=(lsGet('_sb_key','')||SB_KEY);if(!url||!key)return false;
+  var headers={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+  var valStr=JSON.stringify(v);
   try{
-    const res=await fetch(url+'/rest/v1/tracker_data',{method:'POST',
-      headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:k,value:JSON.stringify(v)})});
-    if(res.ok){
+    // PATCH first (update existing row)
+    var pr=await fetch(url+'/rest/v1/tracker_data?key=eq.'+encodeURIComponent(k),{
+      method:'PATCH',headers:Object.assign({},headers,{'Prefer':'return=representation'}),
+      body:JSON.stringify({value:valStr,updated_at:new Date().toISOString()})
+    });
+    var updated=(pr.ok&&(await pr.json().catch(()=>[])));
+    if(pr.ok&&updated&&updated.length>0){
       var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
       lsSet('_last_cloud_push',t);
       var el=document.getElementById('sync-last-push');
-      if(el)el.textContent='☁ Last pushed: '+t;
+      if(el){el.textContent='☁ Last pushed: '+t;el.style.color='var(--green)';}
       return true;
-    } else {
-      var errText=await res.text().catch(()=>'');
-      console.warn('Supabase error:',k,res.status,errText);
-      var el=document.getElementById('sync-last-push');
-      if(el)el.textContent='✗ Push failed: HTTP '+res.status+' — '+errText.slice(0,80);
-      lsSet('_last_push_error','HTTP '+res.status+': '+errText.slice(0,100));
-      return false;
     }
+    // Row doesn't exist yet — INSERT
+    var ir=await fetch(url+'/rest/v1/tracker_data',{
+      method:'POST',headers:headers,
+      body:JSON.stringify({key:k,value:valStr,updated_at:new Date().toISOString()})
+    });
+    if(ir.ok){
+      var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      lsSet('_last_cloud_push',t);
+      var el=document.getElementById('sync-last-push');
+      if(el){el.textContent='☁ Last pushed: '+t;el.style.color='var(--green)';}
+      return true;
+    }
+    var errText=await ir.text().catch(()=>'');
+    lsSet('_last_push_error','HTTP '+ir.status+': '+errText.slice(0,80));
+    var el=document.getElementById('sync-last-push');
+    if(el){el.textContent='✗ Push failed: '+ir.status;el.style.color='var(--red)';}
+    return false;
   }catch(e){console.warn('Supabase failed:',k,e);return false;}
 }
 async function loadFromCloud(){
