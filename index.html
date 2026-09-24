@@ -799,62 +799,97 @@ const SB_KEY=lsGet('_sb_key','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 const getSBH=()=>({'apikey':lsGet('_sb_key',''),'Authorization':'Bearer '+lsGet('_sb_key',''),'Content-Type':'application/json'});
 async function sbSet(k,v){
   var url=(lsGet('_sb_url','')||SB_URL);var key=(lsGet('_sb_key','')||SB_KEY);if(!url||!key)return false;
-  var headers={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+  var headers={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'return=representation'};
   var valStr=JSON.stringify(v);
+  var stamp=new Date().toISOString();
+  function ok(rows){
+    // Store the SERVER timestamp as our local ts — kills clock skew between devices
+    var srvTs=(rows&&rows[0]&&rows[0].updated_at)?new Date(rows[0].updated_at).getTime():Date.now();
+    lsSet('_ts_'+k, srvTs);
+    lsClear('_pending_'+k);
+    lsClear('_dirty_'+k);   // confirmed in cloud
+    var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    lsSet('_last_cloud_push',t); lsClear('_last_push_error');
+    var el=document.getElementById('sync-last-push');
+    if(el){el.textContent='\u2601 Last pushed: '+t;el.style.color='var(--green)';}
+    return true;
+  }
   try{
-    // PATCH first (update existing row)
+    // 1) Try UPDATE first
     var pr=await fetch(url+'/rest/v1/tracker_data?key=eq.'+encodeURIComponent(k),{
-      method:'PATCH',headers:Object.assign({},headers,{'Prefer':'return=representation'}),
-      body:JSON.stringify({value:valStr,updated_at:new Date().toISOString()})
+      method:'PATCH',headers:headers,
+      body:JSON.stringify({value:valStr,updated_at:stamp})
     });
-    var updated=(pr.ok&&(await pr.json().catch(()=>[])));
-    if(pr.ok&&updated&&updated.length>0){
-      var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-      lsSet('_last_cloud_push',t);
-      var el=document.getElementById('sync-last-push');
-      if(el){el.textContent='☁ Last pushed: '+t;el.style.color='var(--green)';}
-      return true;
+    if(pr.ok){
+      var rows=await pr.json().catch(function(){return [];});
+      if(rows&&rows.length>0) return ok(rows);
     }
-    // Row doesn't exist yet — INSERT
+    // 2) No row existed — INSERT
     var ir=await fetch(url+'/rest/v1/tracker_data',{
       method:'POST',headers:headers,
-      body:JSON.stringify({key:k,value:valStr,updated_at:new Date().toISOString()})
+      body:JSON.stringify({key:k,value:valStr,updated_at:stamp})
     });
     if(ir.ok){
-      var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-      lsSet('_last_cloud_push',t);
-      var el=document.getElementById('sync-last-push');
-      if(el){el.textContent='☁ Last pushed: '+t;el.style.color='var(--green)';}
-      return true;
+      var rows2=await ir.json().catch(function(){return [];});
+      return ok(rows2);
     }
-    var errText=await ir.text().catch(()=>'');
+    // 3) Race: another write created the row between our PATCH and POST — retry PATCH once
+    if(ir.status===409){
+      var pr2=await fetch(url+'/rest/v1/tracker_data?key=eq.'+encodeURIComponent(k),{
+        method:'PATCH',headers:headers,
+        body:JSON.stringify({value:valStr,updated_at:stamp})
+      });
+      if(pr2.ok){
+        var rows3=await pr2.json().catch(function(){return [];});
+        if(rows3&&rows3.length>0) return ok(rows3);
+      }
+    }
+    var errText=await ir.text().catch(function(){return '';});
     lsSet('_last_push_error','HTTP '+ir.status+': '+errText.slice(0,80));
-    var el=document.getElementById('sync-last-push');
-    if(el){el.textContent='✗ Push failed: '+ir.status;el.style.color='var(--red)';}
+    lsSet('_pending_'+k,1);
+    var el2=document.getElementById('sync-last-push');
+    if(el2){el2.textContent='\u2717 Push failed: '+ir.status;el2.style.color='var(--red)';}
     return false;
-  }catch(e){console.warn('Supabase failed:',k,e);return false;}
+  }catch(e){ lsSet('_pending_'+k,1); return false; }
 }
 async function loadFromCloud(){
   var _url=lsGet('_sb_url','')||SB_URL;var _key=lsGet('_sb_key','')||SB_KEY;if(!_url||!_key)return;
   try{
     let r=await fetch(_url+'/rest/v1/tracker_data?select=key,value,updated_at',{headers:{'apikey':_key,'Authorization':'Bearer '+_key}});
+    if(!r.ok)return;
     let rows=await r.json();if(!rows||!rows.length)return;
     const rm={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',logos3:'logos',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
-    const now=Date.now();
+    let changed=false;
+    let pushBack=[];
     rows.forEach(row=>{try{
       let v=JSON.parse(row.value);
-      // Skip if we saved this key locally in the last 10 seconds (just ticked, don't wipe)
-      let localSaveTs=lsGet('_ts_'+row.key,0)||0;
-      if(now-localSaveTs<10000) return; // saved <10s ago, skip
+      let cloudTs=row.updated_at?new Date(row.updated_at).getTime():0;
+      let localTs=lsGet('_ts_'+row.key,0)||0;
+      let haveLocal=localStorage.getItem(row.key)!==null;
+      let dirty=lsGet('_dirty_'+row.key,0);
+      // Unsynced local change — NEVER overwrite it, push ours up instead (clock-independent)
+      if(haveLocal && dirty){ pushBack.push(row.key); return; }
+      // Otherwise both timestamps are server-derived: last write wins
+      if(haveLocal && localTs > cloudTs){ pushBack.push(row.key); return; }
+      // Cloud is newer (or we have nothing local) — take it
       localStorage.setItem(row.key,row.value);
-      if(rm[row.key]) S[rm[row.key]]=v;
-      if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); }
+      lsSet('_ts_'+row.key, cloudTs||Date.now());
+      if(rm[row.key]){ S[rm[row.key]]=v; changed=true; }
+      if(row.key==='tasks_v4'&&v&&v.tasks){ T=v; lsSet('tasks_v4',T); changed=true; }
       if(row.key==='75hard_start'&&v){
-        var sfLocalTs=lsGet('_ts_75hard',0)||0;
-        if(Date.now()-sfLocalTs>10000){ lsSet('_75hard_start',v); }
+        var sfDirty=lsGet('_dirty_75hard_start',0);
+        var sfLocalTs=lsGet('_ts_75hard_start',0)||0;
+        if(!sfDirty && sfLocalTs<=cloudTs){ lsSet('_75hard_start',v); lsSet('_ts_75hard_start',cloudTs); changed=true; }
       }
     }catch(e){}});
-    renderAll();renderTasks();fetchPrayerTimes();
+    // Re-push anything where local was newer than cloud (previous push must have failed)
+    const inv={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
+    pushBack.forEach(function(rk){
+      if(inv[rk]) sbSet(rk, S[inv[rk]]).catch(function(){});
+      else if(rk==='tasks_v4') sbSet('tasks_v4', T).catch(function(){});
+      else if(rk==='75hard_start'){ var sd=lsGet('_75hard_start',null); if(sd) sbSet('75hard_start', sd).catch(function(){}); }
+    });
+    if(changed){ renderAll(); renderTasks(); }
   }catch(e){}
 }
 
@@ -886,14 +921,15 @@ let S={
 const KEY_MAP={habits:'h3',prayers:'pr3',biz:'bz3',workouts:'wo3',goals:'gl3',refs:'rf3',targets:'tg3',weekly:'wk3',logos:'logos3',mood:'mood3',reviews:'rev3',food:'food3',favs:'favs3'};
 function ss(k){
   const v=S[k];
-  const ts=Date.now();
-  lsSet(KEY_MAP[k],v);
-  lsSet('_ts_'+KEY_MAP[k], ts); // guard against cloud overwrite for 10s
-  if(k!=='logos'&&k!=='workouts'){
+  const mk=KEY_MAP[k];
+  lsSet(mk,v);
+  lsSet('_dirty_'+mk,1);            // unsynced local change — cloud must NOT overwrite
+  lsSet('_ts_'+mk, Date.now());     // provisional only
+  if(k!=='logos'){
     const _url=lsGet('_sb_url','')||SB_URL;
     const _key=lsGet('_sb_key','')||SB_KEY;
     if(_url&&_key){
-      sbSet(KEY_MAP[k],v).then(function(ok){if(ok)flashSaved('☁');});
+      sbSet(mk,v).then(function(ok){ if(ok) flashSaved('\u2601'); });
     }
   }
   flashSaved();
@@ -1227,7 +1263,9 @@ function migrateOldTasks(raw){
 
 function saveTasks(){
   lsSet('tasks_v4', T);
-  // Tasks pushed only on manual Sync Now (too large for auto-push)
+  lsSet('_ts_tasks_v4', Date.now()); lsSet('_dirty_tasks_v4',1);
+  const url=lsGet('_sb_url','')||SB_URL; const key=lsGet('_sb_key','')||SB_KEY;
+  if(url&&key){ sbSet('tasks_v4', T).then(function(ok){ if(ok)flashSaved('☁'); }); }
   flashSaved();
 }
 function newTaskId(){ return 't_'+Math.random().toString(36).slice(2,11)+Date.now().toString(36).slice(-3); }
@@ -1675,34 +1713,16 @@ function activateMobSection(){
 
 async function testDataPush(){
   var el=document.getElementById('sync-test-result');
-  if(el){el.style.display='block';el.innerHTML='Testing data push...';}
-  var url=(lsGet('_sb_url','')||SB_URL);
-  var key=(lsGet('_sb_key','')||SB_KEY);
-  try{
-    var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
-    // Test PATCH then POST (same as sbSet)
-    var pr=await fetch(url+'/rest/v1/tracker_data?key=eq._data_test',{method:'PATCH',headers:h,body:JSON.stringify({value:'"test"',updated_at:new Date().toISOString()})});
-    var updated=pr.ok?(await pr.json().catch(()=>[])):[];
-    var ok=pr.ok&&updated.length>0;
-    if(!ok){
-      var ir=await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:h,body:JSON.stringify({key:'_data_test',value:'"test"',updated_at:new Date().toISOString()})});
-      ok=ir.ok;
-    }
-    // Test habits
-    var pr2=await fetch(url+'/rest/v1/tracker_data?key=eq.h3',{method:'PATCH',headers:h,body:JSON.stringify({value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})});
-    var updated2=pr2.ok?(await pr2.json().catch(()=>[])):[];
-    var ok2=pr2.ok&&updated2.length>0;
-    if(!ok2&&pr2.ok){
-      var ir2=await fetch(url+'/rest/v1/tracker_data',{method:'POST',headers:h,body:JSON.stringify({key:'h3',value:JSON.stringify(S.habits),updated_at:new Date().toISOString()})});
-      ok2=ir2.ok;
-    }
-    if(el){
-      el.style.background='rgba(61,170,76,.1)';el.style.border='1px solid rgba(61,170,76,.3)';
-      el.innerHTML='<span style="color:'+(ok?'var(--green)':'var(--red)')+'">'+(ok?'✓':'✗')+' Test push</span><br>'
-        +'<span style="color:'+(ok2?'var(--green)':'var(--red)')+'">'+(ok2?'✓':'✗')+' Habits push</span><br>'
-        +'<span style="color:var(--green)">☁ Last pushed: '+lsGet('_last_cloud_push','none')+'</span>';
-    }
-  }catch(e){if(el)el.innerHTML='<span style="color:var(--red)">✗ '+e.message+'</span>';}
+  if(el){el.style.display='block';el.style.background='var(--bg3)';el.style.border='1px solid var(--border)';el.innerHTML='Testing...';}
+  var ok1=await sbSet('_data_test',{test:true,ts:Date.now()});
+  var ok2=await sbSet('h3',S.habits);
+  if(el){
+    el.style.background=ok2?'rgba(61,170,76,.1)':'rgba(224,40,46,.1)';
+    el.style.border='1px solid '+(ok2?'rgba(61,170,76,.3)':'rgba(224,40,46,.3)');
+    el.innerHTML='<span style="color:'+(ok1?'var(--green)':'var(--red)')+'">'+(ok1?'✓':'✗')+' Test key push</span><br>'
+      +'<span style="color:'+(ok2?'var(--green)':'var(--red)')+'">'+(ok2?'✓':'✗')+' Habits push</span><br>'
+      +(ok2?'<span style="color:var(--green)">Sync is working ✓</span>':'<span style="color:var(--red)">Fix needed</span>');
+  }
 }
 
 async function testSupabase(){
@@ -1795,7 +1815,7 @@ async function manualSync(){
     pushes.push(sbSet('tasks_v4',T).catch(e=>console.warn('Sync fail: tasks',e)));
     const sf=lsGet('_75hard_start',null);
     if(sf){
-      lsSet('_ts_75hard', Date.now()); // stamp so pull doesn't immediately overwrite
+      lsSet('_ts_75hard_start', Date.now()); // stamp so pull doesn't immediately overwrite
       pushes.push(sbSet('75hard_start',sf).catch(e=>console.warn('Sync fail: 75hard',e)));
     }
     await Promise.all(pushes);
@@ -1828,29 +1848,13 @@ document.getElementById('day-modal').addEventListener('click',function(e){if(e.t
 
 // ── Business ──
 
-function fillBizInputs(){
-  const d = _bizDay||td();
-  BIZ_CFG.forEach(b=>{
-    const entry = S.biz[b.id]||{};
-    const tod = entry[d]||{hours:'',notes:''};
-    const hEl = document.getElementById('biz-h-'+b.id);
-    const nEl = document.getElementById('biz-n-'+b.id);
-    if(hEl) hEl.value = tod.hours||'';
-    if(nEl) nEl.value = tod.notes||'';
-  });
-}
+
 function setBizDay(d){
   _bizDay = d;
   renderBusiness(); // reload inputs with this day's logged hours
 }
 
-function initBizDayPicker(){
-  const el = document.getElementById('biz-day-picker'); if(!el) return;
-  el.value = _bizDay||td(); // always set to current edit day
-  el.max = td();
-  const minD = new Date(); minD.setDate(minD.getDate()-90);
-  el.min = localDate(minD);
-}
+
 
 
 
@@ -2087,7 +2091,7 @@ function toggleExDetail(name){
 // ── Confetti ──
 function spawnConfetti(big){
   canvas=document.getElementById('confetti-canvas');if(!canvas)return;
-  canvas.style.display='block';ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  canvas.style.display='block';ctx=canvas.getContext&&canvas.getContext('2d');if(!ctx){canvas.style.display='none';return;}canvas.width=window.innerWidth;canvas.height=window.innerHeight;
   count=big?200:60;pieces=[];let colors=['#E0282E','#7B6FD4','#3DAA4C','#D4851A','#2B7FD4','#FFD700','#FF6B6B'];
   for(i=0;i<count;i++)pieces.push({x:Math.random()*canvas.width,y:-10,r:Math.random()*6+3,c:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-0.5)*4,vy:Math.random()*4+2,spin:Math.random()*0.2-0.1,op:1});
   frame=0,max=big?180:90;
@@ -2258,7 +2262,6 @@ function renderBusiness(){
     </div>`;
   }).join('');
   totEl=document.getElementById('biz-totals');if(totEl)totEl.innerHTML=BIZ_CFG.map(b=>{entry=S.biz[b.id]||{};total=Object.values(entry).reduce((s,v)=>s+(parseFloat(v.hours)||0),0);next=MS.find(m=>total<m);let logo=S.logos[b.id];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1.5px solid var(--border)">${logo?`<img src="${logo}" style="width:26px;height:26px;object-fit:contain;border-radius:5px;border:1px solid var(--border)">`:`<div style="width:26px;height:26px;border-radius:5px;background:var(--bg4)"></div>`}<span style="font-size:14px;font-weight:500;color:${b.color};flex:1">${b.name}</span><span style="font-size:13px;color:var(--text3)">${total.toFixed(1)}h${next?' → next: '+next+'h':' ✓ all'}</span></div>`;}).join('');
-  fillBizInputs();
 }
 function saveBizHours(id){
   var h=parseFloat(document.getElementById('biz-h-'+id)?.value)||0;
@@ -2424,7 +2427,7 @@ function reset75Hard(){
   if(!confirm('Are you sure you want to restart 75 Hard?\n\nYour start date will reset to today. All your habit history stays intact.')) return;
   const d = td();
   lsSet('_75hard_start', d);
-  lsSet('_ts_75hard', Date.now()); // guard against cloud overwrite for 10s
+  lsSet('_ts_75hard_start', Date.now()); lsSet('_dirty_75hard_start',1);
   const url=lsGet('_sb_url','')||SB_URL;
   const key=lsGet('_sb_key','')||SB_KEY;
   if(url&&key) sbSet('75hard_start', d).catch(()=>{});
@@ -2435,7 +2438,7 @@ function edit75HardStart(){
   const newDate = prompt('Start date (YYYY-MM-DD):', current);
   if(!newDate||!newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
   lsSet('_75hard_start', newDate);
-  lsSet('_ts_75hard', Date.now()); // guard against cloud overwrite for 10s
+  lsSet('_ts_75hard_start', Date.now()); lsSet('_dirty_75hard_start',1);
   const url=lsGet('_sb_url','')||SB_URL;
   const key=lsGet('_sb_key','')||SB_KEY;
   if(url&&key) sbSet('75hard_start', newDate).catch(()=>{});
@@ -2775,7 +2778,7 @@ function renderBizCharts(){
       +BIZ_CFG.map(b=>{
         const entry=S.biz[b.id]||{};
         const total=Object.entries(entry).filter(([d])=>d>=monthStart).reduce((s,[,v])=>s+(parseFloat(v.hours)||0),0);
-        const days=Object.entries(entry).filter(([d])=>d>=monthStart&&d<=today&&parseFloat(v.hours)>0).length;
+        const days=Object.entries(entry).filter(([d,v])=>d>=monthStart&&d<=today&&parseFloat(v.hours)>0).length;
         const col=bizColors[b.id]||b.color;
         return `<div style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
@@ -3124,29 +3127,6 @@ function importData(input){file=input.files[0];if(!file)return;let r=new FileRea
     st=document.getElementById('import-status');if(st){st.style.display='block';setTimeout(()=>st.style.display='none',3000);}
     renderAll();renderTasks();
   }catch(err){alert('Invalid backup file.');}};r.readAsText(file);}
-function copyAppCode(){
-  // Get the full page HTML
-  let code = document.documentElement.outerHTML;
-  navigator.clipboard.writeText(code).then(()=>{
-    btn=document.getElementById('copy-code-btn');
-    let confirm=document.getElementById('copy-code-confirm');
-    if(btn){btn.textContent='✓ Copied!';btn.style.borderColor='rgba(61,170,76,0.4)';btn.style.color='#3DAA4C';}
-    if(confirm)confirm.style.display='block';
-    setTimeout(()=>{
-      if(btn){btn.textContent='📋 Copy my app code';btn.style.borderColor='';btn.style.color='';}
-    },3000);
-  }).catch(()=>{
-    // Fallback for browsers that block clipboard
-    let ta=document.createElement('textarea');
-    ta.value=document.documentElement.outerHTML;
-    ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    confirm=document.getElementById('copy-code-confirm');
-    if(confirm)confirm.style.display='block';
-  });
-}
 function rerunWizard(){
   if(!confirm('This will re-run the setup wizard. Your data will not be deleted.'))return;
   lsSet('_setup_done',false);
@@ -3233,15 +3213,26 @@ loadFromCloud();
 // Pull fresh data whenever app comes back into focus (switching from phone to app etc)
 // Pull from cloud when switching back to app (with 30s cooldown)
 var _lastCloudPull = 0;
+function retryPendingPushes(){
+  var inv={h3:'habits',pr3:'prayers',bz3:'biz',wo3:'workouts',gl3:'goals',rf3:'refs',tg3:'targets',wk3:'weekly',mood3:'mood',rev3:'reviews',food3:'food',favs3:'favs'};
+  Object.keys(inv).forEach(function(rk){
+    if(lsGet('_pending_'+rk,0)||lsGet('_dirty_'+rk,0)){ sbSet(rk, S[inv[rk]]).catch(function(){}); }
+  });
+  if(lsGet('_pending_tasks_v4',0)||lsGet('_dirty_tasks_v4',0)) sbSet('tasks_v4', T).catch(function(){});
+  if(lsGet('_dirty_75hard_start',0)){ var sd=lsGet('_75hard_start',null); if(sd) sbSet('75hard_start', sd).catch(function(){}); }
+}
 document.addEventListener('visibilitychange', function(){
   if(!document.hidden){
+    retryPendingPushes();
     var now = Date.now();
-    if(now - _lastCloudPull > 30000){ // max once per 30s
+    if(now - _lastCloudPull > 10000){
       _lastCloudPull = now;
       loadFromCloud();
     }
   }
 });
+// Retry failed pushes every 30s while the app is open
+setInterval(function(){ if(!document.hidden) retryPendingPushes(); }, 30000);
 </script>
 </body>
 </html>
