@@ -2292,8 +2292,8 @@ const GYM_DAYS = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:
 const GYM_PLAN_DEFAULT = {
   mon:'Chest, Triceps & Shoulders + Boxing 🥊',
   tue:'Back, Biceps & Abs',
-  wed:'Boxing 🥊 / Cardio',
-  thu:'Back & Biceps + 5k Run 🏃',
+  wed:'5k Run 🏃 / Cardio',
+  thu:'Back & Biceps + Boxing 🥊',
   fri:'Chest, Triceps & Shoulders',
   sat:'Rest',
   sun:'Rest'
@@ -3002,8 +3002,8 @@ function renderTrackerWeekly(){
   const today = td();
 
   const items = [
-    {label:'🥊 Boxing', type:'boxing', target:2, fn: d => !!(S.weekly.boxing||{})[d]},
-    {label:'🏃 5k Run', type:'run',    target:1, fn: d => !!(S.weekly.run||{})[d]},
+    {label:'🥊 Boxing (Mon/Thu)', type:'boxing', target:2, fn: d => !!(S.weekly.boxing||{})[d]},
+    {label:'🏃 5k Run (Wed)', type:'run',    target:1, fn: d => !!(S.weekly.run||{})[d]},
     {label:'Gym sessions', type:'gym', target:4, fn: d => !!(migrateWorkouts(S.workouts[d]||[]).length)},
   ];
 
